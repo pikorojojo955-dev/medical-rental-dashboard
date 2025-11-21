@@ -54,7 +54,7 @@
       margin-top: 4px;
     }
 
-    /* ส่วนหลักด้านล่าง */
+    /* โซนกลาง */
     .charts {
       display: grid;
       grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.6fr);
@@ -93,6 +93,30 @@
       display: inline-block;
       min-width: 120px;
       font-weight: 500;
+    }
+
+    /* ตารางแจ้งเตือนใกล้ครบกำหนด */
+    .due-table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 14px;
+    }
+    .due-table th,
+    .due-table td {
+      border: 1px solid #ddd;
+      padding: 6px 8px;
+      text-align: left;
+      white-space: nowrap;
+    }
+    .due-table th {
+      background: #e3f2fd;
+    }
+    .due-table tr:nth-child(even) td {
+      background: #fafafa;
+    }
+    .due-badge {
+      font-weight: 600;
+      color: #d32f2f;
     }
 
     @media (max-width: 800px) {
@@ -153,10 +177,18 @@
       </div>
     </div>
 
-    <!-- กราฟเต็มความกว้าง -->
+    <!-- Top 5 รุ่น -->
     <div class="panel chart-full">
       <h2>Top 5 รุ่นที่มีจำนวนเครื่องมากที่สุด</h2>
       <canvas id="modelChart" height="140"></canvas>
+    </div>
+
+    <!-- แจ้งเตือนครบกำหนดในเดือนนี้ -->
+    <div class="panel chart-full" style="margin-top:16px;">
+      <h2>เครื่องผลิตออกซิเจนที่ครบกำหนดในเดือนนี้ (เรียงจากใกล้ครบก่อน)</h2>
+      <div id="dueSoonBody" class="card-note">
+        ขณะนี้ยังไม่มีเครื่องที่ครบกำหนดภายในเดือนนี้
+      </div>
     </div>
 
   </div>
@@ -176,11 +208,14 @@
       const dataRows = rows.slice(1);
 
       // index คอลัมน์ที่ใช้
-      const idxItem   = header.indexOf("รายการเช่า");
-      const idxModel  = header.indexOf("รุ่น");
-      const idxSize   = header.indexOf("ขนาด");
-      const idxStatus = header.indexOf("แสดงสถานะ");
-      const idxDays   = header.indexOf("จำนวนวันที่เช่า");
+      const idxItem    = header.indexOf("รายการเช่า");
+      const idxModel   = header.indexOf("รุ่น");
+      const idxSize    = header.indexOf("ขนาด");
+      const idxStatus  = header.indexOf("แสดงสถานะ");
+      const idxDays    = header.indexOf("จำนวนวันที่เช่า");
+      const idxPlace   = header.indexOf("ที่อยู่");
+      const idxDueDate = header.indexOf("วันครบกำหนด");
+      const idxStart   = header.indexOf("วันที่เริ่มทำสัญญา");
 
       console.log("Header:", header);
 
@@ -198,16 +233,26 @@
       let count10 = 0;
       let countFree = 0; // ขนาด 0 = เครื่องว่าง
 
+      // รายการที่ครบกำหนดในเดือนนี้
+      const dueSoonItems = [];
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      const currentMonth = today.getMonth();
+      const currentYear  = today.getFullYear();
+
       for (const row of dataRows) {
         if (row.length === 0 || row.join("").trim() === "") continue;
 
         totalDevices++;
 
-        const item   = idxItem   >= 0 ? (row[idxItem]   || "").trim() : "";
-        const model  = idxModel  >= 0 ? (row[idxModel]  || "").trim() : "";
-        const size   = idxSize   >= 0 ? (row[idxSize]   || "").trim() : "";
-        const status = idxStatus >= 0 ? (row[idxStatus] || "").trim() : "";
-        const daysStr = idxDays  >= 0 ? (row[idxDays]   || "").trim() : "";
+        const item     = idxItem    >= 0 ? (row[idxItem]    || "").trim() : "";
+        const model    = idxModel   >= 0 ? (row[idxModel]   || "").trim() : "";
+        const size     = idxSize    >= 0 ? (row[idxSize]    || "").trim() : "";
+        const status   = idxStatus  >= 0 ? (row[idxStatus]  || "").trim() : "";
+        const daysStr  = idxDays    >= 0 ? (row[idxDays]    || "").trim() : "";
+        const place    = idxPlace   >= 0 ? (row[idxPlace]   || "").trim() : "";
+        const dueStr   = idxDueDate >= 0 ? (row[idxDueDate] || "").trim() : "";
+        const startStr = idxStart   >= 0 ? (row[idxStart]   || "").trim() : "";
 
         // นับสถานะ
         if (status) {
@@ -224,18 +269,56 @@
 
         // นับตามขนาด เฉพาะ "เครื่องผลิตออกซิเจน"
         if (item && item.includes("เครื่องผลิตออกซิเจน")) {
-          // ขนาดในชีตเป็นเลข 3 / 5 / 10 / 0
           if (size === "3")      count3++;
           else if (size === "5") count5++;
           else if (size === "10") count10++;
           else if (size === "0") countFree++;
         }
 
-        // รวมจำนวนวันเช่า
+        // รวมจำนวนวันเช่า (ข้ามเครื่องว่างที่ days=0)
         if (daysStr) {
           const d = Number(daysStr);
-          if (!isNaN(d)) {
+          if (!isNaN(d) && d > 0) {
             totalDays += d;
+          }
+        }
+
+        // ✅ ค้นหา "ครบกำหนดในเดือนนี้"
+        if (
+          item &&
+          item.includes("เครื่องผลิตออกซิเจน") &&
+          status === "อยู่ในสัญญา" &&
+          dueStr &&
+          startStr !== "0" &&  // กันกรณีเครื่องว่าง
+          !dueStr.startsWith("30/12/1899") && !dueStr.startsWith("30/12/1900")
+        ) {
+          const parts = dueStr.split("/");
+          if (parts.length === 3) {
+            const [dDay, dMonth, dYear] = parts.map(Number);
+            if (dYear >= 2000) {
+              const dueDate = new Date(dYear, dMonth - 1, dDay);
+              dueDate.setHours(0,0,0,0);
+
+              const diffMs = dueDate - today;
+              const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+
+              // ต้องอยู่ในเดือนเดียวกับวันนี้ และยังไม่เกินกำหนด
+              if (
+                dYear === currentYear &&
+                (dMonth - 1) === currentMonth &&
+                diffDays >= 0
+              ) {
+                dueSoonItems.push({
+                  item,
+                  model,
+                  size,
+                  place,
+                  dueStr,
+                  daysLeft: diffDays,
+                  dueDate
+                });
+              }
+            }
           }
         }
       }
@@ -249,14 +332,17 @@
       document.getElementById("avgDays").textContent      = avgDays.toLocaleString();
 
       // อัปเดตตัวเลขขนาด
-      document.getElementById("count3L").textContent  = count3.toLocaleString();
-      document.getElementById("count5L").textContent  = count5.toLocaleString();
-      document.getElementById("count10L").textContent = count10.toLocaleString();
+      document.getElementById("count3L").textContent   = count3.toLocaleString();
+      document.getElementById("count5L").textContent   = count5.toLocaleString();
+      document.getElementById("count10L").textContent  = count10.toLocaleString();
       document.getElementById("countFree").textContent = countFree.toLocaleString();
 
-      // สร้างกราฟสถานะ และกราฟรุ่น
+      // สร้างกราฟ
       buildStatusChart(statusCounts);
       buildModelChart(modelCounts);
+
+      // สร้างตารางครบกำหนดในเดือนนี้
+      buildDueSoonTable(dueSoonItems);
     }
 
     function buildStatusChart(statusCounts) {
@@ -310,6 +396,69 @@
           }
         }
       });
+    }
+
+    // ตารางครบกำหนดในเดือนนี้ เรียงจากใกล้ครบก่อน
+    function buildDueSoonTable(items) {
+      const container = document.getElementById("dueSoonBody");
+      if (!container) return;
+
+      if (!items || items.length === 0) {
+        container.textContent = "ขณะนี้ยังไม่มีเครื่องที่ครบกำหนดภายในเดือนนี้";
+        return;
+      }
+
+      // เรียงจากวันครบกำหนดที่ใกล้ที่สุดก่อน
+      items.sort((a, b) => a.dueDate - b.dueDate);
+
+      const table = document.createElement("table");
+      table.className = "due-table";
+
+      const thead = document.createElement("thead");
+      const trHead = document.createElement("tr");
+      ["รายการเช่า", "รุ่น", "ขนาด (ลิตร)", "ที่อยู่", "วันครบกำหนด", "เหลืออีก (วัน)"].forEach(text => {
+        const th = document.createElement("th");
+        th.textContent = text;
+        trHead.appendChild(th);
+      });
+      thead.appendChild(trHead);
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+      items.forEach(it => {
+        const tr = document.createElement("tr");
+
+        const tdItem = document.createElement("td");
+        tdItem.textContent = it.item;
+        tr.appendChild(tdItem);
+
+        const tdModel = document.createElement("td");
+        tdModel.textContent = it.model;
+        tr.appendChild(tdModel);
+
+        const tdSize = document.createElement("td");
+        tdSize.textContent = it.size;
+        tr.appendChild(tdSize);
+
+        const tdPlace = document.createElement("td");
+        tdPlace.textContent = it.place;
+        tr.appendChild(tdPlace);
+
+        const tdDue = document.createElement("td");
+        tdDue.textContent = it.dueStr;
+        tr.appendChild(tdDue);
+
+        const tdLeft = document.createElement("td");
+        tdLeft.innerHTML = `<span class="due-badge">${it.daysLeft}</span>`;
+        tr.appendChild(tdLeft);
+
+        tbody.appendChild(tr);
+      });
+
+      table.appendChild(tbody);
+
+      container.innerHTML = "";
+      container.appendChild(table);
     }
 
     loadData();
