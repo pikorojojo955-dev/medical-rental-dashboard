@@ -20,6 +20,13 @@
       margin-top: 4px;
       margin-bottom: 16px;
     }
+    .subtitle {
+      text-align: center;
+      margin-top: 4px;
+      margin-bottom: 16px;
+      color: #555;
+      font-size: 14px;
+    }
     .table-wrapper {
       overflow-x: auto;
       background: #fff;
@@ -74,8 +81,26 @@
 </head>
 <body>
   <h1>รายงานเช่าอุปกรณ์การแพทย์</h1>
-  <p>ดึงข้อมูลสดจาก Google Sheets</p>
 
+  <!-- ปุ่มไปหน้า Dashboard -->
+  <div style="text-align:center; margin-bottom:12px;">
+    <a href="dashboard.html"
+       style="
+         display:inline-block;
+         background:#007bff;
+         color:white;
+         padding:10px 18px;
+         border-radius:8px;
+         text-decoration:none;
+         font-size:16px;
+       ">
+      👉 เปิด Dashboard สรุปข้อมูล
+    </a>
+  </div>
+
+  <p class="subtitle">ดึงข้อมูลสดจาก Google Sheets</p>
+
+  <!-- แถบค้นหา -->
   <div class="toolbar">
     <label for="searchInput">ค้นหา:</label>
     <input id="searchInput" type="text" placeholder="ค้นหารุ่น / รายการเช่า / สถานะ / ที่อยู่ ฯลฯ" />
@@ -89,7 +114,7 @@
   </div>
 
   <script>
-    // ลิงก์ CSV ของ Google Sheet (ของคุณเอง)
+    // ลิงก์ CSV ของ Google Sheet
     const SHEET_CSV_URL =
       "https://docs.google.com/spreadsheets/d/1bX4w5FDpZY4WOzl69ZJ2t8-fPtI6RKO2eIILSZ1U8Zs/export?format=csv&gid=0";
 
@@ -115,7 +140,7 @@
         });
         thead.appendChild(trHead);
 
-        // แถวถัดๆไป = data
+        // แถวถัดๆ ไป = data
         for (let i = 1; i < rows.length; i++) {
           const tr = document.createElement("tr");
           rows[i].forEach(col => {
