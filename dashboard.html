@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <title>Dashboard รายงานเช่าอุปกรณ์การแพทย์</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 16px;
+      background: #f5f5f5;
+    }
+    h1 {
+      margin-top: 0;
+      text-align: center;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .subtitle {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    /* การ์ดสรุป */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 12px 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+    .card-title {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+    .card-value {
+      font-size: 22px;
+      font-weight: 600;
+    }
+    .card-note {
+      font-size: 11px;
+      color: #999;
+      margin-top: 4px;
+    }
+
+    /* ส่วนหลักด้านล่าง */
+    .charts {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.6fr);
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .chart-full {
+      margin-top: 12px;
+    }
+    .panel {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 12px 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+    .panel h2 {
+      font-size: 16px;
+      margin: 0 0 8px;
+    }
+
+    canvas {
+      max-width: 100%;
+    }
+
+    /* สรุปจำนวนขนาด */
+    .size-list {
+      list-style: none;
+      padding-left: 0;
+      margin: 4px 0 0 0;
+      font-size: 14px;
+    }
+    .size-list li {
+      margin-bottom: 4px;
+    }
+    .size-label {
+      display: inline-block;
+      min-width: 120px;
+      font-weight: 500;
+    }
+
+    @media (max-width: 800px) {
+      .charts {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Dashboard รายงานเช่าอุปกรณ์การแพทย์</h1>
+  <p class="subtitle">ดึงข้อมูลสดจาก Google Sheets</p>
+
+  <div class="container">
+
+    <!-- การ์ดสรุป -->
+    <div class="cards">
+      <div class="card">
+        <div class="card-title">จำนวนเครื่องทั้งหมด</div>
+        <div class="card-value" id="totalDevices">-</div>
+        <div class="card-note">นับจากจำนวนแถวข้อมูลที่มีในระบบ</div>
+      </div>
+      <div class="card">
+        <div class="card-title">เครื่องที่ยังอยู่ในสัญญา</div>
+        <div class="card-value" id="inContract">-</div>
+        <div class="card-note">สถานะ = "อยู่ในสัญญา"</div>
+      </div>
+      <div class="card">
+        <div class="card-title">จำนวนวันเช่ารวม</div>
+        <div class="card-value" id="totalDays">-</div>
+        <div class="card-note">รวมจากคอลัมน์ "จำนวนวันที่เช่า"</div>
+      </div>
+      <div class="card">
+        <div class="card-title">จำนวนวันเช่าเฉลี่ย / เครื่อง</div>
+        <div class="card-value" id="avgDays">-</div>
+        <div class="card-note">จำนวนวันเช่ารวม ÷ จำนวนเครื่อง</div>
+      </div>
+    </div>
+
+    <!-- โซนสรุปขนาด + กราฟสถานะ -->
+    <div class="charts">
+      <div class="panel">
+        <h2>จำนวนเครื่องผลิตออกซิเจนตามขนาด (ลิตร)</h2>
+        <ul class="size-list">
+          <li><span class="size-label">3 ลิตร:</span> <span id="count3L">-</span> เครื่อง</li>
+          <li><span class="size-label">5 ลิตร:</span> <span id="count5L">-</span> เครื่อง</li>
+          <li><span class="size-label">10 ลิตร:</span> <span id="count10L">-</span> เครื่อง</li>
+          <li><span class="size-label">เครื่องว่าง (ขนาด 0):</span> <span id="countFree">-</span> เครื่อง</li>
+        </ul>
+        <div class="card-note" style="margin-top:8px;">
+          นับเฉพาะแถวที่ "รายการเช่า" มีคำว่า "เครื่องผลิตออกซิเจน" และดูค่าจากคอลัมน์ "ขนาด" (3/5/10/0)
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>สัดส่วนสถานะ (อยู่ในสัญญา / อื่น ๆ)</h2>
+        <canvas id="statusChart" height="160"></canvas>
+      </div>
+    </div>
+
+    <!-- กราฟเต็มความกว้าง -->
+    <div class="panel chart-full">
+      <h2>Top 5 รุ่นที่มีจำนวนเครื่องมากที่สุด</h2>
+      <canvas id="modelChart" height="140"></canvas>
+    </div>
+
+  </div>
+
+  <script>
+    // URL CSV ของชีตคุณ
+    const SHEET_CSV_URL =
+      "https://docs.google.com/spreadsheets/d/1bX4w5FDpZY4WOzl69ZJ2t8-fPtI6RKO2eIILSZ1U8Zs/export?format=csv&gid=0";
+
+    async function loadData() {
+      const res = await fetch(SHEET_CSV_URL);
+      const text = await res.text();
+
+      const rows = text.trim().split("\n").map(row => row.split(","));
+
+      const header = rows[0];
+      const dataRows = rows.slice(1);
+
+      // index คอลัมน์ที่ใช้
+      const idxItem   = header.indexOf("รายการเช่า");
+      const idxModel  = header.indexOf("รุ่น");
+      const idxSize   = header.indexOf("ขนาด");
+      const idxStatus = header.indexOf("แสดงสถานะ");
+      const idxDays   = header.indexOf("จำนวนวันที่เช่า");
+
+      console.log("Header:", header);
+
+      let totalDevices = 0;
+      let inContract = 0;
+      let totalDays = 0;
+
+      // ตัวนับต่าง ๆ
+      const statusCounts = {};
+      const modelCounts = {};
+
+      // ขนาดเครื่องผลิตออกซิเจน
+      let count3 = 0;
+      let count5 = 0;
+      let count10 = 0;
+      let countFree = 0; // ขนาด 0 = เครื่องว่าง
+
+      for (const row of dataRows) {
+        if (row.length === 0 || row.join("").trim() === "") continue;
+
+        totalDevices++;
+
+        const item   = idxItem   >= 0 ? (row[idxItem]   || "").trim() : "";
+        const model  = idxModel  >= 0 ? (row[idxModel]  || "").trim() : "";
+        const size   = idxSize   >= 0 ? (row[idxSize]   || "").trim() : "";
+        const status = idxStatus >= 0 ? (row[idxStatus] || "").trim() : "";
+        const daysStr = idxDays  >= 0 ? (row[idxDays]   || "").trim() : "";
+
+        // นับสถานะ
+        if (status) {
+          statusCounts[status] = (statusCounts[status] || 0) + 1;
+          if (status === "อยู่ในสัญญา") {
+            inContract++;
+          }
+        }
+
+        // นับรุ่น
+        if (model) {
+          modelCounts[model] = (modelCounts[model] || 0) + 1;
+        }
+
+        // นับตามขนาด เฉพาะ "เครื่องผลิตออกซิเจน"
+        if (item && item.includes("เครื่องผลิตออกซิเจน")) {
+          // ขนาดในชีตเป็นเลข 3 / 5 / 10 / 0
+          if (size === "3")      count3++;
+          else if (size === "5") count5++;
+          else if (size === "10") count10++;
+          else if (size === "0") countFree++;
+        }
+
+        // รวมจำนวนวันเช่า
+        if (daysStr) {
+          const d = Number(daysStr);
+          if (!isNaN(d)) {
+            totalDays += d;
+          }
+        }
+      }
+
+      const avgDays = totalDevices > 0 ? Math.round(totalDays / totalDevices) : 0;
+
+      // อัปเดตการ์ดบน
+      document.getElementById("totalDevices").textContent = totalDevices.toLocaleString();
+      document.getElementById("inContract").textContent   = inContract.toLocaleString();
+      document.getElementById("totalDays").textContent    = totalDays.toLocaleString();
+      document.getElementById("avgDays").textContent      = avgDays.toLocaleString();
+
+      // อัปเดตตัวเลขขนาด
+      document.getElementById("count3L").textContent  = count3.toLocaleString();
+      document.getElementById("count5L").textContent  = count5.toLocaleString();
+      document.getElementById("count10L").textContent = count10.toLocaleString();
+      document.getElementById("countFree").textContent = countFree.toLocaleString();
+
+      // สร้างกราฟสถานะ และกราฟรุ่น
+      buildStatusChart(statusCounts);
+      buildModelChart(modelCounts);
+    }
+
+    function buildStatusChart(statusCounts) {
+      const ctx = document.getElementById("statusChart").getContext("2d");
+      const labels = Object.keys(statusCounts);
+      const data = Object.values(statusCounts);
+
+      new Chart(ctx, {
+        type: "doughnut",
+        data: {
+          labels,
+          datasets: [{
+            data
+          }]
+        },
+        options: {
+          plugins: {
+            legend: { position: "bottom" }
+          }
+        }
+      });
+    }
+
+    function buildModelChart(modelCounts) {
+      const ctx = document.getElementById("modelChart").getContext("2d");
+
+      const entries = Object.entries(modelCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+
+      const labels = entries.map(e => e[0]);
+      const data   = entries.map(e => e[1]);
+
+      new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels,
+          datasets: [{
+            label: "จำนวนเครื่อง",
+            data
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              precision: 0
+            }
+          }
+        }
+      });
+    }
+
+    loadData();
+  </script>
+</body>
+</html>
