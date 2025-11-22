@@ -59,16 +59,18 @@
     th {
       background: #e3f2fd;
     }
+    /* แถวสลับสีพื้นฐาน */
     tr:nth-child(even) td {
       background: #fafafa;
     }
 
-    /* แถบเตือนจากคอลัมน์ "เครื่องที่ใกล้ถึงกำหนดล่าสุด" */
-    .alert-red {
+    /* แถบเตือนจากคอลัมน์ "เครื่องที่ใกล้ถึงกำหนดล่าสุด"
+       ใส่ที่ td เพื่อทับ zebra ให้ครบทั้งแถว */
+    .alert-red td {
       background: #ffcccc !important;
       animation: blink 1s infinite;
     }
-    .alert-yellow {
+    .alert-yellow td {
       background: #fff6a6 !important;
     }
 
