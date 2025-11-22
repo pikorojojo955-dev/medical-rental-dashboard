@@ -176,7 +176,7 @@
       </div>
     </div>
 
-    <!-- Top 5 เครื่องที่เช่ามากที่สุด (ตามจำนวนเดือนที่เช่า) -->
+    <!-- Top 5 เครื่องที่เช่ามากที่สุด -->
     <div class="panel chart-full">
       <h2>Top 5 เครื่องที่เช่ามากที่สุด (ตามจำนวนเดือนที่เช่า)</h2>
       <div class="card-note" style="margin-bottom:6px;">
@@ -202,7 +202,7 @@
     <div class="panel chart-full" style="margin-top:16px;">
       <h2>เครื่องผลิตออกซิเจนที่ครบกำหนดในเดือนนี้ (เรียงจากใกล้ครบก่อน)</h2>
       <div class="card-note" style="margin-bottom:6px;">
-        แสดงเฉพาะ "เครื่องผลิตออกซิเจน" ที่สถานะ = อยู่ในสัญญา และวันครบกำหนดอยู่ในเดือนปัจจุบัน
+        คำนวณวันครบกำหนดจาก "วันที่เริ่มทำสัญญา" + "อายุ (วัน)" แล้วเลือกเฉพาะที่อยู่ในเดือนปัจจุบัน
       </div>
       <div id="dueSoonBody" class="card-note">
         ขณะนี้ยังไม่มีเครื่องที่ครบกำหนดภายในเดือนนี้
@@ -215,6 +215,24 @@
     const SHEET_CSV_URL =
       "https://docs.google.com/spreadsheets/d/1bX4w5FDpZY4WOzl69ZJ2t8-fPtI6RKO2eIILSZ1U8Zs/export?format=csv&gid=0";
 
+    function parseThaiDate(str) {
+      if (!str) return null;
+      const parts = str.split("/");
+      if (parts.length !== 3) return null;
+      const [d, m, y] = parts.map(Number);
+      if (!d || !m || !y) return null;
+      const dt = new Date(y, m - 1, d);
+      dt.setHours(0,0,0,0);
+      return dt;
+    }
+
+    function formatDate(d) {
+      const dd = String(d.getDate()).padStart(2,"0");
+      const mm = String(d.getMonth() + 1).padStart(2,"0");
+      const yy = d.getFullYear();
+      return `${dd}/${mm}/${yy}`;
+    }
+
     async function loadData() {
       const res = await fetch(SHEET_CSV_URL);
       const text = await res.text();
@@ -223,18 +241,15 @@
       const header = rows[0];
       const dataRows = rows.slice(1);
 
-      const idxItem        = header.indexOf("รายการเช่า");
-      const idxModel       = header.indexOf("รุ่น");
-      const idxSize        = header.indexOf("ขนาด");
-      const idxStart       = header.indexOf("วันที่เริ่มทำสัญญา");
-      const idxAge         = header.indexOf("อายุ");
-      const idxStatus      = header.indexOf("แสดงสถานะ");
-      const idxPrice       = header.indexOf("ราคา");
-      const idxPlace       = header.indexOf("ที่อยู่");
-      const idxDays        = header.indexOf("จำนวนวันที่เช่า");
-      const idxRentMonths  = header.indexOf("จำนวนเดือนที่เช่า");
-      const idxNearDueText = header.indexOf("จำนวนวันที่ใกล้ครบกำหนด");
-      const idxDueDate     = header.indexOf("วันครบกำหนด"); // ถ้ามีคอลัมน์นี้
+      const idxItem       = header.indexOf("รายการเช่า");
+      const idxModel      = header.indexOf("รุ่น");
+      const idxSize       = header.indexOf("ขนาด");
+      const idxStart      = header.indexOf("วันที่เริ่มทำสัญญา");
+      const idxAge        = header.indexOf("อายุ");
+      const idxStatus     = header.indexOf("แสดงสถานะ");
+      const idxPlace      = header.indexOf("ที่อยู่");
+      const idxDays       = header.indexOf("จำนวนวันที่เช่า");
+      const idxRentMonths = header.indexOf("จำนวนเดือนที่เช่า");
 
       let totalDevices = 0;
       let inContract = 0;
@@ -257,17 +272,15 @@
       for (const row of dataRows) {
         if (row.length === 0 || row.join("").trim() === "") continue;
 
-        const item       = idxItem        >= 0 ? (row[idxItem]        || "").trim() : "";
-        const model      = idxModel       >= 0 ? (row[idxModel]       || "").trim() : "";
-        const size       = idxSize        >= 0 ? (row[idxSize]        || "").trim() : "";
-        const startStr   = idxStart       >= 0 ? (row[idxStart]       || "").trim() : "";
-        const ageStr     = idxAge         >= 0 ? (row[idxAge]         || "").trim() : "";
-        const status     = idxStatus      >= 0 ? (row[idxStatus]      || "").trim() : "";
-        const place      = idxPlace       >= 0 ? (row[idxPlace]       || "").trim() : "";
-        const daysStr    = idxDays        >= 0 ? (row[idxDays]        || "").trim() : "";
-        const rentMonth  = idxRentMonths  >= 0 ? (row[idxRentMonths]  || "").trim() : "";
-        const nearDueTxt = idxNearDueText >= 0 ? (row[idxNearDueText] || "").trim() : "";
-        const dueStr     = idxDueDate     >= 0 ? (row[idxDueDate]     || "").trim() : "";
+        const item   = idxItem   >= 0 ? (row[idxItem]   || "").trim() : "";
+        const model  = idxModel  >= 0 ? (row[idxModel]  || "").trim() : "";
+        const size   = idxSize   >= 0 ? (row[idxSize]   || "").trim() : "";
+        const start  = idxStart  >= 0 ? (row[idxStart]  || "").trim() : "";
+        const ageStr = idxAge    >= 0 ? (row[idxAge]    || "").trim() : "";
+        const status = idxStatus >= 0 ? (row[idxStatus] || "").trim() : "";
+        const place  = idxPlace  >= 0 ? (row[idxPlace]  || "").trim() : "";
+        const daysStr= idxDays   >= 0 ? (row[idxDays]   || "").trim() : "";
+        const rentMonth = idxRentMonths >= 0 ? (row[idxRentMonths] || "").trim() : "";
 
         if (!item) continue;
         totalDevices++;
@@ -302,37 +315,36 @@
           days: d
         });
 
-        // เครื่องผลิตออกซิเจนที่ครบกำหนดในเดือนนี้ (ใช้วันครบกำหนด หรือถ้าไม่มีให้ใช้ nearDueTxt)
+        // เครื่องผลิตออกซิเจนที่ครบกำหนดใน "เดือนนี้"
         if (
           item.includes("เครื่องผลิตออกซิเจน") &&
-          status === "อยู่ในสัญญา"
+          status === "อยู่ในสัญญา" &&
+          start && ageStr
         ) {
-          // กรณีมีคอลัมน์ "วันครบกำหนด"
-          if (dueStr && !dueStr.startsWith("30/12/1899") && !dueStr.startsWith("30/12/1900")) {
-            const parts = dueStr.split("/");
-            if (parts.length === 3) {
-              const [dDay, dMonth, dYear] = parts.map(Number);
-              if (dYear >= 2000) {
-                const dueDate = new Date(dYear, dMonth - 1, dDay);
-                dueDate.setHours(0,0,0,0);
-                const diffMs   = dueDate - today;
-                const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
-                if (
-                  dYear === currentYear &&
-                  (dMonth - 1) === currentMonth &&
-                  diffDays >= 0
-                ) {
-                  dueSoonItems.push({
-                    item,
-                    model,
-                    size,
-                    place,
-                    dueStr,
-                    daysLeft: diffDays,
-                    dueDate
-                  });
-                }
-              }
+          const startDate = parseThaiDate(start);
+          const ageDays   = Number(ageStr);
+          if (startDate && !isNaN(ageDays) && ageDays > 0) {
+            const dueDate = new Date(startDate);
+            dueDate.setDate(dueDate.getDate() + ageDays);
+            dueDate.setHours(0,0,0,0);
+
+            const diffMs   = dueDate - today;
+            const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+
+            if (
+              dueDate.getFullYear() === currentYear &&
+              dueDate.getMonth() === currentMonth &&
+              diffDays >= 0
+            ) {
+              dueSoonItems.push({
+                item,
+                model,
+                size,
+                place,
+                dueStr: formatDate(dueDate),
+                daysLeft: diffDays,
+                dueDate
+              });
             }
           }
         }
@@ -352,13 +364,13 @@
       document.getElementById("count10L").textContent  = count10.toLocaleString();
       document.getElementById("countFree").textContent = countFree.toLocaleString();
 
-      // กราฟ
+      // กราฟสถานะ
       buildStatusChart(statusCounts);
 
       // ตาราง Top 5
       buildTop5Table(topList);
 
-      // ตารางครบกำหนดเดือนนี้
+      // ตารางครบกำหนดในเดือนนี้
       buildDueSoonTable(dueSoonItems);
     }
 
@@ -379,19 +391,17 @@
       });
     }
 
-    // Top 5 ตามจำนวนวันเช่า (แล้วโชว์จำนวนเดือนที่เช่า)
+    // Top 5 ตามจำนวนวันเช่า
     function buildTop5Table(list) {
       const tbody = document.getElementById("top5Body");
       if (!tbody) return;
 
-      // เรียงตาม days มาก -> น้อย แล้วเลือก 5 รายการแรก
       list.sort((a, b) => b.days - a.days);
       const top5 = list.slice(0, 5);
 
       tbody.innerHTML = "";
       top5.forEach((r, index) => {
         const tr = document.createElement("tr");
-
         tr.innerHTML = `
           <td>${index + 1}</td>
           <td>${r.item}</td>
@@ -399,7 +409,6 @@
           <td>${r.size || "-"}</td>
           <td>${r.rentMonth || "-"}</td>
         `;
-
         tbody.appendChild(tr);
       });
     }
@@ -431,7 +440,6 @@
       const tbody = document.createElement("tbody");
       items.forEach(it => {
         const tr = document.createElement("tr");
-
         tr.innerHTML = `
           <td>${it.item}</td>
           <td>${it.model}</td>
@@ -440,7 +448,6 @@
           <td>${it.dueStr}</td>
           <td><span class="due-badge">${it.daysLeft}</span></td>
         `;
-
         tbody.appendChild(tr);
       });
 
