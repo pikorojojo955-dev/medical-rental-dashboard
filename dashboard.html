@@ -113,6 +113,25 @@
     tr:nth-child(even) td {
       background: #fafafa;
     }
+
+    /* สีแถบแจ้งเตือนครบกำหนด */
+    .due-red {
+      background: #ffcccc !important;
+      animation: blink 1s infinite;
+    }
+    .due-yellow {
+      background: #fff6a6 !important;
+    }
+    .due-green {
+      background: #d6ffd6 !important;
+    }
+
+    @keyframes blink {
+      0%   { background-color: #ff9a9a; }
+      50%  { background-color: #ff0000; }
+      100% { background-color: #ff9a9a; }
+    }
+
     .due-badge {
       font-weight: 600;
       color: #d32f2f;
@@ -315,7 +334,7 @@
           days: d
         });
 
-        // เครื่องผลิตออกซิเจนที่ครบกำหนดใน "เดือนนี้"
+        // เครื่องผลิตออกซิเจนที่ครบกำหนด "ในเดือนนี้"
         if (
           item.includes("เครื่องผลิตออกซิเจน") &&
           status === "อยู่ในสัญญา" &&
@@ -331,10 +350,10 @@
             const diffMs   = dueDate - today;
             const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
 
+            // เอาทุกตัวที่ครบกำหนดใน "เดือนนี้"
             if (
               dueDate.getFullYear() === currentYear &&
-              dueDate.getMonth() === currentMonth &&
-              diffDays >= 0
+              dueDate.getMonth() === currentMonth
             ) {
               dueSoonItems.push({
                 item,
@@ -342,7 +361,7 @@
                 size,
                 place,
                 dueStr: formatDate(dueDate),
-                daysLeft: diffDays,
+                daysLeft: diffDays, // อาจติดลบได้ถ้าเลยวันแล้ว
                 dueDate
               });
             }
@@ -413,7 +432,7 @@
       });
     }
 
-    // ตารางเครื่องผลิตออกซิเจนที่ครบกำหนดในเดือนนี้
+    // ตารางเครื่องผลิตออกซิเจนที่ครบกำหนดในเดือนนี้ + สีตามช่วงวัน (column R logic)
     function buildDueSoonTable(items) {
       const container = document.getElementById("dueSoonBody");
       if (!container) return;
@@ -423,13 +442,14 @@
         return;
       }
 
-      items.sort((a, b) => a.dueDate - b.dueDate);
+      // เรียงตาม daysLeft จากน้อย -> มาก (เหมือนเรียง column R)
+      items.sort((a, b) => a.daysLeft - b.daysLeft);
 
       const table = document.createElement("table");
 
       const thead = document.createElement("thead");
       const trHead = document.createElement("tr");
-      ["รายการเช่า", "รุ่น", "ขนาด (ลิตร)", "ที่อยู่", "วันครบกำหนด", "เหลืออีก (วัน)"].forEach(text => {
+      ["รายการเช่า", "รุ่น", "ขนาด (ลิตร)", "ที่อยู่", "วันครบกำหนด", "เหลืออีก/เกินมา (วัน)"].forEach(text => {
         const th = document.createElement("th");
         th.textContent = text;
         trHead.appendChild(th);
@@ -439,20 +459,43 @@
 
       const tbody = document.createElement("tbody");
       items.forEach(it => {
+        // แปลง daysLeft เป็นข้อความ
+        let disp;
+        if (it.daysLeft > 0) {
+          disp = "เหลือ " + it.daysLeft + " วัน";
+        } else if (it.daysLeft === 0) {
+          disp = "ครบวันนี้";
+        } else {
+          disp = "เกินมา " + Math.abs(it.daysLeft) + " วัน";
+        }
+
+        // เลือกสีตามเงื่อนไข column R:
+        // 0–3 วัน => แดง + กระพริบ
+        // 4–7 วัน => เหลือง
+        // >7 วัน => เขียว
+        let rowClass = "due-green";
+        if (it.daysLeft <= 3) {          // รวมค่าติดลบด้วย ถือว่าเร่งด่วน
+          rowClass = "due-red";
+        } else if (it.daysLeft <= 7) {
+          rowClass = "due-yellow";
+        }
+
         const tr = document.createElement("tr");
+        tr.classList.add(rowClass);
+
         tr.innerHTML = `
           <td>${it.item}</td>
           <td>${it.model}</td>
           <td>${it.size}</td>
           <td>${it.place}</td>
           <td>${it.dueStr}</td>
-          <td><span class="due-badge">${it.daysLeft}</span></td>
+          <td><span class="due-badge">${disp}</span></td>
         `;
+
         tbody.appendChild(tr);
       });
 
       table.appendChild(tbody);
-
       container.innerHTML = "";
       container.appendChild(table);
     }
