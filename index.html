@@ -114,14 +114,18 @@
         const res = await fetch(SHEET_CSV_URL);
         const text = await res.text();
 
+        // แปลง CSV อย่างง่าย (ในชีตนี้ไม่มีเครื่องหมายจุลภาคในข้อความ)
         const rows = text.trim().split("\n").map(r => r.split(","));
         if (rows.length === 0) return;
 
         headers = rows[0];
         allRows = rows.slice(1);
 
-        // หาคอลัมน์ "เครื่องที่ใกล้ถึงกำหนดล่าสุด"
-        indexNearCol = headers.indexOf("เครื่องที่ใกล้ถึงกำหนดล่าสุด");
+        // หา header = "เครื่องที่ใกล้ถึงกำหนดล่าสุด" (ตัดช่องว่างทั้งหมดทิ้งก่อนเทียบ)
+        const target = "เครื่องที่ใกล้ถึงกำหนดล่าสุด";
+        indexNearCol = headers.findIndex(h =>
+          h.replace(/\s/g, "") === target.replace(/\s/g, "")
+        );
 
         renderTable(allRows);
       } catch (err) {
@@ -151,9 +155,10 @@
 
         const tr = document.createElement("tr");
 
-        // ถ้ามีคอลัมน์ "เครื่องที่ใกล้ถึงกำหนดล่าสุด" → ใช้เป็นเงื่อนไขสี
-        if (indexNearCol !== -1) {
-          const nearStr = (row[indexNearCol] || "").trim();
+        // ใช้ค่าจากคอลัมน์ "เครื่องที่ใกล้ถึงกำหนดล่าสุด" เป็นเงื่อนไขสี
+        if (indexNearCol !== -1 && indexNearCol < row.length) {
+          const nearStrRaw = row[indexNearCol] || "";
+          const nearStr = nearStrRaw.toString().trim();
           const nearVal = parseInt(nearStr, 10);
 
           if (!isNaN(nearVal)) {
