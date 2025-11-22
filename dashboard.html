@@ -95,12 +95,15 @@
       font-weight: 500;
     }
 
-    /* ตารางแจ้งเตือนใกล้ครบกำหนด */
+    /* ตารางต่าง ๆ */
+    .simple-table,
     .due-table {
       border-collapse: collapse;
       width: 100%;
       font-size: 14px;
     }
+    .simple-table th,
+    .simple-table td,
     .due-table th,
     .due-table td {
       border: 1px solid #ddd;
@@ -108,12 +111,15 @@
       text-align: left;
       white-space: nowrap;
     }
+    .simple-table th,
     .due-table th {
       background: #e3f2fd;
     }
+    .simple-table tr:nth-child(even) td,
     .due-table tr:nth-child(even) td {
       background: #fafafa;
     }
+
     .due-badge {
       font-weight: 600;
       color: #d32f2f;
@@ -177,10 +183,12 @@
       </div>
     </div>
 
-    <!-- Top 5 รุ่น -->
+    <!-- แทนที่ Top 5 รุ่นขายดี ด้วย Top 5 เครื่องที่เช่านานที่สุด -->
     <div class="panel chart-full">
-      <h2>Top 5 รุ่นที่มีจำนวนเครื่องมากที่สุด</h2>
-      <canvas id="modelChart" height="140"></canvas>
+      <h2>Top 5 เครื่องที่เช่านานที่สุด (ตามจำนวนเดือนที่เช่า)</h2>
+      <div id="topDurationBody" class="card-note">
+        ยังไม่มีข้อมูลจำนวนเดือนที่เช่า
+      </div>
     </div>
 
     <!-- แจ้งเตือนครบกำหนดในเดือนนี้ -->
@@ -208,14 +216,15 @@
       const dataRows = rows.slice(1);
 
       // index คอลัมน์ที่ใช้
-      const idxItem    = header.indexOf("รายการเช่า");
-      const idxModel   = header.indexOf("รุ่น");
-      const idxSize    = header.indexOf("ขนาด");
-      const idxStatus  = header.indexOf("แสดงสถานะ");
-      const idxDays    = header.indexOf("จำนวนวันที่เช่า");
-      const idxPlace   = header.indexOf("ที่อยู่");
-      const idxDueDate = header.indexOf("วันครบกำหนด");
-      const idxStart   = header.indexOf("วันที่เริ่มทำสัญญา");
+      const idxItem     = header.indexOf("รายการเช่า");
+      const idxModel    = header.indexOf("รุ่น");
+      const idxSize     = header.indexOf("ขนาด");
+      const idxStatus   = header.indexOf("แสดงสถานะ");
+      const idxDays     = header.indexOf("จำนวนวันที่เช่า");
+      const idxMonths   = header.indexOf("จำนวนเดือนที่เช่า");
+      const idxPlace    = header.indexOf("ที่อยู่");
+      const idxDueDate  = header.indexOf("วันครบกำหนด");
+      const idxStart    = header.indexOf("วันที่เริ่มทำสัญญา");
 
       console.log("Header:", header);
 
@@ -223,15 +232,16 @@
       let inContract = 0;
       let totalDays = 0;
 
-      // ตัวนับต่าง ๆ
       const statusCounts = {};
-      const modelCounts = {};
 
       // ขนาดเครื่องผลิตออกซิเจน
       let count3 = 0;
       let count5 = 0;
       let count10 = 0;
       let countFree = 0; // ขนาด 0 = เครื่องว่าง
+
+      // สำหรับ Top 5 เช่านานที่สุด
+      const durationItems = [];
 
       // รายการที่ครบกำหนดในเดือนนี้
       const dueSoonItems = [];
@@ -250,6 +260,7 @@
         const size     = idxSize    >= 0 ? (row[idxSize]    || "").trim() : "";
         const status   = idxStatus  >= 0 ? (row[idxStatus]  || "").trim() : "";
         const daysStr  = idxDays    >= 0 ? (row[idxDays]    || "").trim() : "";
+        const monthsStr= idxMonths  >= 0 ? (row[idxMonths]  || "").trim() : "";
         const place    = idxPlace   >= 0 ? (row[idxPlace]   || "").trim() : "";
         const dueStr   = idxDueDate >= 0 ? (row[idxDueDate] || "").trim() : "";
         const startStr = idxStart   >= 0 ? (row[idxStart]   || "").trim() : "";
@@ -262,11 +273,6 @@
           }
         }
 
-        // นับรุ่น
-        if (model) {
-          modelCounts[model] = (modelCounts[model] || 0) + 1;
-        }
-
         // นับตามขนาด เฉพาะ "เครื่องผลิตออกซิเจน"
         if (item && item.includes("เครื่องผลิตออกซิเจน")) {
           if (size === "3")      count3++;
@@ -275,12 +281,26 @@
           else if (size === "0") countFree++;
         }
 
-        // รวมจำนวนวันเช่า (ข้ามเครื่องว่างที่ days=0)
+        // รวมจำนวนวันเช่า (ใช้เฉพาะค่ามากกว่า 0)
+        let days = 0;
         if (daysStr) {
           const d = Number(daysStr);
           if (!isNaN(d) && d > 0) {
+            days = d;
             totalDays += d;
           }
+        }
+
+        // เก็บข้อมูลสำหรับ Top 5 เช่านานที่สุด
+        if (days > 0) {
+          durationItems.push({
+            item,
+            model,
+            size,
+            place,
+            monthsStr,
+            days
+          });
         }
 
         // ✅ ค้นหา "ครบกำหนดในเดือนนี้"
@@ -302,7 +322,6 @@
               const diffMs = dueDate - today;
               const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
 
-              // ต้องอยู่ในเดือนเดียวกับวันนี้ และยังไม่เกินกำหนด
               if (
                 dYear === currentYear &&
                 (dMonth - 1) === currentMonth &&
@@ -337,9 +356,11 @@
       document.getElementById("count10L").textContent  = count10.toLocaleString();
       document.getElementById("countFree").textContent = countFree.toLocaleString();
 
-      // สร้างกราฟ
+      // สร้างกราฟสถานะ
       buildStatusChart(statusCounts);
-      buildModelChart(modelCounts);
+
+      // สร้างตาราง Top 5 เช่านานที่สุด
+      buildTopDurationTable(durationItems);
 
       // สร้างตารางครบกำหนดในเดือนนี้
       buildDueSoonTable(dueSoonItems);
@@ -366,36 +387,66 @@
       });
     }
 
-    function buildModelChart(modelCounts) {
-      const ctx = document.getElementById("modelChart").getContext("2d");
+    // Top 5 เครื่องที่เช่านานที่สุด (ใช้ days จากคอลัมน์ "จำนวนวันที่เช่า" และแสดงข้อความจากคอลัมน์ "จำนวนเดือนที่เช่า")
+    function buildTopDurationTable(items) {
+      const container = document.getElementById("topDurationBody");
+      if (!container) return;
 
-      const entries = Object.entries(modelCounts)
-        .sort((a, b) => b[1] - a[1])
+      if (!items || items.length === 0) {
+        container.textContent = "ยังไม่มีข้อมูลจำนวนเดือนที่เช่า";
+        return;
+      }
+
+      // เรียงจากจำนวนวันมากที่สุดก่อน แล้วเอาแค่ 5 รายการ
+      const top = items
+        .slice()
+        .sort((a, b) => b.days - a.days)
         .slice(0, 5);
 
-      const labels = entries.map(e => e[0]);
-      const data   = entries.map(e => e[1]);
+      const table = document.createElement("table");
+      table.className = "simple-table";
 
-      new Chart(ctx, {
-        type: "bar",
-        data: {
-          labels,
-          datasets: [{
-            label: "จำนวนเครื่อง",
-            data
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: {
-              beginAtZero: true,
-              precision: 0
-            }
-          }
-        }
+      const thead = document.createElement("thead");
+      const trHead = document.createElement("tr");
+      ["รายการเช่า", "รุ่น", "ขนาด (ลิตร)", "ที่อยู่", "จำนวนเดือนที่เช่า"].forEach(text => {
+        const th = document.createElement("th");
+        th.textContent = text;
+        trHead.appendChild(th);
       });
+      thead.appendChild(trHead);
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+      top.forEach(it => {
+        const tr = document.createElement("tr");
+
+        const tdItem = document.createElement("td");
+        tdItem.textContent = it.item;
+        tr.appendChild(tdItem);
+
+        const tdModel = document.createElement("td");
+        tdModel.textContent = it.model;
+        tr.appendChild(tdModel);
+
+        const tdSize = document.createElement("td");
+        tdSize.textContent = it.size;
+        tr.appendChild(tdSize);
+
+        const tdPlace = document.createElement("td");
+        tdPlace.textContent = it.place;
+        tr.appendChild(tdPlace);
+
+        const tdMonths = document.createElement("td");
+        tdMonths.textContent = it.monthsStr || "-";
+        tr.appendChild(tdMonths);
+
+        tbody.appendChild(tr);
+      });
+
+      table.appendChild(tbody);
+
+      container.innerHTML = "";
+      container.appendChild(table);
     }
 
     // ตารางครบกำหนดในเดือนนี้ เรียงจากใกล้ครบก่อน
@@ -408,7 +459,6 @@
         return;
       }
 
-      // เรียงจากวันครบกำหนดที่ใกล้ที่สุดก่อน
       items.sort((a, b) => a.dueDate - b.dueDate);
 
       const table = document.createElement("table");
