@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <title>รายงานเช่าอุปกรณ์การแพทย์</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <style>
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -15,178 +16,185 @@
       margin-top: 0;
       text-align: center;
     }
-    p {
-      text-align: center;
-      margin-top: 4px;
-      margin-bottom: 16px;
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
     }
     .subtitle {
       text-align: center;
-      margin-top: 4px;
       margin-bottom: 16px;
-      color: #555;
+    }
+
+    .search-wrapper {
+      margin-bottom: 12px;
+    }
+    .search-input {
+      width: 100%;
+      max-width: 100%;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
       font-size: 14px;
     }
+
     .table-wrapper {
-      overflow-x: auto;
-      background: #fff;
-      padding: 12px;
-      border-radius: 8px;
-      max-width: 1200px;
-      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 12px 16px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      overflow-x: auto;
     }
+
     table {
       border-collapse: collapse;
       width: 100%;
-      min-width: 800px;
+      font-size: 14px;
     }
     th, td {
       border: 1px solid #ddd;
       padding: 6px 8px;
-      font-size: 14px;
       text-align: left;
       white-space: nowrap;
     }
     th {
-      background: #e0f2f1;
-      position: sticky;
-      top: 0;
-      z-index: 1;
+      background: #e3f2fd;
     }
     tr:nth-child(even) td {
       background: #fafafa;
     }
 
-    /* แถบค้นหา */
-    .toolbar {
-      max-width: 1200px;
-      margin: 0 auto 12px auto;
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      font-size: 14px;
+    /* แถบเตือนจากคอลัมน์ R ("เครื่องที่ใกล้") */
+    .alert-red {
+      background: #ffcccc !important;
+      animation: blink 1s infinite;
     }
-    .toolbar label {
-      white-space: nowrap;
+    .alert-yellow {
+      background: #fff6a6 !important;
     }
-    .toolbar input {
-      flex: 1;
-      padding: 6px 8px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 14px;
+
+    @keyframes blink {
+      0%   { background-color: #ffb3b3; }
+      50%  { background-color: #ff0000; }
+      100% { background-color: #ffb3b3; }
     }
   </style>
 </head>
 <body>
   <h1>รายงานเช่าอุปกรณ์การแพทย์</h1>
-
   <p class="subtitle">ดึงข้อมูลสดจาก Google Sheets</p>
 
-  <!-- แถบค้นหา -->
-  <div class="toolbar">
-    <label for="searchInput">ค้นหา:</label>
-    <input id="searchInput" type="text" placeholder="ค้นหารุ่น / รายการเช่า / สถานะ / ที่อยู่ ฯลฯ" />
-  </div>
+  <div class="container">
+    <div class="search-wrapper">
+      <input
+        id="searchInput"
+        class="search-input"
+        type="text"
+        placeholder="ค้นหา: รุ่น / รายการเช่า / สถานะ / ที่อยู่ ฯลฯ"
+      />
+    </div>
 
-  <div class="table-wrapper">
-    <table id="data-table">
-      <thead></thead>
-      <tbody></tbody>
-    </table>
+    <div class="table-wrapper">
+      <table id="data-table">
+        <thead></thead>
+        <tbody></tbody>
+      </table>
+    </div>
   </div>
 
   <script>
-    // ลิงก์ CSV ของ Google Sheet
     const SHEET_CSV_URL =
       "https://docs.google.com/spreadsheets/d/1bX4w5FDpZY4WOzl69ZJ2t8-fPtI6RKO2eIILSZ1U8Zs/export?format=csv&gid=0";
+
+    let allRows = [];     // เก็บข้อมูลดิบไว้สำหรับ filter
+    let headers = [];     // หัวคอลัมน์
+    let indexNearCol = -1; // index ของคอลัมน์ "เครื่องที่ใกล้"
 
     async function loadSheet() {
       try {
         const res = await fetch(SHEET_CSV_URL);
         const text = await res.text();
 
-        // แปลง CSV เป็น array 2 มิติ (แถว/คอลัมน์)
-        const rows = text.trim().split("\n").map(row => row.split(","));
+        const rows = text.trim().split("\n").map(r => r.split(","));
+        if (rows.length === 0) return;
 
-        const table = document.getElementById("data-table");
-        const thead = table.querySelector("thead");
-        const tbody = table.querySelector("tbody");
+        headers = rows[0];
+        allRows = rows.slice(1);
 
-        // แถวแรก = header
-        const headerRow = rows[0];
-        const trHead = document.createElement("tr");
-        headerRow.forEach(col => {
-          const th = document.createElement("th");
-          th.textContent = col;
-          trHead.appendChild(th);
-        });
-        thead.appendChild(trHead);
+        // หาคอลัมน์ "เครื่องที่ใกล้"
+        indexNearCol = headers.indexOf("เครื่องที่ใกล้");
 
-        // แถวถัดๆ ไป = data
-        for (let i = 1; i < rows.length; i++) {
-          const tr = document.createElement("tr");
-          rows[i].forEach(col => {
-            const td = document.createElement("td");
-            td.textContent = col;
-            tr.appendChild(td);
-          });
-          tbody.appendChild(tr);
-        }
-
-        // ตั้งค่าระบบค้นหา
-        setupSearch(tbody);
+        renderTable(allRows);
       } catch (err) {
-        console.error(err);
-        alert("โหลดข้อมูลจาก Google Sheets ไม่ได้ กรุณาตรวจสอบสิทธิ์การแชร์หรือลองใหม่อีกครั้ง");
+        console.error("โหลดข้อมูลไม่สำเร็จ:", err);
       }
     }
 
-    // ฟังก์ชันค้นหา/กรองแถวในตาราง
-    function setupSearch(tbody) {
-      const input = document.getElementById("searchInput");
-      if (!input) return;
+    function renderTable(dataRows) {
+      const table = document.getElementById("data-table");
+      const thead = table.querySelector("thead");
+      const tbody = table.querySelector("tbody");
 
-      input.addEventListener("input", () => {
-        const term = input.value.toLowerCase().trim();
+      // สร้างหัวตาราง
+      thead.innerHTML = "";
+      const headTr = document.createElement("tr");
+      headers.forEach(h => {
+        const th = document.createElement("th");
+        th.textContent = h;
+        headTr.appendChild(th);
+      });
+      thead.appendChild(headTr);
 
-        Array.from(tbody.rows).forEach(row => {
-          if (!term) {
-            row.style.display = "";
-            return;
+      // สร้างแถวข้อมูล
+      tbody.innerHTML = "";
+      dataRows.forEach(row => {
+        if (row.join("").trim() === "") return;
+
+        const tr = document.createElement("tr");
+
+        // ถ้ามีคอลัมน์ "เครื่องที่ใกล้" → ใช้เป็นเงื่อนไขสี
+        if (indexNearCol !== -1) {
+          const nearStr = (row[indexNearCol] || "").trim();
+          const nearVal = parseInt(nearStr, 10);
+
+          if (!isNaN(nearVal)) {
+            if (nearVal >= 0 && nearVal <= 3) {
+              tr.classList.add("alert-red");     // 0–3 แดงกระพริบ
+            } else if (nearVal >= 4 && nearVal <= 7) {
+              tr.classList.add("alert-yellow");   // 4–7 เหลือง
+            }
+            // >7 ไม่ต้องทำอะไร
           }
+        }
 
-          const match = Array.from(row.cells).some(td =>
-            td.textContent.toLowerCase().includes(term)
-          );
-
-          row.style.display = match ? "" : "none";
+        row.forEach(col => {
+          const td = document.createElement("td");
+          td.textContent = col;
+          tr.appendChild(td);
         });
+
+        tbody.appendChild(tr);
       });
     }
 
-    // เริ่มทำงาน
-    loadSheet();
-  </script>
+    function setupSearch() {
+      const input = document.getElementById("searchInput");
+      input.addEventListener("input", () => {
+        const q = input.value.toLowerCase().trim();
+        if (!q) {
+          renderTable(allRows);
+          return;
+        }
+        const filtered = allRows.filter(row =>
+          row.some(col => (col || "").toLowerCase().includes(q))
+        );
+        renderTable(filtered);
+      });
+    }
 
-  <!-- ปุ่มลอยไปหน้า Dashboard -->
-  <a href="dashboard.html" 
-     style="
-        position: fixed;
-        right: 20px;
-        bottom: 20px;
-        background: #28a745;
-        color: white;
-        padding: 14px 18px;
-        border-radius: 999px;
-        text-decoration: none;
-        font-size: 18px;
-        font-weight: bold;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        z-index: 9999;
-     ">
-     📊 Dashboard
-  </a>
+    document.addEventListener("DOMContentLoaded", () => {
+      setupSearch();
+      loadSheet();
+    });
+  </script>
 </body>
 </html>
