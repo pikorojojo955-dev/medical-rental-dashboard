@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <title>Dashboard รายงานเช่าอุปกรณ์การแพทย์</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Chart.js ใช้แค่สำหรับกราฟสถานะ -->
+  <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
@@ -95,31 +95,24 @@
       font-weight: 500;
     }
 
-    /* ตารางทั่วไป / ตารางครบกำหนด */
-    .simple-table,
-    .due-table {
+    /* ตารางทั่วไป */
+    table {
       border-collapse: collapse;
       width: 100%;
       font-size: 14px;
     }
-    .simple-table th,
-    .simple-table td,
-    .due-table th,
-    .due-table td {
+    th, td {
       border: 1px solid #ddd;
       padding: 6px 8px;
       text-align: left;
       white-space: nowrap;
     }
-    .simple-table th,
-    .due-table th {
+    th {
       background: #e3f2fd;
     }
-    .simple-table tr:nth-child(even) td,
-    .due-table tr:nth-child(even) td {
+    tr:nth-child(even) td {
       background: #fafafa;
     }
-
     .due-badge {
       font-weight: 600;
       color: #d32f2f;
@@ -162,7 +155,7 @@
       </div>
     </div>
 
-    <!-- สรุปขนาด + กราฟสถานะ -->
+    <!-- โซนสรุปขนาด + กราฟสถานะ -->
     <div class="charts">
       <div class="panel">
         <h2>จำนวนเครื่องผลิตออกซิเจนตามขนาด (ลิตร)</h2>
@@ -183,17 +176,34 @@
       </div>
     </div>
 
-    <!-- 🔹 Top 5 เครื่องที่เช่านานที่สุด (แทนกราฟเดิม) -->
+    <!-- Top 5 เครื่องที่เช่ามากที่สุด (ตามจำนวนเดือนที่เช่า) -->
     <div class="panel chart-full">
-      <h2>Top 5 เครื่องที่เช่านานที่สุด (ตามจำนวนเดือนที่เช่า)</h2>
-      <div id="topDurationBody" class="card-note">
-        ยังไม่มีข้อมูลจำนวนเดือนที่เช่า
+      <h2>Top 5 เครื่องที่เช่ามากที่สุด (ตามจำนวนเดือนที่เช่า)</h2>
+      <div class="card-note" style="margin-bottom:6px;">
+        ใช้คอลัมน์ "จำนวนวันที่เช่า" และ "จำนวนเดือนที่เช่า" ในการเรียงจากเช่านานที่สุด
+      </div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>ลำดับ</th>
+              <th>รายการเช่า</th>
+              <th>รุ่น</th>
+              <th>ขนาด (ลิตร)</th>
+              <th>จำนวนเดือนที่เช่า</th>
+            </tr>
+          </thead>
+          <tbody id="top5Body"></tbody>
+        </table>
       </div>
     </div>
 
-    <!-- 🔔 แจ้งเตือนครบกำหนดในเดือนนี้ -->
+    <!-- เครื่องผลิตออกซิเจนที่ครบกำหนดในเดือนนี้ -->
     <div class="panel chart-full" style="margin-top:16px;">
       <h2>เครื่องผลิตออกซิเจนที่ครบกำหนดในเดือนนี้ (เรียงจากใกล้ครบก่อน)</h2>
+      <div class="card-note" style="margin-bottom:6px;">
+        แสดงเฉพาะ "เครื่องผลิตออกซิเจน" ที่สถานะ = อยู่ในสัญญา และวันครบกำหนดอยู่ในเดือนปัจจุบัน
+      </div>
       <div id="dueSoonBody" class="card-note">
         ขณะนี้ยังไม่มีเครื่องที่ครบกำหนดภายในเดือนนี้
       </div>
@@ -213,27 +223,31 @@
       const header = rows[0];
       const dataRows = rows.slice(1);
 
-      // ตำแหน่งคอลัมน์
-      const idxItem     = header.indexOf("รายการเช่า");
-      const idxModel    = header.indexOf("รุ่น");
-      const idxSize     = header.indexOf("ขนาด");
-      const idxStatus   = header.indexOf("แสดงสถานะ");
-      const idxDays     = header.indexOf("จำนวนวันที่เช่า");
-      const idxMonths   = header.indexOf("จำนวนเดือนที่เช่า");
-      const idxPlace    = header.indexOf("ที่อยู่");
-      const idxDueDate  = header.indexOf("วันครบกำหนด");
-      const idxStart    = header.indexOf("วันที่เริ่มทำสัญญา");
+      const idxItem        = header.indexOf("รายการเช่า");
+      const idxModel       = header.indexOf("รุ่น");
+      const idxSize        = header.indexOf("ขนาด");
+      const idxStart       = header.indexOf("วันที่เริ่มทำสัญญา");
+      const idxAge         = header.indexOf("อายุ");
+      const idxStatus      = header.indexOf("แสดงสถานะ");
+      const idxPrice       = header.indexOf("ราคา");
+      const idxPlace       = header.indexOf("ที่อยู่");
+      const idxDays        = header.indexOf("จำนวนวันที่เช่า");
+      const idxRentMonths  = header.indexOf("จำนวนเดือนที่เช่า");
+      const idxNearDueText = header.indexOf("จำนวนวันที่ใกล้ครบกำหนด");
+      const idxDueDate     = header.indexOf("วันครบกำหนด"); // ถ้ามีคอลัมน์นี้
 
       let totalDevices = 0;
       let inContract = 0;
       let totalDays = 0;
 
       const statusCounts = {};
+      let count3 = 0;
+      let count5 = 0;
+      let count10 = 0;
+      let countFree = 0;
 
-      let count3 = 0, count5 = 0, count10 = 0, countFree = 0;
-
-      const durationItems = [];   // ใช้ทำ Top5
-      const dueSoonItems = [];   // ใช้ทำตารางครบกำหนด
+      const topList = [];
+      const dueSoonItems = [];
 
       const today = new Date();
       today.setHours(0,0,0,0);
@@ -243,84 +257,81 @@
       for (const row of dataRows) {
         if (row.length === 0 || row.join("").trim() === "") continue;
 
+        const item       = idxItem        >= 0 ? (row[idxItem]        || "").trim() : "";
+        const model      = idxModel       >= 0 ? (row[idxModel]       || "").trim() : "";
+        const size       = idxSize        >= 0 ? (row[idxSize]        || "").trim() : "";
+        const startStr   = idxStart       >= 0 ? (row[idxStart]       || "").trim() : "";
+        const ageStr     = idxAge         >= 0 ? (row[idxAge]         || "").trim() : "";
+        const status     = idxStatus      >= 0 ? (row[idxStatus]      || "").trim() : "";
+        const place      = idxPlace       >= 0 ? (row[idxPlace]       || "").trim() : "";
+        const daysStr    = idxDays        >= 0 ? (row[idxDays]        || "").trim() : "";
+        const rentMonth  = idxRentMonths  >= 0 ? (row[idxRentMonths]  || "").trim() : "";
+        const nearDueTxt = idxNearDueText >= 0 ? (row[idxNearDueText] || "").trim() : "";
+        const dueStr     = idxDueDate     >= 0 ? (row[idxDueDate]     || "").trim() : "";
+
+        if (!item) continue;
         totalDevices++;
 
-        const item      = idxItem    >= 0 ? (row[idxItem]    || "").trim() : "";
-        const model     = idxModel   >= 0 ? (row[idxModel]   || "").trim() : "";
-        const size      = idxSize    >= 0 ? (row[idxSize]    || "").trim() : "";
-        const status    = idxStatus  >= 0 ? (row[idxStatus]  || "").trim() : "";
-        const daysStr   = idxDays    >= 0 ? (row[idxDays]    || "").trim() : "";
-        const monthsStr = idxMonths  >= 0 ? (row[idxMonths]  || "").trim() : "";
-        const place     = idxPlace   >= 0 ? (row[idxPlace]   || "").trim() : "";
-        const dueStr    = idxDueDate >= 0 ? (row[idxDueDate] || "").trim() : "";
-        const startStr  = idxStart   >= 0 ? (row[idxStart]   || "").trim() : "";
-
-        // นับสถานะ
+        // สถานะ
         if (status) {
           statusCounts[status] = (statusCounts[status] || 0) + 1;
           if (status === "อยู่ในสัญญา") inContract++;
         }
 
-        // นับตามขนาด เฉพาะ "เครื่องผลิตออกซิเจน"
-        if (item && item.includes("เครื่องผลิตออกซิเจน")) {
-          if (size === "3") count3++;
+        // ขนาดเครื่องผลิตออกซิเจน
+        if (item.includes("เครื่องผลิตออกซิเจน")) {
+          if (size === "3")      count3++;
           else if (size === "5") count5++;
           else if (size === "10") count10++;
           else if (size === "0") countFree++;
         }
 
-        // วันเช่า (ใช้เรียง Top5)
-        let days = 0;
+        // จำนวนวันเช่า
+        let d = 0;
         if (daysStr) {
-          const d = Number(daysStr);
-          if (!isNaN(d) && d > 0) {
-            days = d;
-            totalDays += d;
-          }
+          d = Number(daysStr);
+          if (!isNaN(d) && d > 0) totalDays += d;
         }
 
-        // เก็บข้อมูลเพื่อทำ Top 5 เช่านานที่สุด
-        if (days > 0) {
-          durationItems.push({
-            item,
-            model,
-            size,
-            place,
-            monthsStr,
-            days
-          });
-        }
+        // สำหรับ Top 5
+        topList.push({
+          item,
+          model,
+          size,
+          rentMonth,
+          days: d
+        });
 
-        // หาเครื่องครบกำหนดใน "เดือนนี้"
+        // เครื่องผลิตออกซิเจนที่ครบกำหนดในเดือนนี้ (ใช้วันครบกำหนด หรือถ้าไม่มีให้ใช้ nearDueTxt)
         if (
-          item &&
           item.includes("เครื่องผลิตออกซิเจน") &&
-          status === "อยู่ในสัญญา" &&
-          dueStr &&
-          startStr !== "0" &&
-          !dueStr.startsWith("30/12/1899") &&
-          !dueStr.startsWith("30/12/1900")
+          status === "อยู่ในสัญญา"
         ) {
-          const parts = dueStr.split("/");
-          if (parts.length === 3) {
-            const [dDay, dMonth, dYear] = parts.map(Number);
-            if (dYear >= 2000) {
-              const dueDate = new Date(dYear, dMonth - 1, dDay);
-              dueDate.setHours(0,0,0,0);
-
-              const diffDays = Math.round((dueDate - today) / (1000*60*60*24));
-
-              if (
-                dYear === currentYear &&
-                (dMonth - 1) === currentMonth &&
-                diffDays >= 0
-              ) {
-                dueSoonItems.push({
-                  item, model, size, place,
-                  dueStr,
-                  daysLeft: diffDays,
-                  dueDate
-                });
+          // กรณีมีคอลัมน์ "วันครบกำหนด"
+          if (dueStr && !dueStr.startsWith("30/12/1899") && !dueStr.startsWith("30/12/1900")) {
+            const parts = dueStr.split("/");
+            if (parts.length === 3) {
+              const [dDay, dMonth, dYear] = parts.map(Number);
+              if (dYear >= 2000) {
+                const dueDate = new Date(dYear, dMonth - 1, dDay);
+                dueDate.setHours(0,0,0,0);
+                const diffMs   = dueDate - today;
+                const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+                if (
+                  dYear === currentYear &&
+                  (dMonth - 1) === currentMonth &&
+                  diffDays >= 0
+                ) {
+                  dueSoonItems.push({
+                    item,
+                    model,
+                    size,
+                    place,
+                    dueStr,
+                    daysLeft: diffDays,
+                    dueDate
+                  });
+                }
               }
             }
           }
@@ -329,7 +340,7 @@
 
       const avgDays = totalDevices > 0 ? Math.round(totalDays / totalDevices) : 0;
 
-      // การ์ดด้านบน
+      // การ์ดสรุป
       document.getElementById("totalDevices").textContent = totalDevices.toLocaleString();
       document.getElementById("inContract").textContent   = inContract.toLocaleString();
       document.getElementById("totalDays").textContent    = totalDays.toLocaleString();
@@ -341,11 +352,11 @@
       document.getElementById("count10L").textContent  = count10.toLocaleString();
       document.getElementById("countFree").textContent = countFree.toLocaleString();
 
-      // กราฟสถานะ
+      // กราฟ
       buildStatusChart(statusCounts);
 
-      // ตาราง Top 5 เช่านานที่สุด
-      buildTopDurationTable(durationItems);
+      // ตาราง Top 5
+      buildTop5Table(topList);
 
       // ตารางครบกำหนดเดือนนี้
       buildDueSoonTable(dueSoonItems);
@@ -354,7 +365,7 @@
     function buildStatusChart(statusCounts) {
       const ctx = document.getElementById("statusChart").getContext("2d");
       const labels = Object.keys(statusCounts);
-      const data = Object.values(statusCounts);
+      const data   = Object.values(statusCounts);
 
       new Chart(ctx, {
         type: "doughnut",
@@ -368,67 +379,32 @@
       });
     }
 
-    // 🔹 Top 5 เครื่องที่เช่านานที่สุด – ใช้ days (คอลัมน์ M) เรียง และโชว์ข้อความจาก N
-    function buildTopDurationTable(items) {
-      const container = document.getElementById("topDurationBody");
-      if (!container) return;
+    // Top 5 ตามจำนวนวันเช่า (แล้วโชว์จำนวนเดือนที่เช่า)
+    function buildTop5Table(list) {
+      const tbody = document.getElementById("top5Body");
+      if (!tbody) return;
 
-      if (!items || items.length === 0) {
-        container.textContent = "ยังไม่มีข้อมูลจำนวนเดือนที่เช่า";
-        return;
-      }
+      // เรียงตาม days มาก -> น้อย แล้วเลือก 5 รายการแรก
+      list.sort((a, b) => b.days - a.days);
+      const top5 = list.slice(0, 5);
 
-      const top = items
-        .slice()
-        .sort((a, b) => b.days - a.days)
-        .slice(0, 5);
-
-      const table = document.createElement("table");
-      table.className = "simple-table";
-
-      const thead = document.createElement("thead");
-      const trHead = document.createElement("tr");
-      ["รายการเช่า", "รุ่น", "ขนาด (ลิตร)", "ที่อยู่", "จำนวนเดือนที่เช่า"].forEach(text => {
-        const th = document.createElement("th");
-        th.textContent = text;
-        trHead.appendChild(th);
-      });
-      thead.appendChild(trHead);
-      table.appendChild(thead);
-
-      const tbody = document.createElement("tbody");
-      top.forEach(it => {
+      tbody.innerHTML = "";
+      top5.forEach((r, index) => {
         const tr = document.createElement("tr");
 
-        const tdItem = document.createElement("td");
-        tdItem.textContent = it.item;
-        tr.appendChild(tdItem);
-
-        const tdModel = document.createElement("td");
-        tdModel.textContent = it.model;
-        tr.appendChild(tdModel);
-
-        const tdSize = document.createElement("td");
-        tdSize.textContent = it.size;
-        tr.appendChild(tdSize);
-
-        const tdPlace = document.createElement("td");
-        tdPlace.textContent = it.place;
-        tr.appendChild(tdPlace);
-
-        const tdMonths = document.createElement("td");
-        tdMonths.textContent = it.monthsStr || "-";
-        tr.appendChild(tdMonths);
+        tr.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${r.item}</td>
+          <td>${r.model}</td>
+          <td>${r.size || "-"}</td>
+          <td>${r.rentMonth || "-"}</td>
+        `;
 
         tbody.appendChild(tr);
       });
-
-      table.appendChild(tbody);
-      container.innerHTML = "";
-      container.appendChild(table);
     }
 
-    // 🔔 ตารางครบกำหนดในเดือนนี้
+    // ตารางเครื่องผลิตออกซิเจนที่ครบกำหนดในเดือนนี้
     function buildDueSoonTable(items) {
       const container = document.getElementById("dueSoonBody");
       if (!container) return;
@@ -441,7 +417,6 @@
       items.sort((a, b) => a.dueDate - b.dueDate);
 
       const table = document.createElement("table");
-      table.className = "due-table";
 
       const thead = document.createElement("thead");
       const trHead = document.createElement("tr");
@@ -457,34 +432,20 @@
       items.forEach(it => {
         const tr = document.createElement("tr");
 
-        const tdItem = document.createElement("td");
-        tdItem.textContent = it.item;
-        tr.appendChild(tdItem);
-
-        const tdModel = document.createElement("td");
-        tdModel.textContent = it.model;
-        tr.appendChild(tdModel);
-
-        const tdSize = document.createElement("td");
-        tdSize.textContent = it.size;
-        tr.appendChild(tdSize);
-
-        const tdPlace = document.createElement("td");
-        tdPlace.textContent = it.place;
-        tr.appendChild(tdPlace);
-
-        const tdDue = document.createElement("td");
-        tdDue.textContent = it.dueStr;
-        tr.appendChild(tdDue);
-
-        const tdLeft = document.createElement("td");
-        tdLeft.innerHTML = `<span class="due-badge">${it.daysLeft}</span>`;
-        tr.appendChild(tdLeft);
+        tr.innerHTML = `
+          <td>${it.item}</td>
+          <td>${it.model}</td>
+          <td>${it.size}</td>
+          <td>${it.place}</td>
+          <td>${it.dueStr}</td>
+          <td><span class="due-badge">${it.daysLeft}</span></td>
+        `;
 
         tbody.appendChild(tr);
       });
 
       table.appendChild(tbody);
+
       container.innerHTML = "";
       container.appendChild(table);
     }
