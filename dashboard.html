@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <title>Dashboard รายงานเช่าอุปกรณ์การแพทย์</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Chart.js CDN -->
+  <!-- Chart.js ใช้แค่สำหรับกราฟสถานะ -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
@@ -95,7 +95,7 @@
       font-weight: 500;
     }
 
-    /* ตารางต่าง ๆ */
+    /* ตารางทั่วไป / ตารางครบกำหนด */
     .simple-table,
     .due-table {
       border-collapse: collapse;
@@ -162,7 +162,7 @@
       </div>
     </div>
 
-    <!-- โซนสรุปขนาด + กราฟสถานะ -->
+    <!-- สรุปขนาด + กราฟสถานะ -->
     <div class="charts">
       <div class="panel">
         <h2>จำนวนเครื่องผลิตออกซิเจนตามขนาด (ลิตร)</h2>
@@ -183,7 +183,7 @@
       </div>
     </div>
 
-    <!-- แทนที่ Top 5 รุ่นขายดี ด้วย Top 5 เครื่องที่เช่านานที่สุด -->
+    <!-- 🔹 Top 5 เครื่องที่เช่านานที่สุด (แทนกราฟเดิม) -->
     <div class="panel chart-full">
       <h2>Top 5 เครื่องที่เช่านานที่สุด (ตามจำนวนเดือนที่เช่า)</h2>
       <div id="topDurationBody" class="card-note">
@@ -191,7 +191,7 @@
       </div>
     </div>
 
-    <!-- แจ้งเตือนครบกำหนดในเดือนนี้ -->
+    <!-- 🔔 แจ้งเตือนครบกำหนดในเดือนนี้ -->
     <div class="panel chart-full" style="margin-top:16px;">
       <h2>เครื่องผลิตออกซิเจนที่ครบกำหนดในเดือนนี้ (เรียงจากใกล้ครบก่อน)</h2>
       <div id="dueSoonBody" class="card-note">
@@ -202,7 +202,6 @@
   </div>
 
   <script>
-    // URL CSV ของชีตคุณ
     const SHEET_CSV_URL =
       "https://docs.google.com/spreadsheets/d/1bX4w5FDpZY4WOzl69ZJ2t8-fPtI6RKO2eIILSZ1U8Zs/export?format=csv&gid=0";
 
@@ -211,11 +210,10 @@
       const text = await res.text();
 
       const rows = text.trim().split("\n").map(row => row.split(","));
-
       const header = rows[0];
       const dataRows = rows.slice(1);
 
-      // index คอลัมน์ที่ใช้
+      // ตำแหน่งคอลัมน์
       const idxItem     = header.indexOf("รายการเช่า");
       const idxModel    = header.indexOf("รุ่น");
       const idxSize     = header.indexOf("ขนาด");
@@ -226,25 +224,17 @@
       const idxDueDate  = header.indexOf("วันครบกำหนด");
       const idxStart    = header.indexOf("วันที่เริ่มทำสัญญา");
 
-      console.log("Header:", header);
-
       let totalDevices = 0;
       let inContract = 0;
       let totalDays = 0;
 
       const statusCounts = {};
 
-      // ขนาดเครื่องผลิตออกซิเจน
-      let count3 = 0;
-      let count5 = 0;
-      let count10 = 0;
-      let countFree = 0; // ขนาด 0 = เครื่องว่าง
+      let count3 = 0, count5 = 0, count10 = 0, countFree = 0;
 
-      // สำหรับ Top 5 เช่านานที่สุด
-      const durationItems = [];
+      const durationItems = [];   // ใช้ทำ Top5
+      const dueSoonItems = [];   // ใช้ทำตารางครบกำหนด
 
-      // รายการที่ครบกำหนดในเดือนนี้
-      const dueSoonItems = [];
       const today = new Date();
       today.setHours(0,0,0,0);
       const currentMonth = today.getMonth();
@@ -255,33 +245,31 @@
 
         totalDevices++;
 
-        const item     = idxItem    >= 0 ? (row[idxItem]    || "").trim() : "";
-        const model    = idxModel   >= 0 ? (row[idxModel]   || "").trim() : "";
-        const size     = idxSize    >= 0 ? (row[idxSize]    || "").trim() : "";
-        const status   = idxStatus  >= 0 ? (row[idxStatus]  || "").trim() : "";
-        const daysStr  = idxDays    >= 0 ? (row[idxDays]    || "").trim() : "";
-        const monthsStr= idxMonths  >= 0 ? (row[idxMonths]  || "").trim() : "";
-        const place    = idxPlace   >= 0 ? (row[idxPlace]   || "").trim() : "";
-        const dueStr   = idxDueDate >= 0 ? (row[idxDueDate] || "").trim() : "";
-        const startStr = idxStart   >= 0 ? (row[idxStart]   || "").trim() : "";
+        const item      = idxItem    >= 0 ? (row[idxItem]    || "").trim() : "";
+        const model     = idxModel   >= 0 ? (row[idxModel]   || "").trim() : "";
+        const size      = idxSize    >= 0 ? (row[idxSize]    || "").trim() : "";
+        const status    = idxStatus  >= 0 ? (row[idxStatus]  || "").trim() : "";
+        const daysStr   = idxDays    >= 0 ? (row[idxDays]    || "").trim() : "";
+        const monthsStr = idxMonths  >= 0 ? (row[idxMonths]  || "").trim() : "";
+        const place     = idxPlace   >= 0 ? (row[idxPlace]   || "").trim() : "";
+        const dueStr    = idxDueDate >= 0 ? (row[idxDueDate] || "").trim() : "";
+        const startStr  = idxStart   >= 0 ? (row[idxStart]   || "").trim() : "";
 
         // นับสถานะ
         if (status) {
           statusCounts[status] = (statusCounts[status] || 0) + 1;
-          if (status === "อยู่ในสัญญา") {
-            inContract++;
-          }
+          if (status === "อยู่ในสัญญา") inContract++;
         }
 
         // นับตามขนาด เฉพาะ "เครื่องผลิตออกซิเจน"
         if (item && item.includes("เครื่องผลิตออกซิเจน")) {
-          if (size === "3")      count3++;
+          if (size === "3") count3++;
           else if (size === "5") count5++;
           else if (size === "10") count10++;
           else if (size === "0") countFree++;
         }
 
-        // รวมจำนวนวันเช่า (ใช้เฉพาะค่ามากกว่า 0)
+        // วันเช่า (ใช้เรียง Top5)
         let days = 0;
         if (daysStr) {
           const d = Number(daysStr);
@@ -291,7 +279,7 @@
           }
         }
 
-        // เก็บข้อมูลสำหรับ Top 5 เช่านานที่สุด
+        // เก็บข้อมูลเพื่อทำ Top 5 เช่านานที่สุด
         if (days > 0) {
           durationItems.push({
             item,
@@ -303,14 +291,15 @@
           });
         }
 
-        // ✅ ค้นหา "ครบกำหนดในเดือนนี้"
+        // หาเครื่องครบกำหนดใน "เดือนนี้"
         if (
           item &&
           item.includes("เครื่องผลิตออกซิเจน") &&
           status === "อยู่ในสัญญา" &&
           dueStr &&
-          startStr !== "0" &&  // กันกรณีเครื่องว่าง
-          !dueStr.startsWith("30/12/1899") && !dueStr.startsWith("30/12/1900")
+          startStr !== "0" &&
+          !dueStr.startsWith("30/12/1899") &&
+          !dueStr.startsWith("30/12/1900")
         ) {
           const parts = dueStr.split("/");
           if (parts.length === 3) {
@@ -319,8 +308,7 @@
               const dueDate = new Date(dYear, dMonth - 1, dDay);
               dueDate.setHours(0,0,0,0);
 
-              const diffMs = dueDate - today;
-              const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+              const diffDays = Math.round((dueDate - today) / (1000*60*60*24));
 
               if (
                 dYear === currentYear &&
@@ -328,10 +316,7 @@
                 diffDays >= 0
               ) {
                 dueSoonItems.push({
-                  item,
-                  model,
-                  size,
-                  place,
+                  item, model, size, place,
                   dueStr,
                   daysLeft: diffDays,
                   dueDate
@@ -344,25 +329,25 @@
 
       const avgDays = totalDevices > 0 ? Math.round(totalDays / totalDevices) : 0;
 
-      // อัปเดตการ์ดบน
+      // การ์ดด้านบน
       document.getElementById("totalDevices").textContent = totalDevices.toLocaleString();
       document.getElementById("inContract").textContent   = inContract.toLocaleString();
       document.getElementById("totalDays").textContent    = totalDays.toLocaleString();
       document.getElementById("avgDays").textContent      = avgDays.toLocaleString();
 
-      // อัปเดตตัวเลขขนาด
+      // จำนวนขนาด
       document.getElementById("count3L").textContent   = count3.toLocaleString();
       document.getElementById("count5L").textContent   = count5.toLocaleString();
       document.getElementById("count10L").textContent  = count10.toLocaleString();
       document.getElementById("countFree").textContent = countFree.toLocaleString();
 
-      // สร้างกราฟสถานะ
+      // กราฟสถานะ
       buildStatusChart(statusCounts);
 
-      // สร้างตาราง Top 5 เช่านานที่สุด
+      // ตาราง Top 5 เช่านานที่สุด
       buildTopDurationTable(durationItems);
 
-      // สร้างตารางครบกำหนดในเดือนนี้
+      // ตารางครบกำหนดเดือนนี้
       buildDueSoonTable(dueSoonItems);
     }
 
@@ -375,19 +360,15 @@
         type: "doughnut",
         data: {
           labels,
-          datasets: [{
-            data
-          }]
+          datasets: [{ data }]
         },
         options: {
-          plugins: {
-            legend: { position: "bottom" }
-          }
+          plugins: { legend: { position: "bottom" } }
         }
       });
     }
 
-    // Top 5 เครื่องที่เช่านานที่สุด (ใช้ days จากคอลัมน์ "จำนวนวันที่เช่า" และแสดงข้อความจากคอลัมน์ "จำนวนเดือนที่เช่า")
+    // 🔹 Top 5 เครื่องที่เช่านานที่สุด – ใช้ days (คอลัมน์ M) เรียง และโชว์ข้อความจาก N
     function buildTopDurationTable(items) {
       const container = document.getElementById("topDurationBody");
       if (!container) return;
@@ -397,7 +378,6 @@
         return;
       }
 
-      // เรียงจากจำนวนวันมากที่สุดก่อน แล้วเอาแค่ 5 รายการ
       const top = items
         .slice()
         .sort((a, b) => b.days - a.days)
@@ -444,12 +424,11 @@
       });
 
       table.appendChild(tbody);
-
       container.innerHTML = "";
       container.appendChild(table);
     }
 
-    // ตารางครบกำหนดในเดือนนี้ เรียงจากใกล้ครบก่อน
+    // 🔔 ตารางครบกำหนดในเดือนนี้
     function buildDueSoonTable(items) {
       const container = document.getElementById("dueSoonBody");
       if (!container) return;
@@ -506,7 +485,6 @@
       });
 
       table.appendChild(tbody);
-
       container.innerHTML = "";
       container.appendChild(table);
     }
