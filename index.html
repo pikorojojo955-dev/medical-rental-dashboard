@@ -63,7 +63,7 @@
       background: #fafafa;
     }
 
-    /* แถบเตือนจากคอลัมน์ R ("เครื่องที่ใกล้") */
+    /* แถบเตือนจากคอลัมน์ "เครื่องที่ใกล้ถึงกำหนดล่าสุด" */
     .alert-red {
       background: #ffcccc !important;
       animation: blink 1s infinite;
@@ -105,9 +105,9 @@
     const SHEET_CSV_URL =
       "https://docs.google.com/spreadsheets/d/1bX4w5FDpZY4WOzl69ZJ2t8-fPtI6RKO2eIILSZ1U8Zs/export?format=csv&gid=0";
 
-    let allRows = [];     // เก็บข้อมูลดิบไว้สำหรับ filter
-    let headers = [];     // หัวคอลัมน์
-    let indexNearCol = -1; // index ของคอลัมน์ "เครื่องที่ใกล้"
+    let allRows = [];       // เก็บข้อมูลดิบไว้สำหรับ filter
+    let headers = [];       // หัวคอลัมน์
+    let indexNearCol = -1;  // index ของคอลัมน์ "เครื่องที่ใกล้ถึงกำหนดล่าสุด"
 
     async function loadSheet() {
       try {
@@ -120,8 +120,8 @@
         headers = rows[0];
         allRows = rows.slice(1);
 
-        // หาคอลัมน์ "เครื่องที่ใกล้"
-        indexNearCol = headers.indexOf("เครื่องที่ใกล้");
+        // หาคอลัมน์ "เครื่องที่ใกล้ถึงกำหนดล่าสุด"
+        indexNearCol = headers.indexOf("เครื่องที่ใกล้ถึงกำหนดล่าสุด");
 
         renderTable(allRows);
       } catch (err) {
@@ -151,18 +151,18 @@
 
         const tr = document.createElement("tr");
 
-        // ถ้ามีคอลัมน์ "เครื่องที่ใกล้" → ใช้เป็นเงื่อนไขสี
+        // ถ้ามีคอลัมน์ "เครื่องที่ใกล้ถึงกำหนดล่าสุด" → ใช้เป็นเงื่อนไขสี
         if (indexNearCol !== -1) {
           const nearStr = (row[indexNearCol] || "").trim();
           const nearVal = parseInt(nearStr, 10);
 
           if (!isNaN(nearVal)) {
             if (nearVal >= 0 && nearVal <= 3) {
-              tr.classList.add("alert-red");     // 0–3 แดงกระพริบ
+              tr.classList.add("alert-red");      // 0–3 แดงกระพริบ
             } else if (nearVal >= 4 && nearVal <= 7) {
               tr.classList.add("alert-yellow");   // 4–7 เหลือง
             }
-            // >7 ไม่ต้องทำอะไร
+            // >7 หรือค่าว่าง → ไม่ทำอะไร
           }
         }
 
