@@ -1,0 +1,108 @@
+// ====== ข้อมูลร้าน (แก้ได้) ======
+const PHONE_E164 = "+66904137894";
+const LINE_ID = "0904137894jo";
+const MAP_QUERY = "ร้านยา เจพี ฟาร์มาซี, Bangkok";
+const BOOKING_CAL = "https://calendly.com/your-brand/consult";
+
+// ====== สร้างลิงก์ ======
+const telHref = `tel:${PHONE_E164}`;
+const lineHref = `https://line.me/ti/p/~${LINE_ID.replace(/^@/,'')}`;
+const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(MAP_QUERY)}`;
+
+document.getElementById("callBtn").href = telHref;
+document.getElementById("lineBtn").href = lineHref;
+document.getElementById("mapBtn").href = mapsHref;
+document.getElementById("lineHeader").href = lineHref;
+
+document.getElementById("bookingLine").href = lineHref;
+document.getElementById("bookingCall").href = telHref;
+document.getElementById("bookingCal").href = BOOKING_CAL;
+
+document.getElementById("cCall").href = telHref;
+document.getElementById("cLine").href = lineHref;
+document.getElementById("cMap").href = mapsHref;
+
+document.getElementById("phoneText").href = telHref;
+document.getElementById("mapFrame").src = mapsHref;
+document.getElementById("year").textContent = new Date().getFullYear();
+
+// ====== สลับภาษา TH/EN ======
+const dict = {
+  th: {
+    nav: ["หน้าแรก","บริการ","เกี่ยวกับเรา","บล็อก","จองคิว","ติดต่อ"],
+    heroTitle: "ร้านขายยา & ให้คำปรึกษาโดยเภสัชกร",
+    heroDesc: "ให้คำแนะนำยา เวชภัณฑ์ วัคซีนพื้นฐาน และบริการสุขภาพชุมชน ปลอดภัย ได้มาตรฐาน",
+    hlTitle:"จุดเด่นร้านขายยา",
+    hl1:"ยาคุณภาพ และปลอดภัย",
+    hl2:"เภสัชกรดูแลให้คำปรึกษา",
+    hl3:"อุปกรณ์ทางการแพทย์ครบวงจร",
+    hl4:"ก้าวไปดูแลสุขภาพในทุกมิติ เพื่อสุขภาพคุณ",
+    svcTitle:"บริการของเรา",
+    svcSub:"ปรับเพิ่ม/ลดรายการบริการตามร้านของคุณ",
+    aboutTitle:"เกี่ยวกับร้าน",
+    aboutBody:"เราคือร้านขายยาชุมชนที่เน้นความปลอดภัยและหลักฐานเชิงวิทยาศาสตร์ โดยมีเภสัชกร กิตติศักดิ์ บุญธรรม (ใบอนุญาต ภ. 34783) ดูแล และจ่ายยารวมถึงการคัดเลือกยา เพื่อผลลัพธ์ที่เหมาะกับแต่ละบุคคล",
+    blogTitle:"บล็อกสุขภาพ",
+    bookingTitle:"จองคิว",
+    bookingBody:"เลือกช่องทางที่สะดวก: ไลน์/โทร หรือปฏิทินออนไลน์",
+    contactTitle:"ติดต่อเรา",
+    contactLead:"ฝากข้อความหรือทักไลน์เพื่อสอบถามสินค้า/บริการ",
+    readMore:"อ่านต่อ / Read more",
+    call:"โทรเลย", line:"แชตไลน์", map:"เปิดแผนที่"
+  },
+  en: {
+    nav: ["Home","Services","About","Blog","Booking","Contact"],
+    heroTitle: "Community Pharmacy with Pharmacist Care",
+    heroDesc: "Professional advice, genuine medicines, and community health services.",
+    hlTitle:"Highlights",
+    hl1:"Quality & Safe Meds",
+    hl2:"Pharmacist Counseling",
+    hl3:"Full Medical Supplies",
+    hl4:"Holistic Health Care",
+    svcTitle:"Our Services",
+    svcSub:"Customize services to your store",
+    aboutTitle:"About",
+    aboutBody:"We are a community pharmacy focused on safety and evidence, led by Pharmacist Kittisak Boontham (License No. Ph. 34783), blending Thai Traditional Medicine where appropriate.",
+    blogTitle:"Health Blog",
+    bookingTitle:"Booking",
+    bookingBody:"Book via Line/phone or use our online calendar.",
+    contactTitle:"Contact",
+    contactLead:"Leave a message or reach us on Line for product/service inquiries.",
+    readMore:"Read more",
+    call:"Call", line:"Chat on Line", map:"Open Map"
+  }
+};
+
+let current = "th";
+const langBtn = document.getElementById("langBtn");
+const nav = document.getElementById("nav");
+const navLinks = nav.querySelectorAll("[data-nav]");
+
+function applyLang(l){
+  const d = dict[l];
+  navLinks.forEach((a,i)=>a.textContent=d.nav[i]);
+  document.getElementById("heroTitle").textContent = d.heroTitle;
+  document.getElementById("heroDesc").textContent = d.heroDesc;
+  document.getElementById("hlTitle").textContent = d.hlTitle;
+  document.getElementById("hl1").textContent = d.hl1;
+  document.getElementById("hl2").textContent = d.hl2;
+  document.getElementById("hl3").textContent = d.hl3;
+  document.getElementById("hl4").textContent = d.hl4;
+  document.getElementById("svcTitle").textContent = d.svcTitle;
+  document.getElementById("svcSub").textContent = d.svcSub;
+  document.getElementById("aboutTitle").textContent = d.aboutTitle;
+  document.getElementById("aboutBody").textContent = d.aboutBody;
+  document.getElementById("blogTitle").textContent = d.blogTitle;
+  document.getElementById("bookingTitle").textContent = d.bookingTitle;
+  document.getElementById("bookingBody").textContent = d.bookingBody;
+  document.getElementById("contactTitle").textContent = d.contactTitle;
+  document.getElementById("contactLead").textContent = d.contactLead;
+  document.getElementById("readMore1").textContent = d.readMore;
+  document.getElementById("readMore2").textContent = d.readMore;
+  document.getElementById("readMore3").textContent = d.readMore;
+  document.getElementById("callBtn").textContent = d.call;
+  document.getElementById("lineBtn").textContent = d.line;
+  document.getElementById("mapBtn").textContent = d.map;
+  langBtn.textContent = l.toUpperCase();
+}
+langBtn.onclick = ()=>{ current = (current==="th"?"en":"th"); applyLang(current); };
+applyLang(current);
