@@ -1,118 +1,663 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="th">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>JP Pharmacy – ร้านขายยา เจพี ฟาร์มาซี</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ร้านยา เจพี ฟาร์มาซี | JP Pharmacy</title>
 
-<style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; line-height: 1.6; }
-    header { background: #28a745; padding: 16px; color: white; text-align: center; }
-    nav { display: flex; justify-content: center; gap: 20px; background: #f0f0f0; padding: 10px; }
-    nav a { text-decoration: none; color: #333; font-weight: bold; }
-    .container { max-width: 900px; margin: auto; padding: 20px; }
-    .btn { padding: 10px 15px; border-radius: 6px; display: inline-block; margin: 5px; color: white; text-decoration: none; }
-    .call { background: #28a745; }
-    .line { background: #00c300; }
-    .map { background: #007bff; }
-    footer { margin-top: 30px; text-align: center; padding: 20px; background: #f0f0f0; }
-</style>
+  <style>
+    /* ====== base style ====== */
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:#f5f7f9;
+      color:#222;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    /* ====== header / nav ====== */
+    header {
+      background:#0a8f3c;
+      color:#fff;
+      padding:18px 0 10px;
+    }
+    header .top-row {
+      display:flex;
+      align-items: center;
+      justify-content: space-between;
+      gap:16px;
+      flex-wrap: wrap;
+    }
+    .brand {
+      font-size: 1.1rem;
+    }
+    .brand strong {
+      font-weight: 700;
+    }
+
+    nav {
+      margin-top:10px;
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      gap:16px;
+      flex-wrap:wrap;
+      font-size:0.95rem;
+    }
+    .nav-links {
+      display:flex;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+    .nav-links a {
+      padding:4px 0;
+      border-bottom:2px solid transparent;
+    }
+    .nav-links a:hover {
+      border-bottom-color:#fff;
+    }
+    #langBtn {
+      padding:4px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,0.7);
+      background:rgba(255,255,255,0.1);
+      color:#fff;
+      cursor:pointer;
+      font-size:0.85rem;
+    }
+
+    /* ====== hero ====== */
+    .hero {
+      background:#0a8f3c;
+      color:#fff;
+      padding:32px 0 40px;
+    }
+    .hero-grid {
+      display:grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+      gap:24px;
+      align-items:center;
+    }
+    .hero h1 {
+      margin:0 0 12px;
+      font-size:1.9rem;
+    }
+    .hero p {
+      margin:0 0 16px;
+      font-size:0.98rem;
+      opacity:.95;
+    }
+    .hero-bullets {
+      margin:0 0 18px;
+      padding-left:18px;
+      font-size:0.93rem;
+    }
+    .hero-bullets li { margin-bottom:4px; }
+
+    .btn-row {
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+    .btn {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:8px 16px;
+      border-radius:999px;
+      font-size:0.92rem;
+      cursor:pointer;
+      border:none;
+      text-decoration:none;
+      transition: transform .08s ease, box-shadow .08s ease, opacity .15s ease;
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background:#12a24a;
+      color:#fff;
+      box-shadow:0 2px 6px rgba(0,0,0,0.18);
+    }
+    .btn-line {
+      background:#06c755;
+      color:#fff;
+      box-shadow:0 2px 6px rgba(0,0,0,0.18);
+    }
+    .btn-ghost {
+      background:#fff;
+      color:#0a8f3c;
+      border:1px solid #0a8f3c;
+    }
+    .btn:hover {
+      transform:translateY(-1px);
+      box-shadow:0 4px 10px rgba(0,0,0,0.18);
+      opacity:.96;
+    }
+
+    .hero-photo {
+      border-radius:16px;
+      overflow:hidden;
+      background:#fff;
+      min-height:180px;
+    }
+    .hero-photo img { width:100%; height:auto; }
+
+    /* sections */
+    section {
+      padding:40px 0;
+    }
+    section h2 {
+      font-size:1.4rem;
+      margin:0 0 4px;
+    }
+    section p.lead {
+      margin:0 0 24px;
+      font-size:0.95rem;
+      color:#555;
+    }
+
+    /* highlight list */
+    .highlight-grid {
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+      gap:16px;
+    }
+    .card {
+      background:#fff;
+      border-radius:16px;
+      padding:18px 18px 16px;
+      box-shadow:0 1px 3px rgba(0,0,0,0.05);
+      font-size:0.93rem;
+    }
+    .card h3 {
+      margin:0 0 6px;
+      font-size:1.02rem;
+    }
+    .card small { color:#777; }
+
+    /* services specific */
+    .service-grid {
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px,1fr));
+      gap:18px;
+    }
+
+    /* blog cards */
+    .blog-grid {
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px,1fr));
+      gap:18px;
+    }
+    .blog-card img { border-radius:12px; margin-bottom:10px; }
+    .blog-meta {
+      font-size:0.8rem;
+      color:#777;
+      margin-bottom:4px;
+    }
+    .blog-title {
+      font-size:0.98rem;
+      margin-bottom:6px;
+    }
+    .blog-foot a {
+      font-size:0.85rem;
+      color:#0a8f3c;
+      font-weight:500;
+    }
+
+    /* booking */
+    .booking-grid {
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px,1fr));
+      gap:18px;
+    }
+
+    /* contact */
+    .contact-grid {
+      display:grid;
+      grid-template-columns: minmax(0,1.05fr) minmax(0,1.1fr);
+      gap:24px;
+      align-items:flex-start;
+    }
+    .contact-form label {
+      display:block;
+      font-size:0.85rem;
+      margin-bottom:4px;
+    }
+    .contact-form input,
+    .contact-form textarea {
+      width:100%;
+      border-radius:10px;
+      border:1px solid #cfd6dd;
+      padding:8px 10px;
+      margin-bottom:10px;
+      font-family:inherit;
+      font-size:0.92rem;
+    }
+    .contact-form textarea { min-height:120px; resize:vertical; }
+
+    .contact-info p {
+      margin:4px 0;
+      font-size:0.93rem;
+    }
+    .contact-info .pill-row {
+      margin-top:10px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    iframe#mapFrame {
+      width:100%;
+      border:0;
+      border-radius:14px;
+      min-height:230px;
+      background:#e3e7ea;
+    }
+
+    footer {
+      padding:18px 0 26px;
+      font-size:0.82rem;
+      color:#777;
+      text-align:center;
+    }
+
+    /* responsive */
+    @media (max-width: 768px) {
+      .hero-grid { grid-template-columns:1fr; }
+      .contact-grid { grid-template-columns:1fr; }
+    }
+  </style>
 </head>
-
 <body>
 
-<header>
-    <h1 id="heroTitle">ร้านขายยา JP Pharmacy</h1>
-    <p id="heroDesc">ให้คำแนะนำโดยเภสัชกร – ปลอดภัย มาตรฐาน</p>
-</header>
+  <!-- ===== HEADER + NAV ===== -->
+  <header>
+    <div class="container">
+      <div class="top-row">
+        <div class="brand">
+          ร้านยา เจพี ฟาร์มาซี · <strong>JP Pharmacy</strong> so Supply
+        </div>
+        <a id="lineHeader" class="btn btn-line" href="#" target="_blank" rel="noopener">Line OA</a>
+      </div>
 
-<nav id="nav">
-    <a data-nav="0" href="#">หน้าแรก</a>
-    <a data-nav="1" href="#">บริการ</a>
-    <a data-nav="2" href="#">เกี่ยวกับเรา</a>
-    <a data-nav="3" href="#">บล็อก</a>
-    <a data-nav="4" href="#">จองคิว</a>
-    <a data-nav="5" href="#">ติดต่อ</a>
-</nav>
+      <nav id="nav">
+        <div class="nav-links">
+          <a href="#home"     data-nav>หน้าแรก</a>
+          <a href="#services" data-nav>บริการ</a>
+          <a href="#about"    data-nav>เกี่ยวกับเรา</a>
+          <a href="#blog"     data-nav>บล็อก</a>
+          <a href="#booking"  data-nav>จองคิว</a>
+          <a href="#contact"  data-nav>ติดต่อ</a>
+        </div>
+        <button id="langBtn" type="button">TH</button>
+      </nav>
+    </div>
+  </header>
 
-<div class="container">
+  <!-- ===== HERO ===== -->
+  <section id="home" class="hero">
+    <div class="container hero-grid">
+      <div>
+        <h1 id="heroTitle">ร้านขายยา &amp; ให้คำปรึกษาโดยเภสัชกร</h1>
+        <p id="heroDesc">
+          ให้คำแนะนำยา เวชภัณฑ์ วัคซีนพื้นฐาน และบริการสุขภาพชุมชน ปลอดภัย ได้มาตรฐาน
+        </p>
 
-    <h2 id="contactTitle">ติดต่อเรา</h2>
-    <p id="contactLead">สอบถามสินค้า/บริการ หรือทักไลน์เพื่อพูดคุยได้เลย</p>
+        <ul class="hero-bullets">
+          <li>ยาคุณภาพ และปลอดภัย</li>
+          <li>เภสัชกรดูแลทุกเคส แนะนำการใช้ยา</li>
+          <li>อุปกรณ์การแพทย์และเครื่องผลิตออกซิเจนครบวงจร</li>
+          <li>ดูแลสุขภาพตั้งแต่ที่บ้านจนถึงโรงพยาบาล</li>
+        </ul>
 
-    <a id="callBtn" class="btn call">โทรเลย</a>
-    <a id="lineBtn" class="btn line">แชตไลน์</a>
-    <a id="mapBtn" class="btn map">เปิดแผนที่</a>
+        <div class="btn-row">
+          <a id="callBtn" class="btn btn-primary" href="#">โทรเลย</a>
+          <a id="lineBtn" class="btn btn-line" href="#" target="_blank" rel="noopener">แชตไลน์</a>
+          <a id="mapBtn" class="btn btn-ghost" href="#" target="_blank" rel="noopener">เปิดแผนที่</a>
+        </div>
+      </div>
 
-    <h3 style="margin-top:30px;">Google Maps</h3>
-    <iframe id="mapFrame" width="100%" height="300" style="border:0;" loading="lazy"></iframe>
+      <div class="hero-photo">
+        <!-- จะใช้รูปของคุณเองก็ได้ ใส่ลิงก์แทนรูปตัวอย่างด้านล่าง -->
+        <img src="https://images.pexels.com/photos/6129151/pexels-photo-6129151.jpeg?auto=compress&cs=tinysrgb&w=1200"
+             alt="JP Pharmacy">
+      </div>
+    </div>
+  </section>
 
-</div>
+  <!-- ===== HIGHLIGHTS ===== -->
+  <section>
+    <div class="container">
+      <h2 id="hlTitle">จุดเด่นร้านขายยา</h2>
+      <p class="lead">
+        เน้นความปลอดภัยของผู้ป่วยจริง มีเภสัชกรดูแลการใช้ยาและอุปกรณ์ทางการแพทย์อย่างใกล้ชิด
+      </p>
+      <div class="highlight-grid">
+        <div class="card">
+          <h3 id="hl1">ยาคุณภาพ และปลอดภัย</h3>
+          <p>คัดสรรยาที่ได้มาตรฐาน ผ่านช่องทางถูกกฎหมาย พร้อมตรวจสอบประวัติการใช้ยา</p>
+        </div>
+        <div class="card">
+          <h3 id="hl2">เภสัชกรดูแลให้คำปรึกษา</h3>
+          <p>ให้คำแนะนำการใช้ยา การดูแลโรคเรื้อรัง และการใช้ยาควบคู่สมุนไพร</p>
+        </div>
+        <div class="card">
+          <h3 id="hl3">อุปกรณ์ทางการแพทย์ครบวงจร</h3>
+          <p>เครื่องผลิตออกซิเจน วัดความดัน เตียงไฟฟ้า อุปกรณ์สำหรับดูแลผู้ป่วยที่บ้าน</p>
+        </div>
+        <div class="card">
+          <h3 id="hl4">ก้าวไปดูแลสุขภาพทุกมิติ</h3>
+          <p>ผสมผสานการแพทย์แผนปัจจุบันกับการดูแลแบบองค์รวม เน้นคุณภาพชีวิตคนในชุมชน</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<footer>
-    © <span id="year"></span> JP Pharmacy – All rights reserved.
-    <br>
-    <button id="langBtn">TH</button>
-</footer>
+  <!-- ===== SERVICES ===== -->
+  <section id="services">
+    <div class="container">
+      <h2 id="svcTitle">บริการของเรา</h2>
+      <p id="svcSub" class="lead">
+        ปรับเพิ่ม/ลดรายการบริการตามร้านของคุณ และเพิ่มบริการเช่าเครื่องมือแพทย์
+      </p>
 
-<script>
-// ====== ข้อมูลร้าน ======
-const PHONE_E164 = "+66904137894";
-const LINE_ID = "0904137894jo";
-const MAP_QUERY = "ร้านยา เจพี ฟาร์มาซี, Bangkok";
-const BOOKING_CAL = "https://calendly.com/your-brand/consult";
+      <div class="service-grid">
+        <div class="card">
+          <h3>จ่ายยาและเวชภัณฑ์</h3>
+          <p>ยา OTC, ยาตามใบสั่งแพทย์, ยาใช้ประจำบ้าน, เวชสำอาง และผลิตภัณฑ์ดูแลสุขภาพ</p>
+        </div>
 
-// ====== สร้างลิงก์ ======
-const telHref = `tel:${PHONE_E164}`;
-const lineHref = `https://line.me/ti/p/~${LINE_ID.replace(/^@/,'')}`;
-const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(MAP_QUERY)}`;
+        <div class="card">
+          <h3>คัดกรองสุขภาพ</h3>
+          <p>วัดความดัน น้ำตาล ไขมัน BMI และให้คำแนะนำต่อยอดการดูแลตัวเอง</p>
+        </div>
 
-document.getElementById("callBtn").href = telHref;
-document.getElementById("lineBtn").href = lineHref;
-document.getElementById("mapBtn").href = mapsHref;
+        <div class="card">
+          <h3>อุปกรณ์การแพทย์</h3>
+          <p>อุปกรณ์สำหรับดูแลผู้ป่วยที่บ้าน เครื่องวัดออกซิเจน ปรอทดิจิทัล ฯลฯ</p>
+        </div>
 
-document.getElementById("mapFrame").src = mapsHref;
-document.getElementById("year").textContent = new Date().getFullYear();
+        <div class="card">
+          <h3>รายงานเช่าอุปกรณ์การแพทย์</h3>
+          <p>ระบบเช่าเครื่องผลิตออกซิเจนและเตียงผู้ป่วย พร้อมรายงานสถานะผ่านหน้าเว็บ</p>
+          <div class="btn-row" style="margin-top:8px;">
+            <a href="rental.html" class="btn btn-ghost">รายงานเช่า</a>
+            <a href="dashboard.html" class="btn btn-ghost">Dashboard</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-// ====== สลับภาษา TH/EN ======
-const dict = {
-  th: {
-    nav: ["หน้าแรก","บริการ","เกี่ยวกับเรา","บล็อก","จองคิว","ติดต่อ"],
-    heroTitle: "ร้านขายยา & ให้คำปรึกษาโดยเภสัชกร",
-    heroDesc: "ให้คำแนะนำยา เวชภัณฑ์ และบริการสุขภาพชุมชน",
-    contactTitle:"ติดต่อเรา",
-    contactLead:"สอบถามสินค้า/บริการ หรือทักไลน์เพื่อพูดคุยได้เลย",
-    call:"โทรเลย", line:"แชตไลน์", map:"เปิดแผนที่"
-  },
-  en: {
-    nav: ["Home","Services","About","Blog","Booking","Contact"],
-    heroTitle: "Community Pharmacy with Pharmacist Care",
-    heroDesc: "Safe medicines and professional healthcare advice.",
-    contactTitle:"Contact Us",
-    contactLead:"Chat or call us for more information.",
-    call:"Call", line:"Chat on Line", map:"Open Map"
-  }
-};
+  <!-- ===== ABOUT ===== -->
+  <section id="about">
+    <div class="container">
+      <h2 id="aboutTitle">เกี่ยวกับร้าน</h2>
+      <p id="aboutBody" class="lead">
+        เราคือร้านขายยาชุมชนที่เน้นความปลอดภัยและหลักฐานเชิงวิทยาศาสตร์
+        โดยมีเภสัชกร กิตติศักดิ์ บุญธรรม (ใบอนุญาต ภ. 34783) ดูแลการจ่ายยาและการเลือกใช้ยา
+        รวมถึงให้คำแนะนำการใช้ยาควบคู่กับศาสตร์การแพทย์แผนไทย/เสริมเมื่อเหมาะสม
+      </p>
+    </div>
+  </section>
 
-let current="th";
-function applyLang(l){
-    const d = dict[l];
-    document.querySelectorAll("[data-nav]").forEach((a,i)=>a.textContent=d.nav[i]);
-    document.getElementById("heroTitle").textContent = d.heroTitle;
-    document.getElementById("heroDesc").textContent = d.heroDesc;
-    document.getElementById("contactTitle").textContent = d.contactTitle;
-    document.getElementById("contactLead").textContent = d.contactLead;
-    document.getElementById("callBtn").textContent = d.call;
-    document.getElementById("lineBtn").textContent = d.line;
-    document.getElementById("mapBtn").textContent = d.map;
-    document.getElementById("langBtn").textContent = l.toUpperCase();
-}
-document.getElementById("langBtn").onclick=()=>{
-    current = current==="th" ? "en" : "th";
+  <!-- ===== BLOG ===== -->
+  <section id="blog">
+    <div class="container">
+      <h2 id="blogTitle">บล็อกสุขภาพ</h2>
+      <p class="lead">
+        บทความสุขภาพสั้น ๆ สำหรับคนไข้และคนดูแลผู้ป่วย สามารถเปลี่ยนหัวข้อและรูปได้ตามต้องการ
+      </p>
+
+      <div class="blog-grid">
+        <article class="card blog-card">
+          <img src="https://images.pexels.com/photos/3965474/pexels-photo-3965474.jpeg?auto=compress&cs=tinysrgb&w=800" alt="">
+          <div class="blog-meta">Inhaler · 2025-08-01</div>
+          <div class="blog-title">วิธีใช้ยาพ่นแก้หืดให้ถูกต้อง</div>
+          <div class="blog-foot">
+            <a id="readMore1" href="#" target="_blank" rel="noopener">อ่านต่อ / Read more</a>
+          </div>
+        </article>
+
+        <article class="card blog-card">
+          <img src="https://images.pexels.com/photos/3951915/pexels-photo-3951915.jpeg?auto=compress&cs=tinysrgb&w=800" alt="">
+          <div class="blog-meta">Diabetes · 2025-07-22</div>
+          <div class="blog-title">กินยาลดน้ำตาลอย่างไรให้ปลอดภัย</div>
+          <div class="blog-foot">
+            <a id="readMore2" href="#" target="_blank" rel="noopener">อ่านต่อ / Read more</a>
+          </div>
+        </article>
+
+        <article class="card blog-card">
+          <img src="https://images.pexels.com/photos/965989/pexels-photo-965989.jpeg?auto=compress&cs=tinysrgb&w=800" alt="">
+          <div class="blog-meta">TTM · 2025-06-30</div>
+          <div class="blog-title">สมุนไพรใช้ร่วมกับยาปัจจุบันได้หรือไม่?</div>
+          <div class="blog-foot">
+            <a id="readMore3" href="#" target="_blank" rel="noopener">อ่านต่อ / Read more</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== BOOKING ===== -->
+  <section id="booking">
+    <div class="container">
+      <h2 id="bookingTitle">จองคิว</h2>
+      <p id="bookingBody" class="lead">
+        เลือกช่องทางที่สะดวก: ไลน์, โทรศัพท์ หรือจองผ่านปฏิทินออนไลน์
+      </p>
+
+      <div class="booking-grid">
+        <div class="card">
+          <h3>Line OA</h3>
+          <p>จองหรือสอบถามผ่าน Line Official</p>
+          <a id="bookingLine" href="#" class="btn btn-line" target="_blank" rel="noopener">เปิด Line</a>
+        </div>
+        <div class="card">
+          <h3>โทรศัพท์</h3>
+          <p>โทรคุยกับเภสัชกร เพื่อปรึกษาหรือจองบริการ</p>
+          <a id="bookingCall" href="#" class="btn btn-primary">โทรเลย</a>
+        </div>
+        <div class="card">
+          <h3>ปฏิทินออนไลน์</h3>
+          <p>จองผ่าน Calendly / Google Calendar</p>
+          <a id="bookingCal" href="#" class="btn btn-ghost" target="_blank" rel="noopener">เปิดปฏิทิน</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CONTACT ===== -->
+  <section id="contact">
+    <div class="container">
+      <h2 id="contactTitle">ติดต่อเรา</h2>
+      <p id="contactLead" class="lead">
+        สอบถามสินค้า/บริการ หรือฝากไลน์เพื่อพูดคุยกับเราได้เลย
+      </p>
+
+      <div class="contact-grid">
+        <div class="card contact-form">
+          <label>ชื่อของคุณ</label>
+          <input type="text" placeholder="ชื่อ-สกุล หรือชื่อเล่น">
+
+          <label>อีเมล</label>
+          <input type="email" placeholder="สำหรับส่งรายละเอียดกลับหา">
+
+          <label>ข้อความ</label>
+          <textarea placeholder="เรื่องที่ต้องการสอบถาม / นัดหมาย"></textarea>
+
+          <button class="btn btn-primary" type="button">ส่งข้อความ</button>
+          <p style="font-size:0.8rem;color:#999;margin-top:6px;">
+            *ฟอร์มตัวอย่าง ยังไม่ได้เชื่อมต่อ Google Sheet / Email
+          </p>
+        </div>
+
+        <div>
+          <div class="card contact-info">
+            <p>📞 <a id="phoneText" href="#">+66 90-413-7894</a></p>
+            <p>✉️ hello@yourpharmacy.co</p>
+            <p>📍 Bangkok, Thailand</p>
+            <div class="pill-row">
+              <a id="cCall" class="btn btn-primary" href="#">โทร</a>
+              <a id="cLine" class="btn btn-line" href="#" target="_blank" rel="noopener">Line</a>
+              <a id="cMap"  class="btn btn-ghost" href="#" target="_blank" rel="noopener">Maps</a>
+            </div>
+          </div>
+
+          <div style="margin-top:12px;">
+            <iframe
+              id="mapFrame"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <div class="container">
+      © <span id="year"></span> JP Pharmacy so Supply · ทำเว็บด้วย GitHub Pages
+    </div>
+  </footer>
+
+  <!-- ===== SCRIPT: ลิงก์ + สลับภาษา ===== -->
+  <script>
+    // ===== ข้อมูลร้าน (แก้ได้) =====
+    const PHONE_E164 = "+66904137894";
+    const LINE_ID    = "0904137894jo";
+    const MAP_QUERY  = "ร้านยา เจพี ฟาร์มาซี, Bangkok";
+    const BOOKING_CAL = "https://calendly.com/your-brand/consult"; // ถ้ายังไม่มีใช้ '#' ได้
+
+    // ===== สร้างลิงก์พื้นฐาน =====
+    const telHref  = `tel:${PHONE_E164}`;
+    const lineHref = `https://line.me/ti/p/~${LINE_ID.replace(/^@/,'')}`;
+    const mapsHref = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(MAP_QUERY)}`;
+
+    function setHref(id, href) {
+      const el = document.getElementById(id);
+      if (el) el.href = href;
+    }
+
+    setHref("callBtn", telHref);
+    setHref("lineBtn", lineHref);
+    setHref("mapBtn", mapsHref);
+    setHref("lineHeader", lineHref);
+
+    setHref("bookingLine", lineHref);
+    setHref("bookingCall", telHref);
+    setHref("bookingCal", BOOKING_CAL);
+
+    setHref("cCall", telHref);
+    setHref("cLine", lineHref);
+    setHref("cMap", mapsHref);
+    setHref("phoneText", telHref);
+
+    const mapFrame = document.getElementById("mapFrame");
+    if (mapFrame) {
+      mapFrame.src = mapsHref;
+    }
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    // ===== สลับภาษา TH / EN =====
+    const dict = {
+      th: {
+        nav: ["หน้าแรก","บริการ","เกี่ยวกับเรา","บล็อก","จองคิว","ติดต่อ"],
+        heroTitle: "ร้านขายยา & ให้คำปรึกษาโดยเภสัชกร",
+        heroDesc: "ให้คำแนะนำยา เวชภัณฑ์ วัคซีนพื้นฐาน และบริการสุขภาพชุมชน ปลอดภัย ได้มาตรฐาน",
+        hlTitle:"จุดเด่นร้านขายยา",
+        hl1:"ยาคุณภาพ และปลอดภัย",
+        hl2:"เภสัชกรดูแลให้คำปรึกษา",
+        hl3:"อุปกรณ์ทางการแพทย์ครบวงจร",
+        hl4:"ก้าวไปดูแลสุขภาพทุกมิติ เพื่อสุขภาพคุณ",
+        svcTitle:"บริการของเรา",
+        svcSub:"ปรับเพิ่ม/ลดรายการบริการตามร้านของคุณ และเพิ่มบริการเช่าเครื่องมือแพทย์",
+        aboutTitle:"เกี่ยวกับร้าน",
+        aboutBody:"เราคือร้านขายยาชุมชนที่เน้นความปลอดภัยและหลักฐานเชิงวิทยาศาสตร์ โดยมีเภสัชกร กิตติศักดิ์ บุญธรรม (ใบอนุญาต ภ. 34783) ดูแลการจ่ายยาและการเลือกใช้ยา รวมถึงให้คำแนะนำการใช้ยาควบคู่กับศาสตร์การแพทย์แผนไทย/เสริมเมื่อเหมาะสม",
+        blogTitle:"บล็อกสุขภาพ",
+        bookingTitle:"จองคิว",
+        bookingBody:"เลือกช่องทางที่สะดวก: ไลน์, โทรศัพท์ หรือจองผ่านปฏิทินออนไลน์",
+        contactTitle:"ติดต่อเรา",
+        contactLead:"สอบถามสินค้า/บริการ หรือฝากไลน์เพื่อพูดคุยกับเราได้เลย",
+        readMore:"อ่านต่อ / Read more",
+        call:"โทรเลย",
+        line:"แชตไลน์",
+        map:"เปิดแผนที่"
+      },
+      en: {
+        nav: ["Home","Services","About","Blog","Booking","Contact"],
+        heroTitle: "Community Pharmacy with Pharmacist Care",
+        heroDesc: "Professional advice, genuine medicines, and community health services.",
+        hlTitle:"Highlights",
+        hl1:"Quality & Safe Meds",
+        hl2:"Pharmacist Counseling",
+        hl3:"Full Medical Supplies",
+        hl4:"Holistic Health Care",
+        svcTitle:"Our Services",
+        svcSub:"Customize services to your store and add medical equipment rental.",
+        aboutTitle:"About",
+        aboutBody:"We are a community pharmacy focused on safety and evidence, led by Pharmacist Kittisak Boontham (License No. Ph. 34783), blending Thai Traditional Medicine where appropriate.",
+        blogTitle:"Health Blog",
+        bookingTitle:"Booking",
+        bookingBody:"Book via Line/phone or use our online calendar.",
+        contactTitle:"Contact",
+        contactLead:"Leave a message or reach us on Line for product/service inquiries.",
+        readMore:"Read more",
+        call:"Call",
+        line:"Chat on Line",
+        map:"Open Map"
+      }
+    };
+
+    let current = "th";
+    const langBtn = document.getElementById("langBtn");
+    const nav = document.getElementById("nav");
+    const navLinks = nav.querySelectorAll("[data-nav]");
+
+    function applyLang(l) {
+      const d = dict[l];
+      navLinks.forEach((a,i)=>a.textContent = d.nav[i]);
+      document.getElementById("heroTitle").textContent = d.heroTitle;
+      document.getElementById("heroDesc").textContent = d.heroDesc;
+      document.getElementById("hlTitle").textContent = d.hlTitle;
+      document.getElementById("hl1").textContent = d.hl1;
+      document.getElementById("hl2").textContent = d.hl2;
+      document.getElementById("hl3").textContent = d.hl3;
+      document.getElementById("hl4").textContent = d.hl4;
+      document.getElementById("svcTitle").textContent = d.svcTitle;
+      document.getElementById("svcSub").textContent = d.svcSub;
+      document.getElementById("aboutTitle").textContent = d.aboutTitle;
+      document.getElementById("aboutBody").textContent = d.aboutBody;
+      document.getElementById("blogTitle").textContent = d.blogTitle;
+      document.getElementById("bookingTitle").textContent = d.bookingTitle;
+      document.getElementById("bookingBody").textContent = d.bookingBody;
+      document.getElementById("contactTitle").textContent = d.contactTitle;
+      document.getElementById("contactLead").textContent = d.contactLead;
+      document.getElementById("readMore1").textContent = d.readMore;
+      document.getElementById("readMore2").textContent = d.readMore;
+      document.getElementById("readMore3").textContent = d.readMore;
+      document.getElementById("callBtn").textContent = d.call;
+      document.getElementById("lineBtn").textContent = d.line;
+      document.getElementById("mapBtn").textContent = d.map;
+      langBtn.textContent = l.toUpperCase();
+    }
+
+    langBtn.onclick = () => {
+      current = (current === "th" ? "en" : "th");
+      applyLang(current);
+    };
     applyLang(current);
-};
-applyLang(current);
-</script>
-
+  </script>
 </body>
 </html>
