@@ -64,8 +64,7 @@
       background: #fafafa;
     }
 
-    /* แถบเตือนจากคอลัมน์ "เครื่องที่ใกล้ถึงกำหนดล่าสุด"
-       ใส่ที่ td เพื่อทับ zebra ให้ครบทั้งแถว */
+    /* แถบเตือนจากคอลัมน์ "เครื่องที่ใกล้ถึงกำหนดล่าสุด" */
     .alert-red td {
       background: #ffcccc !important;
       animation: blink 1s infinite;
@@ -78,6 +77,25 @@
       0%   { background-color: #ffb3b3; }
       50%  { background-color: #ff0000; }
       100% { background-color: #ffb3b3; }
+    }
+
+    /* ปุ่มลอยไปหน้า Dashboard */
+    .floating-dashboard-btn {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      background: #16a34a;       /* เขียว */
+      color: #ffffff;
+      padding: 10px 18px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      z-index: 999;
+    }
+    .floating-dashboard-btn:hover {
+      background: #15803d;
     }
   </style>
 </head>
@@ -102,6 +120,11 @@
       </table>
     </div>
   </div>
+
+  <!-- ปุ่มลอยไปหน้า dashboard.html -->
+  <a href="dashboard.html" class="floating-dashboard-btn">
+    เปิด Dashboard
+  </a>
 
   <script>
     const SHEET_CSV_URL =
