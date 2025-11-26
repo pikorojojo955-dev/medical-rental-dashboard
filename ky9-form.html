@@ -27,6 +27,7 @@
       gap: 10px;
       justify-content: flex-end;
       margin-bottom: 20px;
+      flex-wrap: wrap;
     }
     .btn {
       padding: 10px 18px;
@@ -44,59 +45,107 @@
     .btn-print   { background:#ff9800; }
     .btn-download{ background:#9c27b0; }
 
-    /* หัวกระดาษ */
-    h1, h2 {
-      text-align: center;
-      margin: 0;
-      line-height: 1.2;
-    }
-
-    .header-box {
-      background:#ffe0b2;
-      padding:6px;
-      margin-top:10px;
-      text-align:center;
-      font-size:1rem;
-    }
-
-    /* ตาราง */
+    /* ตารางหลัก */
     .table-wrapper {
       border:3px solid #00c853;
-      margin-top:20px;
     }
     table {
       width:100%;
       border-collapse: collapse;
       font-size:0.9rem;
     }
-    th {
-      background:#00c853;
-      color:white;
-      border:1px solid #555;
-      text-align:center;
-      padding:4px;
-    }
-    td {
+    th, td {
       border:1px solid #555;
       padding:4px;
       white-space:nowrap;
+      vertical-align:top;
     }
 
-    /* ปรับขนาดคอลัมน์ให้พอดีฟอร์ม */
-    th:nth-child(1), td:nth-child(1) { width:40px; }
-    th:nth-child(2), td:nth-child(2) { width:80px; }
-    th:nth-child(3), td:nth-child(3) { width:180px; } /* ชื่อผู้ขาย */
-    th:nth-child(4), td:nth-child(4) { width:180px; } /* ชื่อยา */
-    th:nth-child(5), td:nth-child(5) { width:120px; } /* เลขที่ผลิต */
-    th:nth-child(6), td:nth-child(6) { width:60px;  text-align:center;}
-    th:nth-child(7), td:nth-child(7) { width:60px;  text-align:center;}
-    th:nth-child(8), td:nth-child(8) { width:140px; }
-    th:nth-child(9), td:nth-child(9) { width:100px; }
+    /* หัวกระดาษ (row ใน thead) */
+    .title-row th {
+      border:none;
+      text-align:center;
+      font-size:1.4rem;
+      padding-top:8px;
+      padding-bottom:0;
+    }
+    .shop-row th {
+      border:none;
+      text-align:center;
+      font-size:1.2rem;
+      padding-top:0;
+      padding-bottom:0;
+    }
+    .addr-row th {
+      border:none;
+      text-align:center;
+      background:#ffe0b2;
+      font-size:0.95rem;
+      padding-top:4px;
+      padding-bottom:4px;
+    }
+    .label-row th {
+      border:none;
+      font-size:0.9rem;
+      padding-top:2px;
+      padding-bottom:4px;
+    }
+    .label-row th:first-child {
+      text-align:left;
+    }
+    .label-row th:last-child {
+      text-align:right;
+    }
+
+    .editable {
+      border-bottom:1px dotted #555;
+      padding:0 2px;
+      min-width:80px;
+      display:inline-block;
+    }
+
+    /* หัวคอลัมน์ */
+    .header-row th {
+      background:#00c853;
+      color:#fff;
+      text-align:center;
+      border:1px solid #555;
+      padding-top:4px;
+      padding-bottom:4px;
+    }
+
+    /* ปรับความกว้างคอลัมน์ให้พอดีกับฟอร์ม */
+    .header-row th:nth-child(1), td:nth-child(1) { width:40px;  text-align:center; }
+    .header-row th:nth-child(2), td:nth-child(2) { width:80px;  text-align:center; }
+    .header-row th:nth-child(3), td:nth-child(3) { width:180px; }
+    .header-row th:nth-child(4), td:nth-child(4) { width:180px; }
+    .header-row th:nth-child(5), td:nth-child(5) { width:120px; }
+    .header-row th:nth-child(6), td:nth-child(6) { width:60px;  text-align:center; }
+    .header-row th:nth-child(7), td:nth-child(7) { width:60px;  text-align:center; }
+    .header-row th:nth-child(8), td:nth-child(8) { width:140px; }
+    .header-row th:nth-child(9), td:nth-child(9) { width:100px; }
+
+    #status {
+      font-size:0.85rem;
+      color:#777;
+      margin:8px 0;
+    }
 
     @media print {
+      body {
+        padding:0;
+        background:white;
+      }
+      .page {
+        box-shadow:none;
+        margin:0;
+        padding:0 8mm;
+      }
       .top-buttons { display:none; }
-      body { padding:0; background:white; }
-      .page { box-shadow:none; padding:0 8mm; }
+
+      /* ให้หัวกระดาษ (thead) ซ้ำทุกหน้า */
+      thead { display: table-header-group; }
+      tfoot { display: table-footer-group; }
     }
   </style>
 </head>
@@ -104,7 +153,7 @@
 <body>
 <div class="page">
 
-  <!-- ปุ่มบน -->
+  <!-- ปุ่มด้านบน -->
   <div class="top-buttons">
     <a href="./ky9.html"><button class="btn btn-ky9-list">ขย.9 (ข้อมูลดิบ)</button></a>
     <a href="./ky9-form.html"><button class="btn btn-ky9-form">ขย.9 (แบบฟอร์ม)</button></a>
@@ -113,40 +162,55 @@
     <button class="btn btn-download" onclick="window.print()">⬇ PDF</button>
   </div>
 
-  <h1>บัญชีการซื้อยา</h1>
-  <h2>ร้านขายยา <span contenteditable="true">คลังยาดีดี</span></h2>
+  <div id="status">กำลังดึงข้อมูลจาก Google Sheet…</div>
 
-  <div class="header-box">
-    แสนสุข <span contenteditable="true">123 ถนน ข้าวหลาม ตำบล บ้านปึก อำเภอเมืองชลบุรี จังหวัดชลบุรี 20000</span>
-    โทร. <span contenteditable="true">098 444 1614</span>
-  </div>
-
-  <div style="text-align:right; font-size:0.9rem; margin-top:4px;">แบบ ขย.9</div>
-
-  <div id="status" style="color:#777; font-size:0.85rem;">กำลังดึงข้อมูลจาก Google Sheet…</div>
-
-  <!-- ตาราง -->
   <div class="table-wrapper">
     <table>
       <thead>
-      <tr>
-        <th>ลำดับที่</th>
-        <th>วันที่รับ</th>
-        <th>ชื่อผู้ขาย</th>
-        <th>ชื่อยา</th>
-        <th>เลขที่ผลิต</th>
-        <th>จำนวน</th>
-        <th>หน่วย</th>
-        <th>ลายมือชื่อผู้ปฏิบัติ</th>
-        <th>หมายเหตุ</th>
-      </tr>
+        <!-- หัวกระดาษ (จะซ้ำทุกหน้าเวลา print) -->
+        <tr class="title-row">
+          <th colspan="9">บัญชีการซื้อยา</th>
+        </tr>
+        <tr class="shop-row">
+          <th colspan="9">
+            ร้านขายยา
+            <span class="editable" contenteditable="true">คลังยาดีดี</span>
+          </th>
+        </tr>
+        <tr class="addr-row">
+          <th colspan="9">
+            แสนสุข
+            <span class="editable" contenteditable="true">123 ถนน ข้าวหลาม ตำบล บ้านปึก อำเภอเมืองชลบุรี จังหวัดชลบุรี 20000</span>
+            โทร.
+            <span class="editable" contenteditable="true">098 444 1614</span>
+          </th>
+        </tr>
+        <tr class="label-row">
+          <th colspan="9">
+            <!-- ซ้ายปล่อยว่างไว้ / ขวาเขียนแบบฟอร์ม -->
+            <span style="float:right;">แบบ ขย.9</span>
+          </th>
+        </tr>
+
+        <!-- หัวคอลัมน์หลัก -->
+        <tr class="header-row">
+          <th>ลำดับที่</th>
+          <th>วันที่รับ</th>
+          <th>ชื่อผู้ขาย</th>
+          <th>ชื่อยา</th>
+          <th>เลขที่ผลิต</th>
+          <th>จำนวน</th>
+          <th>หน่วย</th>
+          <th>ลายมือชื่อผู้ปฏิบัติ</th>
+          <th>หมายเหตุ</th>
+        </tr>
       </thead>
 
       <tbody id="formBody">
+        <!-- JS จะเติมข้อมูลจาก Google Sheet -->
       </tbody>
     </table>
   </div>
-
 </div>
 
 <script>
@@ -169,35 +233,42 @@ async function loadSheet(){
 
     rows.forEach(r=>{
       const c=r.c||[];
-      const no=c[0]?.v||"";
-      const date=c[1]?.f||c[1]?.v||"";
-      const vendor=c[2]?.v||"";
-      const drug=c[4]?.v||"";   // ⭐ ข้าม ITEMCODE (c[3])
-      const lot=c[5]?.v||"";
-      const qty=c[6]?.v||"";
-      const unit=c[7]?.v||"";
-      const signer=c[8]?.v||"";
-      const remark=c[9]?.v||"";
+      const no    = c[0]?.v || "";
+      const date  = c[1]?.f || c[1]?.v || "";
+      const vendor= c[2]?.v || "";
+      const drug  = c[4]?.v || "";   // ข้าม ITEMCODE (c[3])
+      const lot   = c[5]?.v || "";
+      const qty   = c[6]?.v || "";
+      const unit  = c[7]?.v || "";
+      const sign  = c[8]?.v || "";
+      const remark= c[9]?.v || "";
 
-      if(!drug && !lot && !vendor) return;
+      if(!vendor && !drug && !lot) return;
 
-      tbody.innerHTML+=`
-      <tr>
-        <td>${no}</td>
-        <td>${date}</td>
-        <td>${vendor}</td>
-        <td>${drug}</td>
-        <td>${lot}</td>
-        <td style="text-align:center">${qty}</td>
-        <td style="text-align:center">${unit}</td>
-        <td>${signer}</td>
-        <td>${remark}</td>
-      </tr>`;
+      const tr=document.createElement("tr");
+      function cell(text, center=false){
+        const td=document.createElement("td");
+        td.textContent=text;
+        if(center) td.style.textAlign="center";
+        tr.appendChild(td);
+      }
+
+      cell(no,true);
+      cell(date,true);
+      cell(vendor);
+      cell(drug);
+      cell(lot);
+      cell(qty,true);
+      cell(unit,true);
+      cell(sign);
+      cell(remark);
+
+      tbody.appendChild(tr);
     });
 
     status.textContent="โหลดข้อมูลสำเร็จ";
-  } 
-  catch(e){
+  }catch(e){
+    console.error(e);
     status.textContent="โหลดข้อมูลไม่สำเร็จ";
   }
 }
