@@ -359,7 +359,7 @@ function renderTable(){
     const cb=document.createElement("input");
     cb.type="checkbox";
     cb.className="ky11-check";
-    cb.dataset.drug = r.drugName;
+    cb.dataset.drug = r.drugName;    // ส่งชื่อยาไป ky11
     tdSel.appendChild(cb);
     tr.appendChild(tdSel);
 
@@ -417,21 +417,30 @@ document.getElementById("thDate").addEventListener("click", ()=>{
   renderTable();
 });
 
+/* ✅ ปุ่มทำ ขย.11 จากรายการที่เลือก */
 document.getElementById("btnMakeKy11").addEventListener("click", ()=>{
   const checks = document.querySelectorAll(".ky11-check:checked");
   if(!checks.length){
     alert("กรุณาเลือกรายการอย่างน้อย 1 รายการ เพื่อทำ ขย.11");
     return;
   }
-  const selectedDrugs = new Set();
-  checks.forEach(cb=>{
-    const drug = cb.dataset.drug;
-    if(drug) selectedDrugs.add(drug);
-  });
-  selectedDrugs.forEach(drug=>{
-    const url = "./ky11.html?drug=" + encodeURIComponent(drug);
-    window.open(url, "_blank");
-  });
+
+  // ใช้ชื่อยาตัวแรกที่ติ๊ก
+  let firstDrug = "";
+  for (const cb of checks) {
+    if (cb.dataset.drug) {
+      firstDrug = cb.dataset.drug;
+      break;
+    }
+  }
+
+  if (!firstDrug) {
+    alert("ไม่พบชื่อยาของรายการที่เลือก");
+    return;
+  }
+
+  const url = "./ky11.html?drug=" + encodeURIComponent(firstDrug);
+  window.location.href = url;
 });
 
 loadKy9Form();
@@ -439,4 +448,3 @@ loadKy9Form();
 
 </body>
 </html>
-
