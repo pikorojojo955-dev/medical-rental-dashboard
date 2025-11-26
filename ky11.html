@@ -69,7 +69,6 @@
       margin-left:auto;
     }
 
-    /* ฟอร์มแต่ละแผ่น */
     .sheet {
       border:2px solid #00c853;
       margin-top:12px;
@@ -127,12 +126,12 @@
       color:#fff;
       text-align:center;
     }
-    .sales-table td:nth-child(1) { width:40px; text-align:center; } /* ลำดับ */
-    .sales-table td:nth-child(2) { width:90px; text-align:center; } /* วันเดือนปี */
-    .sales-table td:nth-child(3) { width:120px; text-align:center; }/* จำนวน */
-    .sales-table td:nth-child(4) { width:260px; }                   /* ชื่อผู้ซื้อ */
-    .sales-table td:nth-child(5) { width:180px; }                   /* ลายมือชื่อ */
-    .sales-table td:nth-child(6) { width:120px; }                   /* หมายเหตุ */
+    .sales-table td:nth-child(1) { width:40px; text-align:center; }
+    .sales-table td:nth-child(2) { width:90px; text-align:center; }
+    .sales-table td:nth-child(3) { width:120px; text-align:center; }
+    .sales-table td:nth-child(4) { width:260px; }
+    .sales-table td:nth-child(5) { width:180px; }
+    .sales-table td:nth-child(6) { width:120px; }
 
     .lot-label {
       font-size:0.9rem;
@@ -144,7 +143,7 @@
     @media print {
       body {
         padding:0;
-      background:#fff;
+        background:#fff;
       }
       .page {
         margin:0;
@@ -172,7 +171,6 @@
 <body>
 <div class="page">
 
-  <!-- ปุ่มนำทาง -->
   <div class="top-buttons">
     <a href="./ky9.html"      class="btn btn-ky9-data">ขย.9 (ข้อมูลดิบ)</a>
     <a href="./ky9-form.html" class="btn btn-ky9-form">ขย.9 (แบบฟอร์ม)</a>
@@ -181,7 +179,6 @@
     <button class="btn btn-pdf"   onclick="window.print()">⬇ PDF</button>
   </div>
 
-  <!-- แถบเลือกยา -->
   <div class="toolbar">
     <label for="drugSelect">เลือกชื่อยา / รายการสินค้า:</label>
     <select id="drugSelect">
@@ -190,7 +187,6 @@
     <span id="lotSummary" class="info-note"></span>
   </div>
 
-  <!-- พื้นที่แสดงฟอร์มหลายแผ่น -->
   <div id="sheetsContainer"></div>
 </div>
 
@@ -201,7 +197,7 @@ const URL =`https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx
 
 let allRows = [];
 
-/* -------------------- helper พื้นฐาน -------------------- */
+/* --------- helper พื้นฐาน --------- */
 
 function parseRow(row){
   const c=row.c||[];
@@ -245,9 +241,9 @@ function formatDateMin(rows) {
   return best.dateIn || "";
 }
 
-/* -------------------- อ่านพารามิเตอร์จาก URL -------------------- */
+/* --------- อ่านพารามิเตอร์จาก URL --------- */
 
-// รองรับทั้ง ?drugs=["A","B"] และ ?drug=A
+// ✅ แก้ตรงนี้: single ไม่ trim เพื่อให้ชื่อยาเหมือนในชีตเป๊ะ
 function getDrugsFromQuery() {
   const params = new URLSearchParams(window.location.search);
 
@@ -264,12 +260,12 @@ function getDrugsFromQuery() {
   }
 
   const single = params.get("drug");
-  if (single) return [single.trim()];
+  if (single) return [single];   // ← ไม่ trim
 
   return [];
 }
 
-/* -------------------- UI helper -------------------- */
+/* --------- UI helper --------- */
 
 function populateDrugSelect() {
   const select = document.getElementById("drugSelect");
@@ -303,7 +299,7 @@ function buildSalesRows(count=12) {
   return html;
 }
 
-/* -------------------- สร้าง sheet 1 แผ่น (logic LOT / date) -------------------- */
+/* --------- sheet 1 แผ่น (LOT / date) --------- */
 
 function buildSheetHtml(drugName, groupInfo, rowsForGroup, index) {
   const vendor = rowsForGroup[0]?.vendor || "";
@@ -387,7 +383,7 @@ function buildSheetHtml(drugName, groupInfo, rowsForGroup, index) {
   `;
 }
 
-/* -------------------- render ชื่อยา 1 ตัว (อาจหลาย LOT / หลายวันที่รับ) -------------------- */
+/* --------- render ชื่อยา 1 ตัว (หลาย LOT / หลายวันที่รับ) --------- */
 
 function renderSheetsForDrug(drugName, append=false) {
   const container = document.getElementById("sheetsContainer");
@@ -408,10 +404,9 @@ function renderSheetsForDrug(drugName, append=false) {
     return;
   }
 
-  // group:
   // ถ้ามี LOT → group ตาม LOT
-  // ถ้า LOT ว่าง → group ตามวันที่รับ (dateIn)
-  const groupMap = new Map();  // key -> {mode,label,rows}
+  // ถ้า LOT ว่าง → group ตามวันที่รับเข้า
+  const groupMap = new Map();
   rowsForDrug.forEach(r => {
     const hasLot = r.lot && String(r.lot).trim() !== "";
     const mode   = hasLot ? "lot" : "date";
@@ -426,7 +421,6 @@ function renderSheetsForDrug(drugName, append=false) {
 
   const groups = Array.from(groupMap.values());
 
-  // เรียงลำดับ: ถ้าเป็นโหมด date ให้เรียงตามวันที่
   groups.sort((a,b) => {
     if (a.mode === "date" && b.mode === "date") {
       return toDateValue(a.label) - toDateValue(b.label);
@@ -454,7 +448,7 @@ function renderSheetsForDrug(drugName, append=false) {
   }
 }
 
-/* -------------------- โหลดข้อมูลจาก Google Sheet -------------------- */
+/* --------- โหลดข้อมูลจาก Google Sheet --------- */
 
 function loadData() {
   fetch(URL)
@@ -467,11 +461,10 @@ function loadData() {
 
       populateDrugSelect();
 
-      // ถ้ามีพารามิเตอร์มาจาก ky9-form → สร้างให้เลย
       const preDrugs = getDrugsFromQuery();
       if (preDrugs.length) {
         const select = document.getElementById("drugSelect");
-        select.value = preDrugs[0];  // ให้ dropdown โชว์ตัวแรก
+        select.value = preDrugs[0];
 
         const lotSummary = document.getElementById("lotSummary");
         lotSummary.textContent =
@@ -492,14 +485,12 @@ function loadData() {
     });
 }
 
-/* -------------------- event dropdown -------------------- */
+/* --------- events --------- */
 
 document.getElementById("drugSelect").addEventListener("change", (e) => {
   const drugName = e.target.value;
   renderSheetsForDrug(drugName);
 });
-
-/* -------------------- เริ่มทำงาน -------------------- */
 
 loadData();
 </script>
