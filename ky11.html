@@ -3,169 +3,168 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>บัญชีการขายยา (ขย.11)</title>
+  <title>บัญชีการขายยาอันตราย (ขย.11)</title>
 
   <style>
     body {
       font-family: "TH SarabunPSK", system-ui, sans-serif;
       margin: 0;
-      padding: 16px;
+      padding: 8px;
       background: #f5f5f5;
     }
 
     .page {
-      max-width: 1000px;
+      max-width: 1150px;
       margin: 0 auto;
       background: #fff;
-      padding: 16px 24px 32px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 12px 18px 24px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
 
-    /* ปุ่มด้านบน */
     .top-buttons {
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      margin-bottom:8px;
+      flex-wrap:wrap;
     }
     .btn {
-      padding: 8px 16px;
-      border-radius: 30px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      color: white;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-      text-decoration: none;
+      padding:6px 14px;
+      border-radius:30px;
+      font-size:0.9rem;
+      font-weight:600;
+      cursor:pointer;
+      border:none;
+      color:#fff;
+      box-shadow:0 2px 4px rgba(0,0,0,0.2);
+      text-decoration:none;
     }
-    .btn-ky9-list { background:#00c853; }
+    .btn-ky9-data { background:#00c853; }
     .btn-ky9-form { background:#009688; }
-    .btn-ky11    { background:#1976d2; }
-    .btn-print   { background:#ff9800; }
-    .btn-download{ background:#9c27b0; }
+    .btn-ky11     { background:#1976d2; }
+    .btn-print    { background:#ff9800; }
+    .btn-pdf      { background:#9c27b0; }
 
-    .top-row {
+    .toolbar {
       display:flex;
       flex-wrap:wrap;
-      justify-content:space-between;
       align-items:center;
       gap:8px;
-      margin-bottom:8px;
-    }
-    .status {
-      font-size:0.85rem;
-      color:#777;
-    }
-
-    .lot-box {
+      margin-bottom:10px;
       font-size:0.9rem;
     }
-    .lot-box select {
-      padding:4px 8px;
+    .toolbar label {
+      margin-right:4px;
+    }
+    select {
+      padding:4px 6px;
       border-radius:6px;
       border:1px solid #ccc;
-      min-width:240px;
-    }
-
-    .table-wrapper {
-      border:3px solid #00c853;
-    }
-    table {
-      width:100%;
-      border-collapse:collapse;
+      min-width:260px;
       font-size:0.9rem;
     }
-    th, td {
-      border:1px solid #555;
-      padding:4px;
-      white-space:nowrap;
-      vertical-align:top;
+    .info-note {
+      font-size:0.8rem;
+      color:#777;
+      margin-left:auto;
     }
 
-    /* หัวฟอร์มใน thead */
-    .title-row th {
-      border:none;
-      text-align:center;
-      font-size:1.3rem;
-      padding-top:8px;
-      padding-bottom:0;
+    /* ฟอร์มแต่ละแผ่น */
+    .sheet {
+      border:2px solid #00c853;
+      margin-top:12px;
+      padding:8px 12px 16px;
     }
-    .shop-row th {
-      border:none;
+
+    .sheet-header-title {
+      font-size:1.4rem;
+      font-weight:bold;
       text-align:center;
+    }
+    .sheet-header-sub {
       font-size:1.1rem;
-      padding-top:0;
-      padding-bottom:0;
-    }
-    .addr-row th {
-      border:none;
+      font-weight:bold;
       text-align:center;
-      font-size:0.95rem;
-      padding:4px 0;
     }
-    .label-row th {
-      border:none;
-      font-size:0.9rem;
-      padding-top:4px;
-      padding-bottom:2px;
-    }
-    .label-row th:first-child { text-align:left; }
-    .label-row th:last-child  { text-align:right; }
-
-    .info-top-row th {
-      font-size:0.9rem;
-      padding-top:4px;
-      padding-bottom:4px;
-    }
-    .info-left,
-    .info-mid,
-    .info-right {
-      text-align:left;
+    .sheet-header-addr {
+      text-align:center;
+      margin-bottom:4px;
     }
 
     .editable {
       border-bottom:1px dotted #555;
-      padding:0 2px;
-      min-width:80px;
+      padding:0 3px;
+      min-width:60px;
       display:inline-block;
     }
 
-    /* หัวคอลัมน์ตารางขาย */
-    .header-row th {
+    .sheet-info-table {
+      width:100%;
+      border-collapse:collapse;
+      margin-bottom:4px;
+    }
+    .sheet-info-table td {
+      border:none;
+      padding:2px 4px;
+      font-size:0.9rem;
+    }
+
+    .sales-table {
+      width:100%;
+      border-collapse:collapse;
+      font-size:0.9rem;
+      margin-top:4px;
+    }
+    .sales-table th,
+    .sales-table td {
+      border:1px solid #555;
+      padding:3px 4px;
+      white-space:nowrap;
+      vertical-align:top;
+    }
+    .sales-table th {
       background:#00c853;
       color:#fff;
       text-align:center;
     }
-    .header-row th:nth-child(1),
-    tbody td:nth-child(1) { width:40px;  text-align:center; }
-    .header-row th:nth-child(2),
-    tbody td:nth-child(2) { width:90px;  text-align:center; }
-    .header-row th:nth-child(3),
-    tbody td:nth-child(3) { width:120px; text-align:center; }
-    .header-row th:nth-child(4),
-    tbody td:nth-child(4) { width:220px; }
-    .header-row th:nth-child(5),
-    tbody td:nth-child(5) { width:160px; }
-    .header-row th:nth-child(6),
-    tbody td:nth-child(6) { width:100px; }
+    .sales-table td:nth-child(1) { width:40px; text-align:center; } /* ลำดับ */
+    .sales-table td:nth-child(2) { width:90px; text-align:center; } /* วันเดือนปี */
+    .sales-table td:nth-child(3) { width:120px; text-align:center; }/* จำนวน */
+    .sales-table td:nth-child(4) { width:260px; }                   /* ชื่อผู้ซื้อ */
+    .sales-table td:nth-child(5) { width:180px; }                   /* ลายมือชื่อ */
+    .sales-table td:nth-child(6) { width:120px; }                   /* หมายเหตุ */
+
+    .lot-label {
+      font-size:0.9rem;
+      font-weight:bold;
+      text-align:right;
+      margin-top:2px;
+    }
 
     @media print {
       body {
         padding:0;
-        background:white;
+        background:#fff;
       }
       .page {
-        box-shadow:none;
         margin:0;
-        padding:0 8mm;
+        padding:0 5mm;
+        box-shadow:none;
       }
       .top-buttons,
-      .top-row { display:none; }
+      .toolbar { display:none; }
 
-      thead { display: table-header-group; }
-      tfoot { display: table-footer-group; }
+      .sheet {
+        page-break-after:always;
+      }
+      .sheet:last-child {
+        page-break-after:auto;
+      }
+
+      @page {
+        size:A4 portrait;
+        margin:5mm;
+      }
     }
   </style>
 </head>
@@ -173,84 +172,26 @@
 <body>
 <div class="page">
 
-  <!-- ปุ่มด้านบน -->
+  <!-- ปุ่มนำทาง -->
   <div class="top-buttons">
-    <a href="./ky9.html" class="btn btn-ky9-list">ขย.9 (ข้อมูลดิบ)</a>
+    <a href="./ky9.html"      class="btn btn-ky9-data">ขย.9 (ข้อมูลดิบ)</a>
     <a href="./ky9-form.html" class="btn btn-ky9-form">ขย.9 (แบบฟอร์ม)</a>
-    <a href="./ky11.html" class="btn btn-ky11">ขย.11 (บัญชีการขายยา)</a>
+    <a href="./ky11.html"     class="btn btn-ky11">ขย.11 (บัญชีการขายยา)</a>
     <button class="btn btn-print" onclick="window.print()">🖨 พิมพ์</button>
-    <button class="btn btn-download" onclick="window.print()">⬇ PDF</button>
+    <button class="btn btn-pdf"   onclick="window.print()">⬇ PDF</button>
   </div>
 
-  <!-- เลือก LOT -->
-  <div class="top-row">
-    <div class="lot-box">
-      LOT:
-      <select id="lotSelect">
-        <option value="">--- เลือก LOT / ชื่อยา ---</option>
-      </select>
-    </div>
-    <div id="status" class="status">กำลังดึงข้อมูล LOT จาก ขย.9 …</div>
+  <!-- แถบเลือกยา -->
+  <div class="toolbar">
+    <label for="drugSelect">เลือกชื่อยา / รายการสินค้า:</label>
+    <select id="drugSelect">
+      <option value="">-- เลือกชื่อยาจากรายการ --</option>
+    </select>
+    <span id="lotSummary" class="info-note"></span>
   </div>
 
-  <div class="table-wrapper">
-    <table>
-      <thead>
-        <!-- หัวฟอร์ม (เหมือนใน Excel) -->
-        <tr class="title-row">
-          <th colspan="6">บัญชีการขายยาอันตราย เฉพาะรายการที่เลขขาบอาหารและยากำหนด</th>
-        </tr>
-        <tr class="shop-row">
-          <th colspan="6">ร้านขายยา <span class="editable" contenteditable="true">คลังยาดีดี</span></th>
-        </tr>
-        <tr class="addr-row">
-          <th colspan="6">
-            แสนสุข
-            <span class="editable" contenteditable="true">
-              123 ถนน ข้าวหลาม ตำบล บ้านปึก อำเภอเมืองชลบุรี จังหวัดชลบุรี 20000 โทร. 098 444 1614
-            </span>
-          </th>
-        </tr>
-        <tr class="label-row">
-          <th colspan="6">
-            <span style="float:right;">แบบ ขย.11</span>
-          </th>
-        </tr>
-
-        <!-- บรรทัดข้อมูลยา (3 กล่อง: ซ้าย/กลาง/ขวา) -->
-        <tr class="info-top-row">
-          <th colspan="2" class="info-left">
-            ชื่อยา.......<span id="drugNameDisplay" style="font-weight:bold;"></span><br>
-            ชื่อผู้ผลิต/ผู้นำเข้า...............<span id="producerDisplay"></span><br>
-            ได้มาจาก.......<span id="fromDisplay"></span>
-          </th>
-          <th colspan="2" class="info-mid">
-            เลขที่หรืออักษรของครั้งที่ผลิต.....<span id="lotDisplay" style="font-weight:bold;"></span><br>
-            จำนวนรับ........<span id="qtyDisplay"></span>
-            <span id="unitDisplay"></span>
-          </th>
-          <th colspan="2" class="info-right">
-            ขนาดบรรจุ...............................<br>
-            วันที่รับ........<span id="dateInDisplay"></span>
-          </th>
-        </tr>
-
-        <!-- หัวคอลัมน์ตารางขาย -->
-        <tr class="header-row">
-          <th>ลำดับที่</th>
-          <th>วัน/เดือน/ปี</th>
-          <th>จำนวน / ปริมาณ ที่ขาย</th>
-          <th>ชื่อ สกุล ผู้ซื้อ</th>
-          <th>ลายมือชื่อผู้มีหน้าที่ปฏิบัติการ</th>
-          <th>หมายเหตุ</th>
-        </tr>
-      </thead>
-
-      <tbody id="saleBody">
-        <!-- แถวขายจะถูกสร้างด้วย JS -->
-      </tbody>
-    </table>
-  </div>
+  <!-- พื้นที่แสดงฟอร์มหลายแผ่น -->
+  <div id="sheetsContainer"></div>
 </div>
 
 <script>
@@ -258,115 +199,231 @@ const SPREADSHEET_ID ="1Fqq6zxoM8Qw-hNbl5U7hwmezdzxT32ek43qX70uQAZc";
 const GID ="136320859";
 const URL =`https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
 
-let ky9Rows = [];
+let allRows = [];
 
-function getQueryParam(name){
-  const params=new URLSearchParams(window.location.search);
-  return params.get(name);
+function parseRow(row){
+  const c=row.c||[];
+  return {
+    no:        c[0]?.v ?? "",
+    dateIn:    c[1]?.f || c[1]?.v || "",
+    vendor:    c[2]?.v ?? "",
+    itemCode:  c[3]?.v ?? "",
+    drugName:  c[4]?.v ?? "",
+    lot:       c[5]?.v ?? "",
+    qty:       Number(c[6]?.v ?? 0),
+    unit:      c[7]?.v ?? "",
+    signer:    c[8]?.v ?? "",
+    remark:    c[9]?.v ?? ""
+  };
 }
 
-async function loadLots(){
-  const status=document.getElementById("status");
-  const select=document.getElementById("lotSelect");
+function toDateValue(text) {
+  if (!text) return 0;
+  const parts = text.split("/");
+  if (parts.length < 3) return 0;
+  const d = parseInt(parts[0], 10);
+  const m = parseInt(parts[1], 10) - 1;
+  let y = parseInt(parts[2], 10);
+  if (y < 100) y = 2000 + y;
+  const dt = new Date(y, m, d);
+  return dt.getTime();
+}
 
-  try{
-    const res=await fetch(URL);
-    const text=await res.text();
-    const jsonStr=text.substring(text.indexOf("{"), text.lastIndexOf("}")+1);
-    const data=JSON.parse(jsonStr);
-    ky9Rows=data.table.rows || [];
-
-    ky9Rows.forEach(row=>{
-      const c=row.c||[];
-      const lot=c[5]?.v || "";
-      const drug=c[4]?.v || "";
-      const vendor=c[2]?.v || "";
-      if(!lot || !drug) return;
-
-      const opt=document.createElement("option");
-      opt.value=lot;
-      opt.textContent=`${lot} – ${drug} (${vendor})`;
-      select.appendChild(opt);
-    });
-
-    status.textContent="เลือก LOT เพื่อสร้างฟอร์ม ขย.11";
-
-    const lotFromUrl=getQueryParam("lot");
-    if(lotFromUrl){
-      const found = Array.from(select.options)
-        .find(o=>o.value.toString()===lotFromUrl.toString());
-      if(found){
-        select.value=lotFromUrl;
-        applyLot(lotFromUrl);
-      }
+function formatDateMin(rows) {
+  if (!rows.length) return "";
+  let best = rows[0];
+  let bestVal = toDateValue(best.dateIn);
+  rows.forEach(r => {
+    const v = toDateValue(r.dateIn);
+    if (v && (!bestVal || v < bestVal)) {
+      best = r;
+      bestVal = v;
     }
-  }catch(e){
-    console.error(e);
-    status.textContent="ดึงข้อมูล LOT จาก ขย.9 ไม่สำเร็จ";
-  }
+  });
+  return best.dateIn || "";
+}
 
-  select.addEventListener("change",()=>{
-    const lot=select.value;
-    if(lot){
-      applyLot(lot);
-    }
+/* เติมตัวเลือกชื่อยาใน select */
+function populateDrugSelect() {
+  const select = document.getElementById("drugSelect");
+  const drugSet = new Set();
+  allRows.forEach(r => {
+    if (r.drugName) drugSet.add(r.drugName);
+  });
+  const drugs = Array.from(drugSet).sort((a,b)=>a.localeCompare(b,"th"));
+  drugs.forEach(d => {
+    const opt=document.createElement("option");
+    opt.value=d;
+    opt.textContent=d;
+    select.appendChild(opt);
   });
 }
 
-function applyLot(lot){
-  const status=document.getElementById("status");
-  const row = ky9Rows.find(r => (r.c[5]?.v || "").toString() === lot.toString());
+/* สร้าง HTML ของแถวรายการขาย (ช่องว่าง) */
+function buildSalesRows(count=12) {
+  let html = "";
+  for (let i=1;i<=count;i++){
+    html += `
+      <tr>
+        <td>${i}</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+    `;
+  }
+  return html;
+}
 
-  if(!row){
-    status.textContent="ไม่พบ LOT นี้ใน ขย.9";
+/* สร้างฟอร์ม 1 แผ่นสำหรับ LOT หนึ่ง ๆ */
+function buildSheetHtml(drugName, lotKey, rowsForLot, index) {
+  const vendor = rowsForLot[0]?.vendor || "";
+  const dateIn = formatDateMin(rowsForLot);
+  const unit = rowsForLot[0]?.unit || "";
+  const totalQty = rowsForLot.reduce((sum,r)=>sum + (r.qty||0),0);
+
+  return `
+    <div class="sheet">
+      <div class="sheet-header-title">
+        บัญชีการขายยาอันตราย (ขย.11)
+      </div>
+      <div class="sheet-header-sub">
+        ร้านขายยา <span class="editable" contenteditable="true">คลังยาดีดี</span>
+      </div>
+      <div class="sheet-header-addr">
+        แสนสุข <span class="editable" contenteditable="true">
+        123 ถนน ข้าวหลาม ตำบล บ้านปึก อำเภอเมืองชลบุรี จังหวัดชลบุรี 20000 โทร. 098 444 1614
+        </span>
+      </div>
+
+      <table class="sheet-info-table">
+        <tr>
+          <td colspan="2">
+            ชื่อยา....... <span class="editable" contenteditable="true">${drugName}</span>
+          </td>
+          <td>
+            เลขที่หรืออักษรของครั้งที่ผลิต...... <span class="editable" contenteditable="true">${lotKey}</span>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            ชื่อผู้ผลิต/ผู้นำเข้า....... <span class="editable" contenteditable="true">${vendor}</span>
+          </td>
+          <td>
+            จำนวนรับ......... <span class="editable" contenteditable="true">${totalQty}</span>
+            <span class="editable" contenteditable="true">${unit}</span>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            ได้มาจาก....... <span class="editable" contenteditable="true">${vendor}</span>
+          </td>
+          <td>
+            ขนาดบรรจุ....... <span class="editable" contenteditable="true"></span>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2"></td>
+          <td>
+            วันที่รับ....... <span class="editable" contenteditable="true">${dateIn}</span>
+          </td>
+        </tr>
+      </table>
+
+      <div class="lot-label">
+        แบบ ขย.11 | LOT: ${lotKey} | แผ่นที่ ${index}
+      </div>
+
+      <table class="sales-table">
+        <thead>
+          <tr>
+            <th>ลำดับที่</th>
+            <th>วัน / เดือน / ปี</th>
+            <th>จำนวน / ปริมาณ ที่ขาย</th>
+            <th>ชื่อ สกุล ผู้ซื้อ</th>
+            <th>ลายมือชื่อผู้มีหน้าที่ปฏิบัติการ</th>
+            <th>หมายเหตุ</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${buildSalesRows(12)}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+/* สร้างหลายฟอร์มตาม LOT ของชื่อยานั้น */
+function renderSheetsForDrug(drugName) {
+  const container = document.getElementById("sheetsContainer");
+  const lotSummary = document.getElementById("lotSummary");
+
+  container.innerHTML = "";
+  lotSummary.textContent = "";
+
+  if (!drugName) return;
+
+  const rowsForDrug = allRows.filter(r => r.drugName === drugName);
+  if (!rowsForDrug.length) {
+    container.innerHTML = `<p>ไม่พบข้อมูลสำหรับยา "${drugName}"</p>`;
     return;
   }
 
-  const c=row.c || [];
-  const dateIn = c[1]?.f || c[1]?.v || "";
-  const vendor = c[2]?.v || "";
-  const drug   = c[4]?.v || "";
-  const qty    = c[6]?.v || "";
-  const unit   = c[7]?.v || "";
+  // group by LOT
+  const lotMap = new Map();
+  rowsForDrug.forEach(r => {
+    const lotKey = r.lot || "(ไม่มีเลขที่ LOT)";
+    if (!lotMap.has(lotKey)) lotMap.set(lotKey, []);
+    lotMap.get(lotKey).push(r);
+  });
 
-  // เติมหัวฟอร์ม
-  document.getElementById("drugNameDisplay").textContent = drug;
-  document.getElementById("lotDisplay").textContent      = lot;
-  document.getElementById("producerDisplay").textContent = vendor;
-  document.getElementById("fromDisplay").textContent     = vendor;
-  document.getElementById("qtyDisplay").textContent      = qty || "";
-  document.getElementById("unitDisplay").textContent     = unit || "";
-  document.getElementById("dateInDisplay").textContent   = dateIn;
+  const lots = Array.from(lotMap.keys());
+  lotSummary.textContent = `พบ ${lots.length} LOT สำหรับยานี้`;
 
-  // สร้างแถวขาย: ตามจำนวนรับ แต่ไม่เกิน 40 แถว
-  const saleBody=document.getElementById("saleBody");
-  saleBody.innerHTML="";
-  const numRows = Math.min(parseInt(qty || "0",10) || 15, 40);
-
-  for(let i=1;i<=numRows;i++){
-    const tr=document.createElement("tr");
-
-    function cell(text, center=false){
-      const td=document.createElement("td");
-      td.textContent=text;
-      if(center) td.style.textAlign="center";
-      tr.appendChild(td);
-    }
-
-    cell(i,true);   // ลำดับที่
-    cell("");       // วัน/เดือน/ปี ที่ขาย
-    cell("");       // จำนวน/ปริมาณ ที่ขาย
-    cell("");       // ชื่อ-สกุล ผู้ซื้อ
-    cell("");       // ลายมือชื่อผู้มีหน้าที่ปฏิบัติการ
-    cell("");       // หมายเหตุ
-
-    saleBody.appendChild(tr);
-  }
-
-  status.textContent=`สร้างฟอร์ม ขย.11 สำหรับ LOT ${lot} เรียบร้อยแล้ว`;
+  let index = 1;
+  lots.forEach(lotKey => {
+    const rowsForLot = lotMap.get(lotKey);
+    const html = buildSheetHtml(drugName, lotKey, rowsForLot, index++);
+    container.insertAdjacentHTML("beforeend", html);
+  });
 }
 
-loadLots();
+/* โหลดข้อมูลจาก Google Sheet */
+async function loadData() {
+  try {
+    const res = await fetch(URL);
+    const text = await res.text();
+    const jsonStr = text.substring(text.indexOf("{"), text.lastIndexOf("}")+1);
+    const data = JSON.parse(jsonStr);
+    const rows = data.table.rows || [];
+    allRows = rows.map(parseRow);
+
+    populateDrugSelect();
+
+    // ถ้ามี ?drug= ใน URL ให้ auto เลือกยาและ render
+    const params = new URLSearchParams(location.search);
+    const drugParam = params.get("drug");
+    if (drugParam) {
+      const select = document.getElementById("drugSelect");
+      select.value = drugParam;
+      renderSheetsForDrug(drugParam);
+    }
+  } catch (e) {
+    console.error(e);
+    document.getElementById("sheetsContainer").innerHTML =
+      "<p>โหลดข้อมูลจาก Google Sheet ไม่สำเร็จ</p>";
+  }
+}
+
+/* event: เปลี่ยนชื่อยาใน select */
+document.getElementById("drugSelect").addEventListener("change", e => {
+  const v = e.target.value;
+  renderSheetsForDrug(v);
+});
+
+loadData();
 </script>
 
 </body>
