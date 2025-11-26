@@ -25,7 +25,7 @@
       gap: 10px;
       margin-bottom: 20px;
       flex-wrap: wrap;
-      justify-content: flex-end; /* ปุ่มไปฝั่งขวา */
+      justify-content: flex-end;
     }
     .top-buttons .btn {
       display: inline-block;
@@ -44,20 +44,18 @@
     .btn-ky11      { background: #1976d2; color: #fff; }
     .btn-print     { background: #ff9800; color: #fff; }
     .btn-download  { background: #9c27b0; color: #fff; }
-
     .top-buttons .btn:hover {
       opacity: 0.85;
       transform: translateY(-2px);
     }
 
-    h1,h2,h3 {
+    h1,h2 {
       margin: 0;
       text-align: center;
       line-height: 1.2;
     }
     h1 { font-size: 1.4rem; }
     h2 { font-size: 1.2rem; }
-    h3 { font-size: 1rem; }
 
     .header-box {
       margin-top: 8px;
@@ -116,6 +114,12 @@
     th:nth-child(9), td:nth-child(9) { width: 140px; }
     th:nth-child(10), td:nth-child(10) { width: 100px; }
 
+    .info-line {
+      font-size: 0.9rem;
+      margin-top: 4px;
+      color: #777;
+    }
+
     @media print {
       body {
         background: #fff;
@@ -127,6 +131,7 @@
         padding: 0 8mm;
       }
       .top-buttons { display: none; } /* ซ่อนปุ่มตอนพิมพ์ */
+      .info-line { display: none; }
     }
   </style>
 </head>
@@ -157,6 +162,7 @@
     </div>
 
     <div class="sheet-label">แบบ ขย.9</div>
+    <div id="status" class="info-line">กำลังดึงข้อมูลจาก Google Sheet ขย.9 …</div>
 
     <!-- ตารางหลักแบบในชีต -->
     <div class="table-wrapper">
@@ -175,23 +181,8 @@
             <th>หมายเหตุ</th>
           </tr>
         </thead>
-        <tbody>
-          <!-- แถวเปล่า 15 แถว (จะเพิ่ม/ลดเองก็ได้) -->
-          <tr><td>1</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-          <tr><td>2</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-          <tr><td>3</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-          <tr><td>4</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-          <tr><td>5</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-          <tr><td>6</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-          <tr><td>7</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-          <tr><td>8</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-          <tr><td>9</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-          <tr><td>10</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-          <tr><td>11</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-          <tr><td>12</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-          <tr><td>13</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-          <tr><td>14</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-          <tr><td>15</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tbody id="formBody">
+          <!-- จะถูกเติมด้วย JS จาก Google Sheet ขย9 -->
         </tbody>
       </table>
     </div>
@@ -199,10 +190,84 @@
   </div>
 
   <script>
-    // ตอนนี้ดาวน์โหลด PDF ใช้ผ่าน Print -> Save as PDF
     function downloadPDF() {
+      // สำหรับ GitHub Pages ให้ใช้ Print แล้ว Save as PDF
       window.print();
     }
+
+    // ==== ดึงข้อมูลจาก Google Sheet ขย.9 มาใส่ในตารางฟอร์ม ====
+    const SPREADSHEET_ID = "1Fqq6zxoM8Qw-hNbl5U7hwmezdzxT32ek43qX70uQAZc";
+    const GID = "136320859";
+    const SHEET_URL =
+      `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
+
+    async function loadKy9Form() {
+      const statusEl = document.getElementById("status");
+      const tbody = document.getElementById("formBody");
+
+      try {
+        const res = await fetch(SHEET_URL);
+        const text = await res.text();
+
+        const jsonStr = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
+        const data = JSON.parse(jsonStr);
+        const rows = data.table.rows || [];
+
+        tbody.innerHTML = "";
+
+        rows.forEach((row) => {
+          const c = row.c || [];
+
+          // map ตามโครงสร้างชีต ขย9
+          const no        = c[0]?.v ?? "";
+          const dateIn    = c[1]?.f || c[1]?.v || "";
+          const vendor    = c[2]?.v ?? "";
+          const itemCode  = c[3]?.v ?? "";
+          const drugName  = c[4]?.v ?? "";
+          const lot       = c[5]?.v ?? "";
+          const qty       = c[6]?.v ?? "";
+          const unit      = c[7]?.v ?? "";
+          const signer    = c[8]?.v ?? "";
+          const remark    = c[9]?.v ?? "";
+
+          // ถ้าแถวว่างมาก ๆ ข้าม
+          if (!itemCode && !drugName && !lot && !vendor) return;
+
+          const tr = document.createElement("tr");
+
+          function addCell(text, alignCenter = false) {
+            const td = document.createElement("td");
+            td.textContent = text;
+            if (alignCenter) td.style.textAlign = "center";
+            tr.appendChild(td);
+          }
+
+          addCell(no, true);
+          addCell(dateIn, true);
+          addCell(vendor);
+          addCell(itemCode);
+          addCell(drugName);
+          addCell(lot);
+          addCell(qty, true);
+          addCell(unit, true);
+          addCell(signer);
+          addCell(remark);
+
+          tbody.appendChild(tr);
+        });
+
+        if (rows.length === 0) {
+          statusEl.textContent = "ไม่พบข้อมูลใน Google Sheet ขย.9";
+        } else {
+          statusEl.textContent = "ดึงข้อมูลจาก Google Sheet ขย.9 เรียบร้อยแล้ว";
+        }
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = "ดึงข้อมูลจาก Google Sheet ไม่สำเร็จ กรุณาตรวจสอบสิทธิ์การแชร์ / SPREADSHEET_ID / gid";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", loadKy9Form);
   </script>
 </body>
 </html>
