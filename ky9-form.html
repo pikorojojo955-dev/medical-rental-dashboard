@@ -22,28 +22,32 @@
     /* ปุ่มด้านบน */
     .top-buttons {
       display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
+      gap: 10px;
+      margin-bottom: 20px;
       flex-wrap: wrap;
+      justify-content: flex-end; /* ปุ่มไปฝั่งขวา */
     }
     .top-buttons .btn {
       display: inline-block;
-      padding: 6px 14px;
-      border-radius: 999px;
+      padding: 10px 18px;
+      border-radius: 30px;
       text-decoration: none;
-      font-size: 0.9rem;
+      font-size: 1rem;
       font-weight: 600;
       border: none;
       cursor: pointer;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.12);
-      transition: opacity 0.15s ease, transform 0.1s ease;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+      transition: 0.15s;
     }
-    .btn-ky9-list { background: #00c853; color: #fff; }
-    .btn-ky9-form { background: #00796b; color: #fff; }
-    .btn-ky11    { background: #1976d2; color: #fff; }
+    .btn-ky9-list  { background: #00c853; color: #fff; }
+    .btn-ky9-form  { background: #009688; color: #fff; }
+    .btn-ky11      { background: #1976d2; color: #fff; }
+    .btn-print     { background: #ff9800; color: #fff; }
+    .btn-download  { background: #9c27b0; color: #fff; }
+
     .top-buttons .btn:hover {
-      opacity: 0.9;
-      transform: translateY(-1px);
+      opacity: 0.85;
+      transform: translateY(-2px);
     }
 
     h1,h2,h3 {
@@ -112,12 +116,6 @@
     th:nth-child(9), td:nth-child(9) { width: 140px; }
     th:nth-child(10), td:nth-child(10) { width: 100px; }
 
-    .subheader-row td {
-      border: none;
-      padding: 4px 2px;
-      font-size: 0.9rem;
-    }
-
     @media print {
       body {
         background: #fff;
@@ -128,7 +126,7 @@
         margin: 0;
         padding: 0 8mm;
       }
-      .top-buttons { display: none; }
+      .top-buttons { display: none; } /* ซ่อนปุ่มตอนพิมพ์ */
     }
   </style>
 </head>
@@ -139,6 +137,12 @@
       <a href="./ky9.html" class="btn btn-ky9-list">ขย.9 (ข้อมูลดิบ)</a>
       <a href="./ky9-form.html" class="btn btn-ky9-form">ขย.9 (แบบฟอร์ม)</a>
       <a href="./ky11.html" class="btn btn-ky11">ขย.11 (บัญชีการขายยา)</a>
+
+      <!-- ปุ่มพิมพ์ -->
+      <button class="btn btn-print" onclick="window.print()">🖨 พิมพ์เอกสาร</button>
+
+      <!-- ปุ่มดาวน์โหลด PDF (ใช้ Save as PDF ตอน Print) -->
+      <button class="btn btn-download" onclick="downloadPDF()">⬇ ดาวน์โหลด PDF</button>
     </div>
 
     <!-- หัวกระดาษ -->
@@ -172,22 +176,8 @@
           </tr>
         </thead>
         <tbody>
-          <!-- แถวเปล่าให้เขียน 15 แถว (เพิ่ม/ลดได้) -->
-          <!-- ใช้ลำดับที่ 1–15 เผื่อพิมพ์ -->
-          <!-- คุณสามารถคัดลอกบล็อก <tr> เพิ่มได้ตามต้องการ -->
-          <!-- row 1 -->
-          <tr>
-            <td>1</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
+          <!-- แถวเปล่า 15 แถว (จะเพิ่ม/ลดเองก็ได้) -->
+          <tr><td>1</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
           <tr><td>2</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
           <tr><td>3</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
           <tr><td>4</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
@@ -207,5 +197,12 @@
     </div>
 
   </div>
+
+  <script>
+    // ตอนนี้ดาวน์โหลด PDF ใช้ผ่าน Print -> Save as PDF
+    function downloadPDF() {
+      window.print();
+    }
+  </script>
 </body>
 </html>
