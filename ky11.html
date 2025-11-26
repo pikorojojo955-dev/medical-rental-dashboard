@@ -243,7 +243,8 @@ function formatDateMin(rows) {
 
 /* --------- อ่านพารามิเตอร์จาก URL --------- */
 
-// ✅ แก้ตรงนี้: single ไม่ trim เพื่อให้ชื่อยาเหมือนในชีตเป๊ะ
+// รองรับ ?drugs=["A","B"] และ ?drug=A
+// single ไม่ trim เพื่อให้ตรงกับชื่อในชีต
 function getDrugsFromQuery() {
   const params = new URLSearchParams(window.location.search);
 
@@ -260,7 +261,7 @@ function getDrugsFromQuery() {
   }
 
   const single = params.get("drug");
-  if (single) return [single];   // ← ไม่ trim
+  if (single) return [single];
 
   return [];
 }
@@ -282,17 +283,18 @@ function populateDrugSelect() {
   });
 }
 
+/* ✅ แถวตารางขาย: ให้คอลัมน์ 2–6 แก้ไขได้ */
 function buildSalesRows(count=12) {
   let html = "";
   for (let i=1;i<=count;i++){
     html += `
       <tr>
         <td>${i}</td>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
-        <td>&nbsp;</td>
+        <td contenteditable="true"></td>
+        <td contenteditable="true"></td>
+        <td contenteditable="true"></td>
+        <td contenteditable="true"></td>
+        <td contenteditable="true"></td>
       </tr>
     `;
   }
@@ -404,8 +406,7 @@ function renderSheetsForDrug(drugName, append=false) {
     return;
   }
 
-  // ถ้ามี LOT → group ตาม LOT
-  // ถ้า LOT ว่าง → group ตามวันที่รับเข้า
+  // ถ้ามี LOT → group ตาม LOT   ถ้า LOT ว่าง → group ตามวันที่รับเข้า
   const groupMap = new Map();
   rowsForDrug.forEach(r => {
     const hasLot = r.lot && String(r.lot).trim() !== "";
