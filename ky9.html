@@ -11,6 +11,11 @@
       padding: 16px;
       background: #f5f5f5;
     }
+    <div class="top-buttons">
+  <a href="ky9.html" class="btn btn-ky9">ขย.9 (บัญชีการซื้อยา)</a>
+  <a href="ky11.html" class="btn btn-ky11">ขย.11 (บัญชีการขายยา)</a>
+</div>
+
     h1 {
       margin: 0 0 4px;
       font-size: 1.4rem;
@@ -84,6 +89,39 @@
       }
     }
   </style>
+  .top-buttons {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.top-buttons .btn {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+}
+
+.btn-ky9 {
+  background: #00c853;
+  color: #ffffff;
+}
+
+.btn-ky11 {
+  background: #1976d2;
+  color: #ffffff;
+}
+
+.top-buttons .btn:hover {
+  opacity: 0.9;
+}
+
 </head>
 <body>
   <h1>บัญชีการซื้อยา (ขย.9)</h1>
