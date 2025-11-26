@@ -4,13 +4,15 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>แบบฟอร์มบัญชีการซื้อยา (ขย.9)</title>
+
   <style>
     body {
-      font-family: "TH SarabunPSK", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: "TH SarabunPSK", system-ui, sans-serif;
       margin: 0;
       padding: 16px;
       background: #f5f5f5;
     }
+
     .page {
       max-width: 1000px;
       margin: 0 auto;
@@ -23,251 +25,185 @@
     .top-buttons {
       display: flex;
       gap: 10px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
       justify-content: flex-end;
+      margin-bottom: 20px;
     }
-    .top-buttons .btn {
-      display: inline-block;
+    .btn {
       padding: 10px 18px;
       border-radius: 30px;
-      text-decoration: none;
       font-size: 1rem;
       font-weight: 600;
-      border: none;
       cursor: pointer;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.15);
-      transition: 0.15s;
+      border: none;
+      color: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
-    .btn-ky9-list  { background: #00c853; color: #fff; }
-    .btn-ky9-form  { background: #009688; color: #fff; }
-    .btn-ky11      { background: #1976d2; color: #fff; }
-    .btn-print     { background: #ff9800; color: #fff; }
-    .btn-download  { background: #9c27b0; color: #fff; }
-    .top-buttons .btn:hover {
-      opacity: 0.85;
-      transform: translateY(-2px);
-    }
+    .btn-ky9-list { background:#00c853; }
+    .btn-ky9-form { background:#009688; }
+    .btn-ky11    { background:#1976d2; }
+    .btn-print   { background:#ff9800; }
+    .btn-download{ background:#9c27b0; }
 
-    h1,h2 {
-      margin: 0;
+    /* หัวกระดาษ */
+    h1, h2 {
       text-align: center;
+      margin: 0;
       line-height: 1.2;
     }
-    h1 { font-size: 1.4rem; }
-    h2 { font-size: 1.2rem; }
 
     .header-box {
-      margin-top: 8px;
-      margin-bottom: 8px;
-      background: #ffe0b2;
-      padding: 6px;
-    }
-    .header-line {
-      text-align: center;
-      font-size: 0.95rem;
+      background:#ffe0b2;
+      padding:6px;
+      margin-top:10px;
+      text-align:center;
+      font-size:1rem;
     }
 
-    /* ส่วนชื่อร้าน/ที่อยู่ แก้ไขได้ */
-    .editable {
-      border-bottom: 1px dotted #555;
-      padding: 0 2px;
-      min-width: 80px;
-      display: inline-block;
-    }
-
-    .sheet-label {
-      text-align: right;
-      font-size: 0.9rem;
-      margin-top: 4px;
-      color: #555;
-    }
-
+    /* ตาราง */
     .table-wrapper {
-      margin-top: 8px;
-      border: 3px solid #00c853;
+      border:3px solid #00c853;
+      margin-top:20px;
     }
     table {
-      width: 100%;
+      width:100%;
       border-collapse: collapse;
-      font-size: 0.85rem;
+      font-size:0.9rem;
     }
-    thead {
-      background: #00c853;
-      color: #fff;
+    th {
+      background:#00c853;
+      color:white;
+      border:1px solid #555;
+      text-align:center;
+      padding:4px;
     }
-    th, td {
-      border: 1px solid #666;
-      padding: 4px 4px;
-      text-align: left;
-      vertical-align: top;
-      white-space: nowrap;
+    td {
+      border:1px solid #555;
+      padding:4px;
+      white-space:nowrap;
     }
-    th:nth-child(1), td:nth-child(1) { width: 40px; text-align: center; }
-    th:nth-child(2), td:nth-child(2) { width: 80px; text-align: center; }
-    th:nth-child(3), td:nth-child(3) { width: 160px; }
-    th:nth-child(4), td:nth-child(4) { width: 80px; }
-    th:nth-child(5), td:nth-child(5) { width: 160px; }
-    th:nth-child(6), td:nth-child(6) { width: 120px; }
-    th:nth-child(7), td:nth-child(7) { width: 80px; text-align: center; }
-    th:nth-child(8), td:nth-child(8) { width: 60px; text-align: center; }
-    th:nth-child(9), td:nth-child(9) { width: 140px; }
-    th:nth-child(10), td:nth-child(10) { width: 100px; }
 
-    .info-line {
-      font-size: 0.9rem;
-      margin-top: 4px;
-      color: #777;
-    }
+    /* ปรับขนาดคอลัมน์ให้พอดีฟอร์ม */
+    th:nth-child(1), td:nth-child(1) { width:40px; }
+    th:nth-child(2), td:nth-child(2) { width:80px; }
+    th:nth-child(3), td:nth-child(3) { width:180px; } /* ชื่อผู้ขาย */
+    th:nth-child(4), td:nth-child(4) { width:180px; } /* ชื่อยา */
+    th:nth-child(5), td:nth-child(5) { width:120px; } /* เลขที่ผลิต */
+    th:nth-child(6), td:nth-child(6) { width:60px;  text-align:center;}
+    th:nth-child(7), td:nth-child(7) { width:60px;  text-align:center;}
+    th:nth-child(8), td:nth-child(8) { width:140px; }
+    th:nth-child(9), td:nth-child(9) { width:100px; }
 
     @media print {
-      body {
-        background: #fff;
-        padding: 0;
-      }
-      .page {
-        box-shadow: none;
-        margin: 0;
-        padding: 0 8mm;
-      }
-      .top-buttons { display: none; } /* ซ่อนปุ่มตอนพิมพ์ */
-      .info-line { display: none; }
+      .top-buttons { display:none; }
+      body { padding:0; background:white; }
+      .page { box-shadow:none; padding:0 8mm; }
     }
   </style>
 </head>
+
 <body>
-  <div class="page">
-    <!-- ปุ่มลัด -->
-    <div class="top-buttons">
-      <a href="./ky9.html" class="btn btn-ky9-list">ขย.9 (ข้อมูลดิบ)</a>
-      <a href="./ky9-form.html" class="btn btn-ky9-form">ขย.9 (แบบฟอร์ม)</a>
-      <a href="./ky11.html" class="btn btn-ky11">ขย.11 (บัญชีการขายยา)</a>
+<div class="page">
 
-      <!-- ปุ่มพิมพ์ -->
-      <button class="btn btn-print" onclick="window.print()">🖨 พิมพ์เอกสาร</button>
-
-      <!-- ปุ่มดาวน์โหลด PDF (ใช้ Save as PDF ตอน Print) -->
-      <button class="btn btn-download" onclick="downloadPDF()">⬇ ดาวน์โหลด PDF</button>
-    </div>
-
-    <!-- หัวกระดาษ -->
-    <h1>บัญชีการซื้อยา</h1>
-    <h2>ร้านขายยา <span class="editable" contenteditable="true">คลังยาดีดี</span></h2>
-
-    <div class="header-box">
-      <div class="header-line">
-        แสนสุข <span class="editable" contenteditable="true">123 ถนน ข้าวหลาม ตำบล บ้านปึก อำเภอเมืองชลบุรี จังหวัดชลบุรี 20000</span>
-        โทร. <span class="editable" contenteditable="true">098 444 1614</span>
-      </div>
-    </div>
-
-    <div class="sheet-label">แบบ ขย.9</div>
-    <div id="status" class="info-line">กำลังดึงข้อมูลจาก Google Sheet ขย.9 …</div>
-
-    <!-- ตารางหลักแบบในชีต -->
-    <div class="table-wrapper">
-      <table>
-        <thead>
-          <tr>
-            <th>ลำดับที่</th>
-            <th>วันที่รับสินค้า</th>
-            <th>ชื่อผู้ขาย</th>
-            <th>ITEMCODE</th>
-            <th>ชื่อยา</th>
-            <th>เลขที่หรืออักษรครั้งที่ผลิต</th>
-            <th>จำนวน/ปริมาณ</th>
-            <th>หน่วย</th>
-            <th>ลายมือชื่อผู้มีหน้าที่ปฏิบัติการ</th>
-            <th>หมายเหตุ</th>
-          </tr>
-        </thead>
-        <tbody id="formBody">
-          <!-- จะถูกเติมด้วย JS จาก Google Sheet ขย9 -->
-        </tbody>
-      </table>
-    </div>
-
+  <!-- ปุ่มบน -->
+  <div class="top-buttons">
+    <a href="./ky9.html"><button class="btn btn-ky9-list">ขย.9 (ข้อมูลดิบ)</button></a>
+    <a href="./ky9-form.html"><button class="btn btn-ky9-form">ขย.9 (แบบฟอร์ม)</button></a>
+    <a href="./ky11.html"><button class="btn btn-ky11">ขย.11</button></a>
+    <button class="btn btn-print" onclick="window.print()">🖨 พิมพ์</button>
+    <button class="btn btn-download" onclick="window.print()">⬇ PDF</button>
   </div>
 
-  <script>
-    function downloadPDF() {
-      // สำหรับ GitHub Pages ให้ใช้ Print แล้ว Save as PDF
-      window.print();
-    }
+  <h1>บัญชีการซื้อยา</h1>
+  <h2>ร้านขายยา <span contenteditable="true">คลังยาดีดี</span></h2>
 
-    // ==== ดึงข้อมูลจาก Google Sheet ขย.9 มาใส่ในตารางฟอร์ม ====
-    const SPREADSHEET_ID = "1Fqq6zxoM8Qw-hNbl5U7hwmezdzxT32ek43qX70uQAZc";
-    const GID = "136320859";
-    const SHEET_URL =
-      `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
+  <div class="header-box">
+    แสนสุข <span contenteditable="true">123 ถนน ข้าวหลาม ตำบล บ้านปึก อำเภอเมืองชลบุรี จังหวัดชลบุรี 20000</span>
+    โทร. <span contenteditable="true">098 444 1614</span>
+  </div>
 
-    async function loadKy9Form() {
-      const statusEl = document.getElementById("status");
-      const tbody = document.getElementById("formBody");
+  <div style="text-align:right; font-size:0.9rem; margin-top:4px;">แบบ ขย.9</div>
 
-      try {
-        const res = await fetch(SHEET_URL);
-        const text = await res.text();
+  <div id="status" style="color:#777; font-size:0.85rem;">กำลังดึงข้อมูลจาก Google Sheet…</div>
 
-        const jsonStr = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
-        const data = JSON.parse(jsonStr);
-        const rows = data.table.rows || [];
+  <!-- ตาราง -->
+  <div class="table-wrapper">
+    <table>
+      <thead>
+      <tr>
+        <th>ลำดับที่</th>
+        <th>วันที่รับ</th>
+        <th>ชื่อผู้ขาย</th>
+        <th>ชื่อยา</th>
+        <th>เลขที่ผลิต</th>
+        <th>จำนวน</th>
+        <th>หน่วย</th>
+        <th>ลายมือชื่อผู้ปฏิบัติ</th>
+        <th>หมายเหตุ</th>
+      </tr>
+      </thead>
 
-        tbody.innerHTML = "";
+      <tbody id="formBody">
+      </tbody>
+    </table>
+  </div>
 
-        rows.forEach((row) => {
-          const c = row.c || [];
+</div>
 
-          // map ตามโครงสร้างชีต ขย9
-          const no        = c[0]?.v ?? "";
-          const dateIn    = c[1]?.f || c[1]?.v || "";
-          const vendor    = c[2]?.v ?? "";
-          const itemCode  = c[3]?.v ?? "";
-          const drugName  = c[4]?.v ?? "";
-          const lot       = c[5]?.v ?? "";
-          const qty       = c[6]?.v ?? "";
-          const unit      = c[7]?.v ?? "";
-          const signer    = c[8]?.v ?? "";
-          const remark    = c[9]?.v ?? "";
+<script>
+const SPREADSHEET_ID ="1Fqq6zxoM8Qw-hNbl5U7hwmezdzxT32ek43qX70uQAZc";
+const GID ="136320859";
+const URL =`https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
 
-          // ถ้าแถวว่างมาก ๆ ข้าม
-          if (!itemCode && !drugName && !lot && !vendor) return;
+async function loadSheet(){
+  const tbody=document.getElementById("formBody");
+  const status=document.getElementById("status");
 
-          const tr = document.createElement("tr");
+  try{
+    const res=await fetch(URL);
+    const t=await res.text();
+    const jsonStr=t.substring(t.indexOf("{"),t.lastIndexOf("}")+1);
+    const data=JSON.parse(jsonStr);
+    const rows=data.table.rows;
 
-          function addCell(text, alignCenter = false) {
-            const td = document.createElement("td");
-            td.textContent = text;
-            if (alignCenter) td.style.textAlign = "center";
-            tr.appendChild(td);
-          }
+    tbody.innerHTML="";
 
-          addCell(no, true);
-          addCell(dateIn, true);
-          addCell(vendor);
-          addCell(itemCode);
-          addCell(drugName);
-          addCell(lot);
-          addCell(qty, true);
-          addCell(unit, true);
-          addCell(signer);
-          addCell(remark);
+    rows.forEach(r=>{
+      const c=r.c||[];
+      const no=c[0]?.v||"";
+      const date=c[1]?.f||c[1]?.v||"";
+      const vendor=c[2]?.v||"";
+      const drug=c[4]?.v||"";   // ⭐ ข้าม ITEMCODE (c[3])
+      const lot=c[5]?.v||"";
+      const qty=c[6]?.v||"";
+      const unit=c[7]?.v||"";
+      const signer=c[8]?.v||"";
+      const remark=c[9]?.v||"";
 
-          tbody.appendChild(tr);
-        });
+      if(!drug && !lot && !vendor) return;
 
-        if (rows.length === 0) {
-          statusEl.textContent = "ไม่พบข้อมูลใน Google Sheet ขย.9";
-        } else {
-          statusEl.textContent = "ดึงข้อมูลจาก Google Sheet ขย.9 เรียบร้อยแล้ว";
-        }
-      } catch (err) {
-        console.error(err);
-        statusEl.textContent = "ดึงข้อมูลจาก Google Sheet ไม่สำเร็จ กรุณาตรวจสอบสิทธิ์การแชร์ / SPREADSHEET_ID / gid";
-      }
-    }
+      tbody.innerHTML+=`
+      <tr>
+        <td>${no}</td>
+        <td>${date}</td>
+        <td>${vendor}</td>
+        <td>${drug}</td>
+        <td>${lot}</td>
+        <td style="text-align:center">${qty}</td>
+        <td style="text-align:center">${unit}</td>
+        <td>${signer}</td>
+        <td>${remark}</td>
+      </tr>`;
+    });
 
-    document.addEventListener("DOMContentLoaded", loadKy9Form);
-  </script>
+    status.textContent="โหลดข้อมูลสำเร็จ";
+  } 
+  catch(e){
+    status.textContent="โหลดข้อมูลไม่สำเร็จ";
+  }
+}
+
+loadSheet();
+</script>
+
 </body>
 </html>
