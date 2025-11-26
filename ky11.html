@@ -53,6 +53,9 @@
       margin-bottom:10px;
       font-size:0.9rem;
     }
+    .toolbar label {
+      margin-right:4px;
+    }
     select {
       padding:4px 6px;
       border-radius:6px;
@@ -124,12 +127,12 @@
       color:#fff;
       text-align:center;
     }
-    .sales-table td:nth-child(1) { width:40px; text-align:center; }
-    .sales-table td:nth-child(2) { width:90px; text-align:center; }
-    .sales-table td:nth-child(3) { width:120px; text-align:center; }
-    .sales-table td:nth-child(4) { width:260px; }
-    .sales-table td:nth-child(5) { width:180px; }
-    .sales-table td:nth-child(6) { width:120px; }
+    .sales-table td:nth-child(1) { width:40px; text-align:center; } /* ลำดับ */
+    .sales-table td:nth-child(2) { width:90px; text-align:center; } /* วันเดือนปี */
+    .sales-table td:nth-child(3) { width:120px; text-align:center; }/* จำนวน */
+    .sales-table td:nth-child(4) { width:260px; }                   /* ชื่อผู้ซื้อ */
+    .sales-table td:nth-child(5) { width:180px; }                   /* ลายมือชื่อ */
+    .sales-table td:nth-child(6) { width:120px; }                   /* หมายเหตุ */
 
     .lot-label {
       font-size:0.9rem;
@@ -141,7 +144,7 @@
     @media print {
       body {
         padding:0;
-        background:#fff;
+      background:#fff;
       }
       .page {
         margin:0;
@@ -198,7 +201,8 @@ const URL =`https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx
 
 let allRows = [];
 
-/* แปลง row จาก gviz เป็น object ที่ใช้ง่าย */
+/* -------------------- helper พื้นฐาน -------------------- */
+
 function parseRow(row){
   const c=row.c||[];
   return {
@@ -215,7 +219,6 @@ function parseRow(row){
   };
 }
 
-/* แปลง "15/3/24" -> time value */
 function toDateValue(text) {
   if (!text) return 0;
   const parts = text.split("/");
@@ -228,7 +231,6 @@ function toDateValue(text) {
   return dt.getTime();
 }
 
-/* เลือกวันที่รับที่เก่าสุดใน group */
 function formatDateMin(rows) {
   if (!rows.length) return "";
   let best = rows[0];
@@ -243,7 +245,32 @@ function formatDateMin(rows) {
   return best.dateIn || "";
 }
 
-/* เติมตัวเลือกชื่อยาใน select */
+/* -------------------- อ่านพารามิเตอร์จาก URL -------------------- */
+
+// รองรับทั้ง ?drugs=["A","B"] และ ?drug=A
+function getDrugsFromQuery() {
+  const params = new URLSearchParams(window.location.search);
+
+  const raw = params.get("drugs");
+  if (raw) {
+    try {
+      const arr = JSON.parse(decodeURIComponent(raw));
+      if (Array.isArray(arr)) {
+        return arr.filter(x => typeof x === "string" && x.trim() !== "");
+      }
+    } catch(e) {
+      console.warn("parse drugs ไม่ได้:", e);
+    }
+  }
+
+  const single = params.get("drug");
+  if (single) return [single.trim()];
+
+  return [];
+}
+
+/* -------------------- UI helper -------------------- */
+
 function populateDrugSelect() {
   const select = document.getElementById("drugSelect");
   const drugSet = new Set();
@@ -259,7 +286,6 @@ function populateDrugSelect() {
   });
 }
 
-/* สร้างแถวตารางขาย (ว่าง) */
 function buildSalesRows(count=12) {
   let html = "";
   for (let i=1;i<=count;i++){
@@ -277,7 +303,8 @@ function buildSalesRows(count=12) {
   return html;
 }
 
-/* สร้างฟอร์ม 1 แผ่นสำหรับ group เดียว (LOT หรือ DATE) */
+/* -------------------- สร้าง sheet 1 แผ่น (logic LOT / date) -------------------- */
+
 function buildSheetHtml(drugName, groupInfo, rowsForGroup, index) {
   const vendor = rowsForGroup[0]?.vendor || "";
   const dateIn = formatDateMin(rowsForGroup);
@@ -360,24 +387,31 @@ function buildSheetHtml(drugName, groupInfo, rowsForGroup, index) {
   `;
 }
 
-/* สร้างหลายฟอร์มตาม LOT หรือวันที่รับ (ถ้าไม่มี LOT) */
-function renderSheetsForDrug(drugName) {
+/* -------------------- render ชื่อยา 1 ตัว (อาจหลาย LOT / หลายวันที่รับ) -------------------- */
+
+function renderSheetsForDrug(drugName, append=false) {
   const container = document.getElementById("sheetsContainer");
   const lotSummary = document.getElementById("lotSummary");
 
-  container.innerHTML = "";
-  lotSummary.textContent = "";
+  if (!append) {
+    container.innerHTML = "";
+    lotSummary.textContent = "";
+  }
 
   if (!drugName) return;
 
   const rowsForDrug = allRows.filter(r => r.drugName === drugName);
   if (!rowsForDrug.length) {
-    container.innerHTML = `<p>ไม่พบข้อมูลสำหรับยา "${drugName}"</p>`;
+    if (!append) {
+      container.innerHTML = `<p>ไม่พบข้อมูลสำหรับยา "${drugName}"</p>`;
+    }
     return;
   }
 
-  // group ตาม LOT, ถ้า LOT ว่างให้ group ตามวันที่รับเข้า
-  const groupMap = new Map(); // key -> {mode,label,rows}
+  // group:
+  // ถ้ามี LOT → group ตาม LOT
+  // ถ้า LOT ว่าง → group ตามวันที่รับ (dateIn)
+  const groupMap = new Map();  // key -> {mode,label,rows}
   rowsForDrug.forEach(r => {
     const hasLot = r.lot && String(r.lot).trim() !== "";
     const mode   = hasLot ? "lot" : "date";
@@ -390,39 +424,66 @@ function renderSheetsForDrug(drugName) {
     groupMap.get(key).rows.push(r);
   });
 
-  // แปลงเป็น array เพื่อเรียงลำดับ (โดยวันที่หรือชื่อ lot ก็ได้)
   const groups = Array.from(groupMap.values());
 
-  // ถ้าเป็น mode = "date" ให้เรียงตามวันที่รับเข้า
+  // เรียงลำดับ: ถ้าเป็นโหมด date ให้เรียงตามวันที่
   groups.sort((a,b) => {
     if (a.mode === "date" && b.mode === "date") {
       return toDateValue(a.label) - toDateValue(b.label);
     }
-    // อย่างอื่นก็เรียงตาม label เฉย ๆ
-    return String(a.label).localeCompare(String(b.label),"th");
+    return String(a.label).localeCompare(String(b.label), "th");
   });
 
-  // แสดงฟอร์มทีละ group
-  let index = 1;
+  let indexOffset = container.querySelectorAll(".sheet").length;
+  let localIndex = 1;
+
   groups.forEach(g => {
-    const html = buildSheetHtml(drugName, {mode:g.mode,label:g.label}, g.rows, index++);
+    const html = buildSheetHtml(
+      drugName,
+      { mode: g.mode, label: g.label },
+      g.rows,
+      indexOffset + (localIndex++)
+    );
     container.insertAdjacentHTML("beforeend", html);
   });
 
-  lotSummary.textContent = `พบ ${groups.length} แผ่น (แยกตาม ${groups.some(g=>g.mode==="lot")?"LOT / วันที่รับเข้า":"วันที่รับเข้า"})`;
+  if (!append) {
+    lotSummary.textContent =
+      `พบ ${groups.length} แผ่นสำหรับ "${drugName}" (แยกตาม ` +
+      `${groups.some(g=>g.mode==="lot") ? "LOT / วันที่รับเข้า" : "วันที่รับเข้า"})`;
+  }
 }
 
-/* โหลดข้อมูลจาก Google Sheet */
+/* -------------------- โหลดข้อมูลจาก Google Sheet -------------------- */
+
 function loadData() {
   fetch(URL)
     .then(res => res.text())
     .then(txt => {
-      // ตัด prefix/suffix ของ gviz ออก เหลือแต่ JSON
       const json = JSON.parse(txt.substring(txt.indexOf("{"), txt.lastIndexOf("}") + 1));
       const table = json.table;
       const rows = table.rows || [];
-      allRows = rows.map(parseRow).filter(r => r.drugName); // เอาเฉพาะที่มีชื่อยา
+      allRows = rows.map(parseRow).filter(r => r.drugName);
+
       populateDrugSelect();
+
+      // ถ้ามีพารามิเตอร์มาจาก ky9-form → สร้างให้เลย
+      const preDrugs = getDrugsFromQuery();
+      if (preDrugs.length) {
+        const select = document.getElementById("drugSelect");
+        select.value = preDrugs[0];  // ให้ dropdown โชว์ตัวแรก
+
+        const lotSummary = document.getElementById("lotSummary");
+        lotSummary.textContent =
+          `สร้างฟอร์มจากรายการที่เลือกใน ขย.9 จำนวน ${preDrugs.length} รายการยา`;
+
+        const container = document.getElementById("sheetsContainer");
+        container.innerHTML = "";
+
+        preDrugs.forEach(name => {
+          renderSheetsForDrug(name, true);
+        });
+      }
     })
     .catch(err => {
       console.error("โหลดข้อมูลไม่สำเร็จ:", err);
@@ -431,13 +492,15 @@ function loadData() {
     });
 }
 
-/* event: เปลี่ยนชื่อยาใน select */
+/* -------------------- event dropdown -------------------- */
+
 document.getElementById("drugSelect").addEventListener("change", (e) => {
   const drugName = e.target.value;
   renderSheetsForDrug(drugName);
 });
 
-/* เริ่มต้นโหลดข้อมูล */
+/* -------------------- เริ่มทำงาน -------------------- */
+
 loadData();
 </script>
 </body>
