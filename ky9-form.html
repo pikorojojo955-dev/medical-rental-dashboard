@@ -9,30 +9,30 @@
     body {
       font-family: "TH SarabunPSK", system-ui, sans-serif;
       margin: 0;
-      padding: 16px;
+      padding: 8px;
       background: #f5f5f5;
     }
 
     .page {
-      max-width: 1100px;
+      max-width: 1150px;
       margin: 0 auto;
       background: #fff;
-      padding: 16px 24px 32px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 12px 18px 24px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
 
     /* ปุ่มด้านบน */
     .top-buttons {
       display: flex;
       gap: 10px;
-      justify-content: flex-end;
-      margin-bottom: 12px;
+      justify-content: center;
+      margin-bottom: 8px;
       flex-wrap: wrap;
     }
     .btn {
-      padding: 8px 16px;
+      padding: 6px 14px;
       border-radius: 30px;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       font-weight: 600;
       cursor: pointer;
       border: none;
@@ -43,11 +43,29 @@
     .btn-ky9-list { background:#00c853; }
     .btn-ky9-form { background:#009688; }
     .btn-ky11    { background:#1976d2; }
+    .btn-ky11-small { background:#1976d2; font-size:0.85rem; padding:4px 10px; }
 
-    h1 {
+    /* หัวแบบฟอร์ม */
+    .form-header {
       text-align:center;
-      margin:0 0 8px;
-      font-size:1.4rem;
+      margin-bottom:4px;
+    }
+    .form-header .title {
+      font-size:1.3rem;
+      font-weight:bold;
+    }
+    .form-header .shop {
+      font-size:1.05rem;
+    }
+    .editable {
+      border-bottom:1px dotted #666;
+      padding:0 2px;
+      min-width:60px;
+      display:inline-block;
+    }
+    .addr {
+      font-size:0.95rem;
+      margin-top:2px;
     }
 
     .toolbar {
@@ -56,21 +74,20 @@
       justify-content:space-between;
       align-items:center;
       gap:8px;
-      margin-bottom:8px;
-    }
-
-    .search-box {
+      margin:6px 0 6px;
       font-size:0.9rem;
     }
+
     .search-box input {
       padding:4px 8px;
       border-radius:8px;
       border:1px solid #ccc;
-      min-width:220px;
+      min-width:260px;
+      font-size:0.9rem;
     }
 
     .status {
-      font-size:0.85rem;
+      font-size:0.8rem;
       color:#777;
     }
 
@@ -85,7 +102,7 @@
     }
     th, td {
       border:1px solid #555;
-      padding:4px;
+      padding:3px 4px;
       white-space:nowrap;
       vertical-align:top;
     }
@@ -94,21 +111,20 @@
       background:#00c853;
       color:#fff;
       text-align:center;
+      font-size:0.9rem;
     }
 
     th:nth-child(1), td:nth-child(1) { width:40px;  text-align:center; }
     th:nth-child(2), td:nth-child(2) { width:90px;  text-align:center; }
-    th:nth-child(3), td:nth-child(3) { width:180px; }
-    th:nth-child(4), td:nth-child(4) { width:100px; }
-    th:nth-child(5), td:nth-child(5) { width:180px; }
-    th:nth-child(6), td:nth-child(6) { width:120px; }
+    th:nth-child(3), td:nth-child(3) { width:200px; }
+    th:nth-child(4), td:nth-child(4) { width:240px; }
+    th:nth-child(5), td:nth-child(5) { width:130px; }
+    th:nth-child(6), td:nth-child(6) { width:60px;  text-align:center; }
     th:nth-child(7), td:nth-child(7) { width:60px;  text-align:center; }
-    th:nth-child(8), td:nth-child(8) { width:60px;  text-align:center; }
-    th:nth-child(9), td:nth-child(9) { width:140px; }
-    th:nth-child(10), td:nth-child(10){ width:120px; }
-    th:nth-child(11), td:nth-child(11){ width:90px;  text-align:center; }
+    th:nth-child(8), td:nth-child(8) { width:150px; }
+    th:nth-child(9), td:nth-child(9) { width:120px; }
+    th:nth-child(10),td:nth-child(10){ width:60px;  text-align:center; }
 
-    /* ทำให้หัว "ชื่อยา" กดเรียงได้ */
     .sortable {
       cursor:pointer;
       user-select:none;
@@ -123,10 +139,22 @@
     }
 
     @media print {
-      body { padding:0; background:white; }
-      .page { box-shadow:none; margin:0; padding:0 8mm; }
+      body {
+        padding:0;
+        background:white;
+      }
+      .page {
+        box-shadow:none;
+        margin:0;
+        padding:0 5mm;
+      }
       .top-buttons,
       .toolbar { display:none; }
+
+      @page {
+        size: A4 portrait;
+        margin: 5mm;
+      }
     }
   </style>
 </head>
@@ -141,13 +169,29 @@
     <a href="./ky11.html" class="btn btn-ky11">ขย.11 (บัญชีการขายยา)</a>
   </div>
 
-  <h1>บัญชีการซื้อยา (ข้อมูลดิบ ขย.9)</h1>
+  <!-- หัวแบบฟอร์ม -->
+  <div class="form-header">
+    <div class="title">บัญชีการซื้อยา (ข้อมูลดิบ ขย.9)</div>
+    <div class="shop">
+      ร้านขายยา
+      <span class="editable" contenteditable="true">คลังยาดีดี</span>
+    </div>
+    <div class="addr">
+      แสนสุข
+      <span class="editable" contenteditable="true">
+        123 ถนน ข้าวหลาม ตำบล บ้านปึก อำเภอเมืองชลบุรี จังหวัดชลบุรี 20000 โทร. 098 444 1614
+      </span>
+    </div>
+  </div>
 
   <div class="toolbar">
-    <div class="search-box">
+    <div>
       ค้นหารายการ:
       <input id="searchInput" type="text"
-             placeholder="พิมพ์ชื่อยา / ITEMCODE / LOT / ผู้ขาย">
+             placeholder="พิมพ์ชื่อยา / LOT / ผู้ขาย">
+      <button id="btnMakeKy11" class="btn btn-ky11-small">
+        ทำ ขย.11 จากที่เลือก
+      </button>
     </div>
     <div id="status" class="status">กำลังดึงข้อมูลจาก Google Sheet…</div>
   </div>
@@ -157,19 +201,25 @@
       <thead>
         <tr>
           <th>ลำดับที่</th>
-          <th>วันที่รับสินค้า</th>
+
+          <th id="thDate" class="sortable">
+            วันที่รับสินค้า
+            <span id="sortIconDate" class="sort-indicator">⇅</span>
+          </th>
+
           <th>ชื่อผู้ขาย</th>
-          <th>ITEMCODE</th>
+
           <th id="thDrug" class="sortable">
             ชื่อยา
-            <span id="sortIcon" class="sort-indicator">⇅</span>
+            <span id="sortIconDrug" class="sort-indicator">⇅</span>
           </th>
+
           <th>เลขที่ผลิต (LOT)</th>
           <th>จำนวน</th>
           <th>หน่วย</th>
           <th>ลายมือชื่อผู้ปฏิบัติ</th>
           <th>หมายเหตุ</th>
-          <th>ขย.11</th>
+          <th>เลือก ขย.11</th>
         </tr>
       </thead>
       <tbody id="ky9Body">
@@ -185,9 +235,9 @@ const SPREADSHEET_ID ="1Fqq6zxoM8Qw-hNbl5U7hwmezdzxT32ek43qX70uQAZc";
 const GID ="136320859";
 const URL =`https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
 
-let allRows = [];      // เก็บข้อมูลดิบที่แปลงแล้ว
-let currentFilter = ""; // ข้อความค้นหา
-let currentSort = { key: "drugName", dir: "asc" }; // asc / desc
+let allRows = [];      // ข้อมูลดิบหลัง parse
+let currentFilter = "";
+let currentSort = { key: "drugName", dir: "asc" }; // drugName | dateIn
 
 function parseRow(row){
   const c=row.c||[];
@@ -195,15 +245,27 @@ function parseRow(row){
     no:        c[0]?.v ?? "",
     dateIn:    c[1]?.f || c[1]?.v || "",
     vendor:    c[2]?.v ?? "",
-    itemCode:  c[3]?.v ?? "",
+    itemCode:  c[3]?.v ?? "",  // ไม่แสดง แต่เก็บไว้เผื่อใช้ต่อ
     drugName:  c[4]?.v ?? "",
     lot:       c[5]?.v ?? "",
     qty:       c[6]?.v ?? "",
     unit:      c[7]?.v ?? "",
     signer:    c[8]?.v ?? "",
     remark:    c[9]?.v ?? ""
-    // ถ้ามีคอลัมน์อื่นเพิ่มสามารถต่อได้
   };
+}
+
+// แปลง "18/2/24" → timestamp
+function toDateValue(text) {
+  if (!text) return 0;
+  const parts = text.split("/");
+  if (parts.length < 3) return 0;
+  const d = parseInt(parts[0], 10);
+  const m = parseInt(parts[1], 10) - 1;
+  let y = parseInt(parts[2], 10);
+  if (y < 100) y = 2000 + y; // สมมติเป็นปี 20xx
+  const dt = new Date(y, m, d);
+  return dt.getTime();
 }
 
 function renderTable(){
@@ -212,31 +274,32 @@ function renderTable(){
 
   let rows = allRows.slice();
 
-  // กรองด้วยข้อความค้นหา
+  // กรองจากช่องค้นหา
   if(currentFilter){
     const q=currentFilter.toLowerCase();
     rows = rows.filter(r =>
       (r.drugName && r.drugName.toLowerCase().includes(q)) ||
-      (r.itemCode && r.itemCode.toLowerCase().includes(q)) ||
       (r.vendor   && r.vendor.toLowerCase().includes(q))   ||
       (r.lot      && r.lot.toLowerCase().includes(q))
     );
   }
 
-  // เรียงตามชื่อยา
+  // เรียง
   rows.sort((a,b)=>{
-    const key=currentSort.key;
-    let av=a[key] ?? "";
-    let bv=b[key] ?? "";
-    av=av.toString().toLowerCase();
-    bv=bv.toString().toLowerCase();
-    if(av<bv) return currentSort.dir==="asc" ? -1 : 1;
-    if(av>bv) return currentSort.dir==="asc" ? 1 : -1;
+    let av, bv;
+    if (currentSort.key === "dateIn") {
+      av = toDateValue(a.dateIn);
+      bv = toDateValue(b.dateIn);
+    } else {
+      av = (a[currentSort.key] ?? "").toString().toLowerCase();
+      bv = (b[currentSort.key] ?? "").toString().toLowerCase();
+    }
+    if(av < bv) return currentSort.dir === "asc" ? -1 : 1;
+    if(av > bv) return currentSort.dir === "asc" ?  1 : -1;
     return 0;
   });
 
   rows.forEach(r=>{
-    // ถ้าแถวโล่งมาก ข้าม
     if(!r.drugName && !r.lot && !r.vendor) return;
 
     const tr=document.createElement("tr");
@@ -251,7 +314,6 @@ function renderTable(){
     cell(r.no, true);
     cell(r.dateIn, true);
     cell(r.vendor);
-    cell(r.itemCode);
     cell(r.drugName);
     cell(r.lot);
     cell(r.qty, true);
@@ -259,18 +321,14 @@ function renderTable(){
     cell(r.signer);
     cell(r.remark);
 
-    // คอลัมน์ ขย.11: ทำฟอร์มสำหรับ item นี้ (ทุก LOT ของ item เดียวกัน)
-    const tdBtn=document.createElement("td");
-    if(r.itemCode){
-      const link=document.createElement("a");
-      link.textContent="ทำ ขย.11";
-      link.href="./ky11.html?item=" + encodeURIComponent(r.itemCode);
-      link.target="_blank";
-      link.style.textDecoration="none";
-      link.style.color="#1976d2";
-      tdBtn.appendChild(link);
-    }
-    tr.appendChild(tdBtn);
+    // คอลัมน์เลือกทำ ขย.11
+    const tdSel=document.createElement("td");
+    const cb=document.createElement("input");
+    cb.type="checkbox";
+    cb.className="ky11-check";
+    cb.dataset.drug = r.drugName;   // ใช้ชื่อยาเป็น key ไปทำ ky11
+    tdSel.appendChild(cb);
+    tr.appendChild(tdSel);
 
     tbody.appendChild(tr);
   });
@@ -295,13 +353,13 @@ async function loadKy9(){
   }
 }
 
-// จัดการ search
+// ค้นหา
 document.getElementById("searchInput").addEventListener("input", (e)=>{
   currentFilter = e.target.value.trim();
   renderTable();
 });
 
-// จัดการ sort เมื่อคลิกหัว "ชื่อยา"
+// เรียงตามชื่อยา
 document.getElementById("thDrug").addEventListener("click", ()=>{
   if(currentSort.key === "drugName"){
     currentSort.dir = currentSort.dir === "asc" ? "desc" : "asc";
@@ -309,12 +367,49 @@ document.getElementById("thDrug").addEventListener("click", ()=>{
     currentSort.key = "drugName";
     currentSort.dir = "asc";
   }
-  const icon=document.getElementById("sortIcon");
-  icon.textContent = currentSort.dir === "asc" ? "▲" : "▼";
+  const iconDrug=document.getElementById("sortIconDrug");
+  iconDrug.textContent = currentSort.dir === "asc" ? "▲" : "▼";
+  // reset icon วันที่
+  document.getElementById("sortIconDate").textContent = "⇅";
   renderTable();
 });
 
-// โหลดข้อมูลเมื่อเปิดหน้า
+// เรียงตามวันที่รับสินค้า
+document.getElementById("thDate").addEventListener("click", ()=>{
+  if(currentSort.key === "dateIn"){
+    currentSort.dir = currentSort.dir === "asc" ? "desc" : "asc";
+  }else{
+    currentSort.key = "dateIn";
+    currentSort.dir = "asc";
+  }
+  const iconDate=document.getElementById("sortIconDate");
+  iconDate.textContent = currentSort.dir === "asc" ? "▲" : "▼";
+  // reset icon ชื่อยา
+  document.getElementById("sortIconDrug").textContent = "⇅";
+  renderTable();
+});
+
+// ปุ่ม "ทำ ขย.11 จากที่เลือก"
+document.getElementById("btnMakeKy11").addEventListener("click", ()=>{
+  const checks = document.querySelectorAll(".ky11-check:checked");
+  if(!checks.length){
+    alert("กรุณาเลือกรายการอย่างน้อย 1 รายการ เพื่อทำ ขย.11");
+    return;
+  }
+
+  const selectedDrugs = new Set();
+  checks.forEach(cb=>{
+    const drug = cb.dataset.drug;
+    if(drug) selectedDrugs.add(drug);
+  });
+
+  selectedDrugs.forEach(drug=>{
+    const url = "./ky11.html?drug=" + encodeURIComponent(drug);
+    window.open(url, "_blank");
+  });
+});
+
+// โหลดข้อมูลตอนเริ่ม
 loadKy9();
 </script>
 
