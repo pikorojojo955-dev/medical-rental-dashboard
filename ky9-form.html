@@ -449,25 +449,37 @@ document.getElementById("btnMakeKy11").addEventListener("click", ()=>{
 
 /* ปุ่มดาวน์โหลด Excel สำหรับ ขย.9 (ให้เหมือนตอน print: ตัดคอลัมน์เลือก ขย.11) */
 document.getElementById("btnExportKy9").addEventListener("click", () => {
-  const originalTable = document.querySelector(".table-wrapper table");
-  if (!originalTable) {
-    alert("ไม่พบตารางสำหรับส่งออก");
-    return;
+  try {
+    // 1) เช็คว่าโหลดไลบรารี XLSX สำเร็จหรือยัง
+    if (typeof XLSX === "undefined") {
+      alert("ยังโหลดตัวช่วย Excel (XLSX) ไม่สำเร็จ\nกรุณารีเฟรชหน้าเว็บแล้วลองใหม่อีกครั้ง");
+      return;
+    }
+
+    const originalTable = document.querySelector(".table-wrapper table");
+    if (!originalTable) {
+      alert("ไม่พบตารางสำหรับส่งออก");
+      return;
+    }
+
+    // 2) clone ตาราง เพื่อไม่ไปยุ่งกับ DOM จริง
+    const table = originalTable.cloneNode(true);
+
+    // 3) ลบคอลัมน์สุดท้าย (เลือก ขย.11) เหมือนตอน print
+    table.querySelectorAll("tr").forEach(tr => {
+      if (tr.lastElementChild) tr.removeChild(tr.lastElementChild);
+    });
+
+    // 4) แปลงเป็น Excel
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.table_to_sheet(table);
+
+    XLSX.utils.book_append_sheet(wb, ws, "ขย.9");
+    XLSX.writeFile(wb, "ky9-form.xlsx");
+  } catch (err) {
+    console.error(err);
+    alert("เกิดข้อผิดพลาดขณะสร้างไฟล์ Excel: " + err.message);
   }
-
-  // clone ตาราง เพื่อไม่ไปยุ่งกับ DOM จริง
-  const table = originalTable.cloneNode(true);
-
-  // ลบคอลัมน์สุดท้าย (เลือก ขย.11) เหมือนตอน print
-  table.querySelectorAll("tr").forEach(tr => {
-    if (tr.lastElementChild) tr.removeChild(tr.lastElementChild);
-  });
-
-  const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.table_to_sheet(table);
-
-  XLSX.utils.book_append_sheet(wb, ws, "ขย.9");
-  XLSX.writeFile(wb, "ky9-form.xlsx");
 });
 
 loadKy9Form();
