@@ -44,6 +44,7 @@
     .btn-ky11     { background:#1976d2; }
     .btn-print    { background:#ff9800; }
     .btn-pdf      { background:#9c27b0; }
+    .btn-excel    { background:#4caf50; }
 
     .toolbar {
       display:flex;
@@ -177,6 +178,7 @@
     <a href="./ky11.html"     class="btn btn-ky11">ขย.11 (บัญชีการขายยา)</a>
     <button class="btn btn-print" onclick="window.print()">🖨 พิมพ์</button>
     <button class="btn btn-pdf"   onclick="window.print()">⬇ PDF</button>
+    <button class="btn btn-excel" id="btnExportKy11">⬇ Excel</button>
   </div>
 
   <div class="toolbar">
@@ -189,6 +191,9 @@
 
   <div id="sheetsContainer"></div>
 </div>
+
+<!-- ไลบรารีสำหรับ export เป็น Excel -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <script>
 const SPREADSHEET_ID ="1Fqq6zxoM8Qw-hNbl5U7hwmezdzxT32ek43qX70uQAZc";
@@ -283,7 +288,7 @@ function populateDrugSelect() {
   });
 }
 
-/* ✅ แถวตารางขาย: ให้คอลัมน์ 2–6 แก้ไขได้ */
+/* แถวตารางขาย: ให้คอลัมน์ 2–6 แก้ไขได้ */
 function buildSalesRows(count=12) {
   let html = "";
   for (let i=1;i<=count;i++){
@@ -491,6 +496,78 @@ function loadData() {
 document.getElementById("drugSelect").addEventListener("change", (e) => {
   const drugName = e.target.value;
   renderSheetsForDrug(drugName);
+});
+
+/* ปุ่มดาวน์โหลด Excel สำหรับ ขย.11 (ให้ layout ใกล้เคียงตอน print) */
+document.getElementById("btnExportKy11").addEventListener("click", () => {
+  const sheetDivs = document.querySelectorAll(".sheet");
+  if (!sheetDivs.length) {
+    alert("ยังไม่มีแผ่น ขย.11 บนหน้าจอ (กรุณาเลือกชื่อยาก่อน)");
+    return;
+  }
+
+  const wb = XLSX.utils.book_new();
+
+  sheetDivs.forEach((sheetDiv, index) => {
+    const tempTable = document.createElement("table");
+
+    const addRow = (cellsArr) => {
+      const tr = document.createElement("tr");
+      cellsArr.forEach(c => {
+        const td = document.createElement("td");
+        if (c.colspan) td.colSpan = c.colspan;
+        td.textContent = c.text || "";
+        tr.appendChild(td);
+      });
+      tempTable.appendChild(tr);
+    };
+
+    // หัวเรื่อง / ร้าน / ที่อยู่
+    const title   = sheetDiv.querySelector(".sheet-header-title")?.innerText.trim() || "";
+    const sub     = sheetDiv.querySelector(".sheet-header-sub")?.innerText.trim() || "";
+    const addr    = sheetDiv.querySelector(".sheet-header-addr")?.innerText.trim() || "";
+
+    addRow([{ text: title, colspan: 6 }]);
+    addRow([{ text: sub,   colspan: 6 }]);
+    addRow([{ text: addr,  colspan: 6 }]);
+    addRow([{ text: "",    colspan: 6 }]);
+
+    // ตาราง info ด้านบน
+    const infoTable = sheetDiv.querySelector(".sheet-info-table");
+    if (infoTable) {
+      infoTable.querySelectorAll("tr").forEach(trOld => {
+        const cells = Array.from(trOld.cells).map(td => ({
+          text: td.innerText.trim()
+        }));
+        addRow(cells);
+      });
+    }
+
+    addRow([{ text: "", colspan: 6 }]);
+
+    // lot-label
+    const lotLabel = sheetDiv.querySelector(".lot-label")?.innerText.trim() || "";
+    addRow([{ text: lotLabel, colspan: 6 }]);
+
+    addRow([{ text: "", colspan: 6 }]);
+
+    // ตารางรายการขาย
+    const salesTable = sheetDiv.querySelector(".sales-table");
+    if (salesTable) {
+      salesTable.querySelectorAll("tr").forEach(trOld => {
+        const cells = Array.from(trOld.cells).map(td => ({
+          text: td.innerText.trim()
+        }));
+        addRow(cells);
+      });
+    }
+
+    const ws = XLSX.utils.table_to_sheet(tempTable);
+    const sheetName = "แผ่น" + (index + 1);
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+  });
+
+  XLSX.writeFile(wb, "ky11.xlsx");
 });
 
 loadData();
