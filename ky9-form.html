@@ -46,6 +46,7 @@
     .btn-print      { background:#ff9800; }
     .btn-pdf        { background:#9c27b0; }
     .btn-ky11-small { background:#1976d2; font-size:0.85rem; padding:4px 10px; }
+    .btn-excel      { background:#4caf50; }
 
     .toolbar {
       display:flex;
@@ -198,6 +199,7 @@
     <a href="./ky11.html"     class="btn btn-ky11">ขย.11 (บัญชีการขายยา)</a>
     <button class="btn btn-print" onclick="window.print()">🖨 พิมพ์</button>
     <button class="btn btn-pdf"   onclick="window.print()">⬇ PDF</button>
+    <button class="btn btn-excel" id="btnExportKy9">⬇ Excel</button>
   </div>
 
   <div class="toolbar">
@@ -238,19 +240,15 @@
 
         <tr class="col-header">
           <th>ลำดับที่</th>
-
           <th id="thDate" class="sortable">
             วันที่รับสินค้า
             <span id="sortIconDate" class="sort-indicator">⇅</span>
           </th>
-
           <th>ชื่อผู้ขาย</th>
-
           <th id="thDrug" class="sortable">
             ชื่อยา / รายการสินค้า
             <span id="sortIconDrug" class="sort-indicator">⇅</span>
           </th>
-
           <th>เลขที่ผลิต (LOT)</th>
           <th>จำนวน</th>
           <th>หน่วย</th>
@@ -264,6 +262,9 @@
   </div>
 
 </div>
+
+<!-- ไลบรารีสำหรับ export เป็น Excel -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <script>
 const SPREADSHEET_ID ="1Fqq6zxoM8Qw-hNbl5U7hwmezdzxT32ek43qX70uQAZc";
@@ -337,7 +338,7 @@ function renderTable(){
 
     const tr=document.createElement("tr");
 
-    // ✅ ฟังก์ชัน cell รองรับ editable
+    // ฟังก์ชันสร้าง cell รองรับ editable
     function cell(text, center=false, editable=false){
       const td=document.createElement("td");
       td.textContent=text;
@@ -352,7 +353,7 @@ function renderTable(){
     cell(r.dateIn, true);
     cell(r.vendor);
     cell(r.drugName);
-    cell(r.lot, false, true);     // ✅ LOT แก้ไขได้
+    cell(r.lot, false, true);     // LOT แก้ไขได้
     cell(r.qty, true);
     cell(r.unit, true);
     cell(r.signer);
@@ -444,6 +445,29 @@ document.getElementById("btnMakeKy11").addEventListener("click", ()=>{
 
   const url = "./ky11.html?drug=" + encodeURIComponent(firstDrug);
   window.location.href = url;
+});
+
+/* ปุ่มดาวน์โหลด Excel สำหรับ ขย.9 (ให้เหมือนตอน print: ตัดคอลัมน์เลือก ขย.11) */
+document.getElementById("btnExportKy9").addEventListener("click", () => {
+  const originalTable = document.querySelector(".table-wrapper table");
+  if (!originalTable) {
+    alert("ไม่พบตารางสำหรับส่งออก");
+    return;
+  }
+
+  // clone ตาราง เพื่อไม่ไปยุ่งกับ DOM จริง
+  const table = originalTable.cloneNode(true);
+
+  // ลบคอลัมน์สุดท้าย (เลือก ขย.11) เหมือนตอน print
+  table.querySelectorAll("tr").forEach(tr => {
+    if (tr.lastElementChild) tr.removeChild(tr.lastElementChild);
+  });
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.table_to_sheet(table);
+
+  XLSX.utils.book_append_sheet(wb, ws, "ขย.9");
+  XLSX.writeFile(wb, "ky9-form.xlsx");
 });
 
 loadKy9Form();
