@@ -410,6 +410,12 @@
           </td>
         </tr>
         <tr>
+          <td class="label">ภาษีมูลค่าเพิ่ม 7.00%</td>
+          <td class="value">
+            <input id="sumVat" type="text" value="0.00" readonly>
+          </td>
+        </tr>
+        <tr>
           <td class="label">หัก มัดจำ/อื่น ๆ</td>
           <td class="value">
             <input id="sumDeposit" type="text" value="0.00">
@@ -468,6 +474,7 @@
     `https://docs.google.com/spreadsheets/d/${PRODUCT_SHEET_ID}/gviz/tq?tqx=out:json&gid=${PRODUCT_GID}`;
   const RECEIPT_URL = "./Receipt%20Form.html";
   const STORAGE_KEY = "JP_LAST_QUOTATION";
+  const VAT_RATE = 0.07; // 7%
 
   let products = [];
 
@@ -659,13 +666,17 @@
       sub += amt;
     }
 
-    document.getElementById("sumSubTotal").value = sub.toFixed(2);
-
     const discount = parseMoney(document.getElementById("sumDiscount").value);
     const deposit  = parseMoney(document.getElementById("sumDeposit").value);
-    const grand = sub - discount - deposit;
 
-    document.getElementById("sumGrand").value = grand.toFixed(2);
+    const afterDiscount = sub - discount;
+    const vat = afterDiscount * VAT_RATE;
+    const grand = afterDiscount + vat - deposit;
+
+    document.getElementById("sumSubTotal").value = sub.toFixed(2);
+    document.getElementById("sumVat").value       = vat.toFixed(2);
+    document.getElementById("sumGrand").value     = grand.toFixed(2);
+
     document.getElementById("amountWords").textContent =
       numberToThaiBahtText(grand);
   }
@@ -740,6 +751,7 @@
         subTotal:  document.getElementById("sumSubTotal").value || "",
         discount:  document.getElementById("sumDiscount").value || "",
         deposit:   document.getElementById("sumDeposit").value || "",
+        vat:       document.getElementById("sumVat").value || "",
         grand:     document.getElementById("sumGrand").value || "",
         words:     document.getElementById("amountWords").textContent || ""
       },
@@ -795,7 +807,6 @@
     if (custNameInput && buyerSpan) {
       // พิมพ์/แก้ไขที่ "ชื่อผู้รับ"
       custNameInput.addEventListener("input", () => {
-        // ถ้าเคยแก้ชื่อผู้สั่งซื้อเองแล้วและช่องไม่ว่าง -> ไม่เขียนทับ
         if (buyerEdited && buyerSpan.textContent.trim() !== "") return;
         buyerSpan.textContent = custNameInput.value;
       });
