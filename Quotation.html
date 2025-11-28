@@ -303,6 +303,7 @@
       body { background:#fff; padding:0; }
       .page { box-shadow:none; margin:0; padding:0 5mm 5mm; }
       .top-bar { display:none; }
+      .status-text { display:none; }
       @page { size:A4 portrait; margin:5mm; }
     }
   </style>
@@ -383,10 +384,7 @@
         <th class="amount-cell">จำนวนเงิน</th>
       </tr>
       </thead>
-      <tbody id="itemBody">
-      <!-- สร้าง 10 แถว -->
-      <!-- จะใช้ JS เติม id ให้แต่ละช่อง -->
-      </tbody>
+      <tbody id="itemBody"></tbody>
     </table>
   </div>
 
@@ -435,7 +433,7 @@
       <div class="footer-sign-row">
         <div class="sign-box">
           <div class="sign-line"></div>
-          ( .................................................. )<br>
+          ( <span id="buyerName" contenteditable="true">..................................................</span> )<br>
           ผู้สั่งซื้อ
         </div>
         <div class="sign-box">
@@ -477,10 +475,9 @@
     tbody.innerHTML = "";
     for (let i = 0; i < 10; i++) {
       const tr = document.createElement("tr");
-
       tr.innerHTML = `
         <td class="number-cell">
-          <input class="cell-input center" id="idx_${i}" type="text" value="${i+1}">
+          <span id="idx_${i}">${i+1}</span>
         </td>
         <td class="itemcode-cell">
           <input class="cell-input" id="code_${i}" type="text">
@@ -529,16 +526,16 @@
     // เลขที่ใบเสนอราคา RUN จาก localStorage
     let seq = parseInt(localStorage.getItem("JP_QUO_SEQ") || "0", 10);
     seq++;
-    localStorage.setItem("JP_QUO_SEQ", String(seq).padStart(4,"0"));
-    const seqStr = String(seq).padStart(4,"0");
+    localStorage.setItem("JP_QUO_SEQ", String(seq).padStart(4, "0"));
+    const seqStr = String(seq).padStart(4, "0");
 
     const today = new Date();
-    const valid = new Date(today.getTime() + 30*24*60*60*1000);
+    const valid = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
 
     function fmt(d) {
-      const dd = String(d.getDate()).padStart(2,"0");
-      const mm = String(d.getMonth()+1).padStart(2,"0");
-      const yy = d.getFullYear()+543; // พ.ศ.
+      const dd = String(d.getDate()).padStart(2, "0");
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const yy = d.getFullYear() + 543; // พ.ศ.
       return `${dd}/${mm}/${yy}`;
     }
 
@@ -546,7 +543,8 @@
     document.getElementById("quoteDate").value = fmt(today);
     document.getElementById("validUntil").value = fmt(valid);
     document.getElementById("contactName").value = "คุณพัฒน์นรี";
-    document.getElementById("contactTel").value = "090-413-7894, 090-967-4207";
+    document.getElementById("contactTel").value =
+      "090-413-7894, 090-967-4207";
   }
 
   // ===== FETCH PRODUCTS FROM SHEET =====
@@ -562,19 +560,21 @@
       products = rows.map(r => {
         const c = r.c || [];
         return {
-          itemCode: c[0]?.v ?? "",
+          itemCode:    c[0]?.v ?? "",
           productName: c[1]?.v ?? "",
-          category: c[2]?.v ?? "",
-          unit: c[3]?.v ?? "",
+          category:    c[2]?.v ?? "",
+          unit:        c[3]?.v ?? "",
           cost: Number(c[5]?.v ?? 0)
         };
       }).filter(p => p.itemCode || p.productName);
 
       buildProductDatalist();
-      status.textContent = `โหลดข้อมูลสินค้าแล้ว ${products.length} รายการ • สามารถค้นจากหมวด / ชื่อสินค้า / รหัสสินค้า ได้`;
+      status.textContent =
+        `โหลดข้อมูลสินค้าแล้ว ${products.length} รายการ • สามารถค้นหาจากหมวด / ชื่อสินค้า / รหัสสินค้า ได้`;
     } catch (e) {
       console.error(e);
-      status.textContent = "ดึงข้อมูลจาก Google Sheet ไม่สำเร็จ – กรุณาตรวจสอบอินเทอร์เน็ต (ยังสามารถกรอกสินค้าด้วยมือได้)";
+      status.textContent =
+        "ดึงข้อมูลจาก Google Sheet ไม่สำเร็จ – กรุณาตรวจสอบอินเทอร์เน็ต (ยังสามารถกรอกสินค้าด้วยมือได้)";
     }
   }
 
@@ -593,10 +593,10 @@
   // ===== ROW HANDLERS =====
   function attachRowEvents() {
     for (let i = 0; i < 10; i++) {
-      const desc = document.getElementById(`desc_${i}`);
-      const code = document.getElementById(`code_${i}`);
-      const qty  = document.getElementById(`qty_${i}`);
-      const price= document.getElementById(`price_${i}`);
+      const desc  = document.getElementById(`desc_${i}`);
+      const code  = document.getElementById(`code_${i}`);
+      const qty   = document.getElementById(`qty_${i}`);
+      const price = document.getElementById(`price_${i}`);
 
       desc.addEventListener("change", () => handleDescSelect(i));
       code.addEventListener("change", () => handleCodeInput(i));
@@ -616,9 +616,7 @@
   function handleDescSelect(row) {
     const descInput = document.getElementById(`desc_${row}`);
     const text = descInput.value || "";
-
-    // พยายามดึง itemcode จากวงเล็บท้าย
-    const m = text.match(/\(([^()]+)\)\s*$/);
+    const m = text.match(/\(([^()]+)\)\s*$/);   // ดึง code ในวงเล็บท้าย
     if (m) {
       const code = m[1].trim();
       fillRowByCode(row, code);
@@ -628,18 +626,16 @@
   function handleCodeInput(row) {
     const codeInput = document.getElementById(`code_${row}`);
     const code = codeInput.value || "";
-    if (code) {
-      fillRowByCode(row, code);
-    }
+    if (code) fillRowByCode(row, code);
   }
 
   function fillRowByCode(row, code) {
     const p = findProductByCode(code);
     if (!p) return;
 
-    document.getElementById(`code_${row}`).value = p.itemCode || "";
-    document.getElementById(`desc_${row}`).value = p.productName || "";
-    document.getElementById(`unit_${row}`).value = p.unit || "";
+    document.getElementById(`code_${row}`).value  = p.itemCode || "";
+    document.getElementById(`desc_${row}`).value  = p.productName || "";
+    document.getElementById(`unit_${row}`).value  = p.unit || "";
     document.getElementById(`price_${row}`).value =
       p.cost ? p.cost.toFixed(2) : "";
 
@@ -675,7 +671,7 @@
 
     const discount = parseMoney(document.getElementById("sumDiscount").value);
     const deposit  = parseMoney(document.getElementById("sumDeposit").value);
-    const grand = sub - discount - deposit;
+    const grand    = sub - discount - deposit;
 
     document.getElementById("sumGrand").value = grand.toFixed(2);
     document.getElementById("amountWords").textContent =
@@ -686,13 +682,12 @@
     amount = parseFloat(amount);
     if (isNaN(amount) || amount === 0) return "ศูนย์บาทถ้วน";
 
-    const thNum = ["ศูนย์","หนึ่ง","สอง","สาม","สี่","ห้า","หก","เจ็ด","แปด","เก้า"];
+    const thNum  = ["ศูนย์","หนึ่ง","สอง","สาม","สี่","ห้า","หก","เจ็ด","แปด","เก้า"];
     const thUnit = ["","สิบ","ร้อย","พัน","หมื่น","แสน","ล้าน"];
 
     function readNumber(numStr) {
       numStr = numStr.replace(/^0+/,"");
       if (numStr === "") return "";
-      // ถ้ามากกว่าล้าน ใช้ recursion
       if (numStr.length > 6) {
         const head = numStr.slice(0, numStr.length - 6);
         const tail = numStr.slice(-6);
@@ -702,13 +697,13 @@
       const digits = numStr.split("").map(d => parseInt(d,10));
       const len = digits.length;
       for (let i = 0; i < len; i++) {
-        const d = digits[i];
-        const pos = len - i - 1; // 0=หน่วย,1=สิบ,...
+        const d   = digits[i];
+        const pos = len - i - 1;
         if (d === 0) continue;
-        if (pos === 0) { // หน่วย
+        if (pos === 0) {
           if (d === 1 && len > 1) result += "เอ็ด";
           else result += thNum[d];
-        } else if (pos === 1) { // สิบ
+        } else if (pos === 1) {
           if (d === 1) result += "สิบ";
           else if (d === 2) result += "ยี่สิบ";
           else result += thNum[d] + "สิบ";
@@ -722,18 +717,12 @@
     const fixed = amount.toFixed(2);
     const [bahtStr, satangStr] = fixed.split(".");
     let text = "";
-    const bahtNum = parseInt(bahtStr,10);
+    const bahtNum   = parseInt(bahtStr,10);
     const satangNum = parseInt(satangStr,10);
 
-    if (bahtNum > 0) {
-      text += readNumber(bahtStr) + "บาท";
-    }
-
-    if (satangNum === 0) {
-      text += "ถ้วน";
-    } else {
-      text += readNumber(satangStr) + "สตางค์";
-    }
+    if (bahtNum > 0) text += readNumber(bahtStr) + "บาท";
+    if (satangNum === 0) text += "ถ้วน";
+    else text += readNumber(satangStr) + "สตางค์";
     return text;
   }
 
@@ -749,6 +738,24 @@
 
     document.getElementById("branchSelect")
       .addEventListener("change", updateBranchInfo);
+
+    // sync: เมื่อพิมพ์ "ชื่อผู้รับ" ให้เติมชื่อใน "ผู้สั่งซื้อ" อัตโนมัติ
+    const defaultBuyerText = "..................................................";
+    const buyerSpan = document.getElementById("buyerName");
+    if (buyerSpan) {
+      buyerSpan.textContent = defaultBuyerText;
+
+      document.getElementById("custName").addEventListener("input", () => {
+        const val = document.getElementById("custName").value.trim();
+        if (
+          buyerSpan.textContent.trim() === "" ||
+          buyerSpan.textContent === defaultBuyerText
+        ) {
+          buyerSpan.textContent =
+            val === "" ? defaultBuyerText : val;
+        }
+      });
+    }
   });
 </script>
 </body>
