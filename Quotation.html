@@ -42,9 +42,9 @@
       align-items:center;
       gap:6px;
     }
-    .btn-back  { background:#607d8b; }
-    .btn-print { background:#ff9800; }
-    .btn-receipt { background:#4caf50; }  /* ปุ่มใบเสร็จรับเงิน */
+    .btn-back    { background:#607d8b; }
+    .btn-print   { background:#ff9800; }
+    .btn-receipt { background:#4caf50; }
 
     /* header logo + branch */
     .doc-header {
@@ -164,15 +164,12 @@
       background:#00c853;
       color:#fff;
     }
-    .number-cell {
-      text-align:center;
-      width:40px;
-    }
+    .number-cell { text-align:center; width:40px; }
     .itemcode-cell { width:130px; }
-    .desc-cell { width:320px; }
-    .qty-cell { width:70px; text-align:center; }
-    .unit-cell { width:80px; text-align:center; }
-    .price-cell { width:110px; text-align:right; }
+    .desc-cell   { width:320px; }
+    .qty-cell    { width:70px;  text-align:center; }
+    .unit-cell   { width:80px;  text-align:center; }
+    .price-cell  { width:110px; text-align:right; }
     .amount-cell { width:120px; text-align:right; }
 
     .cell-input {
@@ -184,12 +181,8 @@
       box-sizing:border-box;
       outline:none;
     }
-    .cell-input.number {
-      text-align:right;
-    }
-    .cell-input.center {
-      text-align:center;
-    }
+    .cell-input.number { text-align:right; }
+    .cell-input.center { text-align:center; }
 
     /* summary block */
     .summary-row {
@@ -228,13 +221,8 @@
       border-bottom:1px solid #000;
       padding:2px 4px;
     }
-    .summary-right .label {
-      width:55%;
-    }
-    .summary-right .value {
-      width:45%;
-      text-align:right;
-    }
+    .summary-right .label { width:55%; }
+    .summary-right .value { width:45%; text-align:right; }
     .summary-right input {
       border:none;
       width:100%;
@@ -258,19 +246,14 @@
       border-right:1px solid #000;
       padding-right:10px;
     }
-    .footer-left p {
-      margin:2px 0;
-    }
+    .footer-left p { margin:2px 0; }
     .footer-sign-row {
       margin-top:10px;
       display:flex;
       justify-content:space-between;
       gap:10px;
     }
-    .sign-box {
-      flex:1;
-      text-align:center;
-    }
+    .sign-box { flex:1; text-align:center; }
     .sign-line {
       border-bottom:1px solid #000;
       height:26px;
@@ -293,7 +276,6 @@
       color:#555;
     }
 
-    /* status text */
     .status-text {
       font-size:0.8rem;
       color:#777;
@@ -314,8 +296,8 @@
   <div class="top-bar">
     <a href="./ky9.html" class="btn btn-back">← หน้าเอกสาร (ขย.9)</a>
 
-    <!-- ปุ่มไปหน้าใบเสร็จรับเงิน -->
-    <a href="./Receipt%20Form.html" class="btn btn-receipt" target="_blank">
+    <!-- ปุ่มไปหน้าใบเสร็จรับเงิน (ใช้ JS เก็บข้อมูลแล้วค่อยไป) -->
+    <a href="#" id="btnToReceipt" class="btn btn-receipt">
       🧾 ใบเสร็จรับเงิน
     </a>
 
@@ -391,8 +373,6 @@
       </tr>
       </thead>
       <tbody id="itemBody">
-      <!-- สร้าง 10 แถว -->
-      <!-- จะใช้ JS เติม id ให้แต่ละช่อง -->
       </tbody>
     </table>
   </div>
@@ -447,7 +427,7 @@
         </div>
         <div class="sign-box">
           <div class="sign-line"></div>
-          ( พัฒน์นรี โพธิรัตน์ )<br>
+          ( พัฒน์นรี โพธิราช )<br>
           ผู้จัดทำเอกสาร / Prepared by
         </div>
       </div>
@@ -466,25 +446,23 @@
   </div>
 </div>
 
-<!-- datalist สำหรับค้นหาสินค้า -->
 <datalist id="productList"></datalist>
 
 <script>
-  // ===== CONFIG GOOGLE SHEET =====
   const PRODUCT_SHEET_ID = "1U4d5PqBMQ1GfTahwvbvzDFQrEikT5sYCOwZIx8FabMI";
   const PRODUCT_GID = "942187814";
   const PRODUCT_URL =
     `https://docs.google.com/spreadsheets/d/${PRODUCT_SHEET_ID}/gviz/tq?tqx=out:json&gid=${PRODUCT_GID}`;
+  const RECEIPT_URL = "./Receipt%20Form.html";
+  const STORAGE_KEY = "JP_LAST_QUOTATION";
 
   let products = [];
 
-  // ===== INITIAL UI BUILD =====
   function buildItemRows() {
     const tbody = document.getElementById("itemBody");
     tbody.innerHTML = "";
     for (let i = 0; i < 10; i++) {
       const tr = document.createElement("tr");
-
       tr.innerHTML = `
         <td class="number-cell">
           <input class="cell-input center" id="idx_${i}" type="text" value="${i+1}">
@@ -513,7 +491,6 @@
     }
   }
 
-  // ===== BRANCH INFO =====
   function updateBranchInfo() {
     const val = document.getElementById("branchSelect").value;
     const el = document.getElementById("branchInfo");
@@ -531,9 +508,7 @@
     }
   }
 
-  // ===== QUOTE META AUTO FILL =====
   function initQuoteMeta() {
-    // เลขที่ใบเสนอราคา RUN จาก localStorage
     let seq = parseInt(localStorage.getItem("JP_QUO_SEQ") || "0", 10);
     seq++;
     localStorage.setItem("JP_QUO_SEQ", String(seq).padStart(4,"0"));
@@ -545,7 +520,7 @@
     function fmt(d) {
       const dd = String(d.getDate()).padStart(2,"0");
       const mm = String(d.getMonth()+1).padStart(2,"0");
-      const yy = d.getFullYear()+543; // พ.ศ.
+      const yy = d.getFullYear()+543;
       return `${dd}/${mm}/${yy}`;
     }
 
@@ -556,7 +531,6 @@
     document.getElementById("contactTel").value = "090-413-7894, 090-967-4207";
   }
 
-  // ===== FETCH PRODUCTS FROM SHEET =====
   async function loadProducts() {
     const status = document.getElementById("status");
     try {
@@ -597,13 +571,12 @@
     });
   }
 
-  // ===== ROW HANDLERS =====
   function attachRowEvents() {
     for (let i = 0; i < 10; i++) {
-      const desc = document.getElementById(`desc_${i}`);
-      const code = document.getElementById(`code_${i}`);
-      const qty  = document.getElementById(`qty_${i}`);
-      const price= document.getElementById(`price_${i}`);
+      const desc  = document.getElementById(`desc_${i}`);
+      const code  = document.getElementById(`code_${i}`);
+      const qty   = document.getElementById(`qty_${i}`);
+      const price = document.getElementById(`price_${i}`);
 
       desc.addEventListener("change", () => handleDescSelect(i));
       code.addEventListener("change", () => handleCodeInput(i));
@@ -623,8 +596,6 @@
   function handleDescSelect(row) {
     const descInput = document.getElementById(`desc_${row}`);
     const text = descInput.value || "";
-
-    // พยายามดึง itemcode จากวงเล็บท้าย
     const m = text.match(/\(([^()]+)\)\s*$/);
     if (m) {
       const code = m[1].trim();
@@ -635,9 +606,7 @@
   function handleCodeInput(row) {
     const codeInput = document.getElementById(`code_${row}`);
     const code = codeInput.value || "";
-    if (code) {
-      fillRowByCode(row, code);
-    }
+    if (code) fillRowByCode(row, code);
   }
 
   function fillRowByCode(row, code) {
@@ -665,7 +634,6 @@
       amt ? amt.toFixed(2) : "";
   }
 
-  // ===== TOTALS & THAI TEXT =====
   function parseMoney(str) {
     const n = parseFloat((str || "0").toString().replace(/,/g,""));
     return isNaN(n) ? 0 : n;
@@ -699,7 +667,6 @@
     function readNumber(numStr) {
       numStr = numStr.replace(/^0+/,"");
       if (numStr === "") return "";
-      // ถ้ามากกว่าล้าน ใช้ recursion
       if (numStr.length > 6) {
         const head = numStr.slice(0, numStr.length - 6);
         const tail = numStr.slice(-6);
@@ -710,12 +677,12 @@
       const len = digits.length;
       for (let i = 0; i < len; i++) {
         const d = digits[i];
-        const pos = len - i - 1; // 0=หน่วย,1=สิบ,...
+        const pos = len - i - 1;
         if (d === 0) continue;
-        if (pos === 0) { // หน่วย
+        if (pos === 0) {
           if (d === 1 && len > 1) result += "เอ็ด";
           else result += thNum[d];
-        } else if (pos === 1) { // สิบ
+        } else if (pos === 1) {
           if (d === 1) result += "สิบ";
           else if (d === 2) result += "ยี่สิบ";
           else result += thNum[d] + "สิบ";
@@ -732,32 +699,80 @@
     const bahtNum = parseInt(bahtStr,10);
     const satangNum = parseInt(satangStr,10);
 
-    if (bahtNum > 0) {
-      text += readNumber(bahtStr) + "บาท";
-    }
-
-    if (satangNum === 0) {
-      text += "ถ้วน";
-    } else {
-      text += readNumber(satangStr) + "สตางค์";
-    }
+    if (bahtNum > 0) text += readNumber(bahtStr) + "บาท";
+    if (satangNum === 0) text += "ถ้วน";
+    else text += readNumber(satangStr) + "สตางค์";
     return text;
   }
 
-  // ===== INIT =====
+  // === ส่งข้อมูลไปใบเสร็จ ===
+  function saveQuotationToStorage() {
+    const data = {
+      timestamp: Date.now(),
+      branchCode: document.getElementById("branchSelect").value,
+      customer: {
+        name:  document.getElementById("custName").value || "",
+        org:   document.getElementById("custOrg").value || "",
+        addr:  document.getElementById("custAddr").value || "",
+        tel:   document.getElementById("custTel").value || ""
+      },
+      meta: {
+        quoteNo:     document.getElementById("quoteNo").value || "",
+        quoteDate:   document.getElementById("quoteDate").value || "",
+        validUntil:  document.getElementById("validUntil").value || "",
+        contactName: document.getElementById("contactName").value || "",
+        contactTel:  document.getElementById("contactTel").value || ""
+      },
+      totals: {
+        subTotal:  document.getElementById("sumSubTotal").value || "",
+        discount:  document.getElementById("sumDiscount").value || "",
+        deposit:   document.getElementById("sumDeposit").value || "",
+        grand:     document.getElementById("sumGrand").value || "",
+        words:     document.getElementById("amountWords").textContent || ""
+      },
+      items: []
+    };
+
+    for (let i = 0; i < 10; i++) {
+      const item = {
+        idx:    document.getElementById(`idx_${i}`).value || "",
+        code:   document.getElementById(`code_${i}`).value || "",
+        desc:   document.getElementById(`desc_${i}`).value || "",
+        qty:    document.getElementById(`qty_${i}`).value || "",
+        unit:   document.getElementById(`unit_${i}`).value || "",
+        price:  document.getElementById(`price_${i}`).value || "",
+        amount: document.getElementById(`amount_${i}`).value || ""
+      };
+      const hasData = item.code || item.desc || item.qty || item.amount;
+      if (hasData) data.items.push(item);
+    }
+
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch (e) {
+      console.error("Save quotation failed:", e);
+    }
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     buildItemRows();
     attachRowEvents();
     updateBranchInfo();
     initQuoteMeta();
-    loadProducts().then(() => {
-      recalcTotals();
-    });
+    loadProducts().then(recalcTotals);
 
     document.getElementById("branchSelect")
       .addEventListener("change", updateBranchInfo);
+
+    const btnToReceipt = document.getElementById("btnToReceipt");
+    if (btnToReceipt) {
+      btnToReceipt.addEventListener("click", (ev) => {
+        ev.preventDefault();
+        saveQuotationToStorage();
+        window.location.href = RECEIPT_URL;
+      });
+    }
   });
 </script>
 </body>
 </html>
-
