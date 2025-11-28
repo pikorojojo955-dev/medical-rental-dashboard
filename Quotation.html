@@ -739,21 +739,28 @@
     document.getElementById("branchSelect")
       .addEventListener("change", updateBranchInfo);
 
-    // sync: เมื่อพิมพ์ "ชื่อผู้รับ" ให้เติมชื่อใน "ผู้สั่งซื้อ" อัตโนมัติ
-    const defaultBuyerText = "..................................................";
+    // SYNC: ชื่อผู้รับ → ผู้สั่งซื้อ (และยังแก้ผู้สั่งซื้อเองได้)
     const buyerSpan = document.getElementById("buyerName");
+    const defaultBuyerText = "..................................................";
+
     if (buyerSpan) {
-      buyerSpan.textContent = defaultBuyerText;
+      if (!buyerSpan.textContent.trim()) {
+        buyerSpan.textContent = defaultBuyerText;
+      }
 
       document.getElementById("custName").addEventListener("input", () => {
         const val = document.getElementById("custName").value.trim();
-        if (
-          buyerSpan.textContent.trim() === "" ||
-          buyerSpan.textContent === defaultBuyerText
-        ) {
-          buyerSpan.textContent =
-            val === "" ? defaultBuyerText : val;
+
+        // ถ้ายังไม่ได้แก้ผู้สั่งซื้อเอง ให้ auto-fill
+        if (!buyerSpan.dataset.manualEdit) {
+          buyerSpan.innerHTML = ""; // กันปัญหาแสดงแค่ตัวแรก
+          buyerSpan.innerText = val === "" ? defaultBuyerText : val;
         }
+      });
+
+      // ถ้ามีการพิมพ์แก้ในช่องผู้สั่งซื้อเอง ให้ถือเป็น manual
+      buyerSpan.addEventListener("input", () => {
+        buyerSpan.dataset.manualEdit = "yes";
       });
     }
   });
