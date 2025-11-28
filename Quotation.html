@@ -287,6 +287,11 @@
       .page { box-shadow:none; margin:0; padding:0 5mm 5mm; }
       .top-bar { display:none; }
       @page { size:A4 portrait; margin:5mm; }
+
+      /* ซ่อน placeholder ทุกช่องเวลา “พิมพ์/เซฟ PDF” ให้ช่องว่างโล่ง */
+      input::placeholder {
+        color: transparent;
+      }
     }
   </style>
 </head>
@@ -296,7 +301,7 @@
   <div class="top-bar">
     <a href="./ky9.html" class="btn btn-back">← หน้าเอกสาร (ขย.9)</a>
 
-    <!-- ปุ่มไปหน้าใบเสร็จรับเงิน (ใช้ JS เก็บข้อมูลแล้วค่อยไป) -->
+    <!-- ปุ่มไปหน้าใบเสร็จรับเงิน -->
     <a href="#" id="btnToReceipt" class="btn btn-receipt">
       🧾 ใบเสร็จรับเงิน
     </a>
@@ -372,8 +377,7 @@
         <th class="amount-cell">จำนวนเงิน</th>
       </tr>
       </thead>
-      <tbody id="itemBody">
-      </tbody>
+      <tbody id="itemBody"></tbody>
     </table>
   </div>
 
@@ -446,6 +450,7 @@
   </div>
 </div>
 
+<!-- datalist สำหรับค้นหาสินค้า -->
 <datalist id="productList"></datalist>
 
 <script>
