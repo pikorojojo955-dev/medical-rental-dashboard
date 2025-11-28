@@ -276,6 +276,14 @@
       color:#555;
     }
 
+    /* editable buyer name */
+    #buyerName {
+      min-width:120px;
+      display:inline-block;
+      text-align:center;
+      outline:none;
+    }
+
     .status-text {
       font-size:0.8rem;
       color:#777;
@@ -288,7 +296,7 @@
       .top-bar { display:none; }
       @page { size:A4 portrait; margin:5mm; }
 
-      /* ซ่อน placeholder ทุกช่องเวลา “พิมพ์/เซฟ PDF” ให้ช่องว่างโล่ง */
+      /* ซ่อน placeholder เวลา print / PDF */
       input::placeholder {
         color: transparent;
       }
@@ -426,7 +434,7 @@
       <div class="footer-sign-row">
         <div class="sign-box">
           <div class="sign-line"></div>
-          ( .................................................. )<br>
+          ( <span id="buyerName" contenteditable="true"></span> )<br>
           ผู้สั่งซื้อ
         </div>
         <div class="sign-box">
@@ -710,7 +718,7 @@
     return text;
   }
 
-  // === ส่งข้อมูลไปใบเสร็จ ===
+  // === บันทึกข้อมูลไป localStorage เพื่อใช้ใน Receipt Form ===
   function saveQuotationToStorage() {
     const data = {
       timestamp: Date.now(),
@@ -769,12 +777,32 @@
     document.getElementById("branchSelect")
       .addEventListener("change", updateBranchInfo);
 
+    // ปุ่มไปหน้า Receipt Form
     const btnToReceipt = document.getElementById("btnToReceipt");
     if (btnToReceipt) {
       btnToReceipt.addEventListener("click", (ev) => {
         ev.preventDefault();
         saveQuotationToStorage();
         window.location.href = RECEIPT_URL;
+      });
+    }
+
+    // === AUTO FILL ผู้สั่งซื้อจาก "ชื่อผู้รับ" แต่ยังแก้เองได้ ===
+    let buyerEdited = false;
+    const custNameInput = document.getElementById("custName");
+    const buyerSpan = document.getElementById("buyerName");
+
+    if (custNameInput && buyerSpan) {
+      // พิมพ์/แก้ไขที่ "ชื่อผู้รับ"
+      custNameInput.addEventListener("input", () => {
+        // ถ้าเคยแก้ชื่อผู้สั่งซื้อเองแล้วและช่องไม่ว่าง -> ไม่เขียนทับ
+        if (buyerEdited && buyerSpan.textContent.trim() !== "") return;
+        buyerSpan.textContent = custNameInput.value;
+      });
+
+      // ถ้ามีการพิมพ์แก้ที่ช่องผู้สั่งซื้อเอง
+      buyerSpan.addEventListener("input", () => {
+        buyerEdited = buyerSpan.textContent.trim() !== "";
       });
     }
   });
