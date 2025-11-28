@@ -1,9 +1,270 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <title>Quotation · JP Medical So Supply</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body {
+      margin: 0;
+      padding: 8px;
+      font-family: "TH SarabunPSK", system-ui, sans-serif;
+      background:#f5f5f5;
+    }
+    .page {
+      max-width: 1120px;
+      margin: 0 auto;
+      background:#fff;
+      padding: 16px 20px 26px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+    .top-buttons{
+      display:flex;
+      gap:10px;
+      margin-bottom:8px;
+      flex-wrap:wrap;
+    }
+    .btn{
+      border:none;
+      border-radius:999px;
+      padding:6px 14px;
+      font-size:0.9rem;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      color:#fff;
+      text-decoration:none;
+      box-shadow:0 2px 4px rgba(0,0,0,0.25);
+    }
+    .btn-back{background:#6b7280;}
+    .btn-print{background:#2563eb;}
+
+    .header-box{
+      display:flex;
+      align-items:center;
+      gap:16px;
+      padding:8px 0 14px;
+      border-bottom:3px solid #16a34a;
+      margin-bottom:14px;
+    }
+    .header-box img{
+      height:70px;
+      width:auto;
+    }
+    .header-text-main{
+      font-size:20px;
+      font-weight:700;
+      color:#14532d;
+    }
+    .header-text-sub{
+      font-size:14px;
+      line-height:1.4;
+    }
+
+    h1{
+      text-align:center;
+      margin:6px 0 2px;
+      font-size:22px;
+    }
+    h2.sub-title{
+      text-align:center;
+      margin:0 0 10px;
+      font-size:18px;
+    }
+
+    .info-row{
+      display:flex;
+      gap:10px;
+      margin-bottom:10px;
+      flex-wrap:wrap;
+    }
+    .info-block{
+      flex:1 1 320px;
+      border:1px solid #cbd5e1;
+      border-radius:10px;
+      padding:6px 10px 8px;
+      font-size:14px;
+      background:#f9fafb;
+    }
+    .info-title{
+      font-weight:700;
+      margin-bottom:4px;
+    }
+    .editable{
+      border-bottom:1px dotted #64748b;
+      min-width:40px;
+      display:inline-block;
+    }
+
+    table.items{
+      width:100%;
+      border-collapse:collapse;
+      font-size:14px;
+      margin-top:8px;
+    }
+    table.items th,
+    table.items td{
+      border:1px solid #444;
+      padding:3px 4px;
+      vertical-align:top;
+      white-space:nowrap;
+    }
+    table.items th{
+      background:#e5f3ff;
+      text-align:center;
+      font-weight:600;
+    }
+    .text-right{text-align:right;}
+    .cell-input{
+      width:100%;
+      border:none;
+      padding:2px 3px;
+      font-family:inherit;
+      font-size:14px;
+      box-sizing:border-box;
+    }
+    .cell-input:focus{
+      outline:1px solid #60a5fa;
+    }
+    tfoot td{
+      background:#f3f4f6;
+      font-weight:600;
+    }
+    .sum-label{
+      text-align:right;
+    }
+    .sum-input{
+      width:100%;
+      border:none;
+      background:transparent;
+      text-align:right;
+      font-size:14px;
+      font-family:inherit;
+    }
+    .sum-input:focus{
+      outline:1px solid #60a5fa;
+      background:#fff;
+    }
+
+    @media print{
+      body{background:#fff;padding:0;}
+      .page{box-shadow:none;margin:0;padding:0 8mm;}
+      .top-buttons{display:none;}
+      @page{
+        size:A4 portrait;
+        margin:6mm;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ปุ่มด้านบน -->
+  <div class="top-buttons">
+    <a href="ky9.html" class="btn btn-back">← หน้าเอกสาร (ขย.9)</a>
+    <button class="btn btn-print" onclick="window.print()">🖨 พิมพ์ / PDF</button>
+  </div>
+
+  <!-- หัวกระดาษ + โลโก้ -->
+  <div class="header-box">
+    <img src="LOGO.jpg" alt="JP Medical Logo">
+    <div>
+      <div class="header-text-main">
+        ร้านอุปกรณ์การแพทย์ เจพี เมดิคอล โซ ซัพพลาย (สำนักงานใหญ่)
+      </div>
+      <div class="header-text-sub">
+        เลขที่ 871/1 ถนนอุบล ตำบลเมืองใต้ อำเภอเมือง จังหวัดศรีสะเกษ 33000<br>
+        โทร 090-413-7894, 090-967-4207
+      </div>
+    </div>
+  </div>
+
+  <h1>QUOTATION</h1>
+  <h2 class="sub-title">ใบเสนอราคา</h2>
+
+  <!-- ข้อมูลลูกค้า + รายละเอียดใบเสนอราคา -->
+  <div class="info-row">
+    <div class="info-block">
+      <div class="info-title">เรียน (Customer)</div>
+      ชื่อลูกค้า: <span class="editable" contenteditable="true"></span><br>
+      ชื่อหน่วยงาน / ร้าน: <span class="editable" contenteditable="true"></span><br>
+      ที่อยู่: <span class="editable" contenteditable="true"></span><br>
+      โทร: <span class="editable" contenteditable="true"></span>
+    </div>
+
+    <div class="info-block">
+      <div class="info-title">รายละเอียดใบเสนอราคา</div>
+      เลขที่ใบเสนอราคา:
+      <span id="quoteNumber" class="editable" contenteditable="true"></span><br>
+      วันที่:
+      <span id="quoteDate" class="editable" contenteditable="true"></span><br>
+      ราคาใช้ได้ถึงวันที่:
+      <span id="quoteValidUntil" class="editable" contenteditable="true"></span><br>
+      ผู้ติดต่อ:
+      <span id="contactName" class="editable" contenteditable="true"></span><br>
+      โทร:
+      <span id="contactPhone" class="editable" contenteditable="true"></span>
+    </div>
+  </div>
+
+  <!-- datalist สำหรับ dropdown -->
+  <datalist id="itemCodeList"></datalist>
+  <datalist id="productList"></datalist>
+
+  <!-- ตารางสินค้า -->
+  <table class="items">
+    <thead>
+      <tr>
+        <th style="width:40px;">ลำดับ</th>
+        <th style="width:110px;">Item Code</th>
+        <th>รายละเอียดสินค้า (เลือกจากหมวด / ชื่อสินค้า)</th>
+        <th style="width:70px;">จำนวน</th>
+        <th style="width:80px;">หน่วย</th>
+        <th style="width:90px;">ราคา/หน่วย</th>
+        <th style="width:110px;">จำนวนเงิน</th>
+      </tr>
+    </thead>
+    <tbody id="itemBody"></tbody>
+    <tfoot>
+      <tr>
+        <td colspan="5" class="sum-label">ยอดรวม (Subtotal)</td>
+        <td colspan="2">
+          <input id="sumSubtotal" class="sum-input" type="text" readonly>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="5" class="sum-label">ส่วนลด (Discount)</td>
+        <td colspan="2">
+          <input id="sumDiscount" class="sum-input" type="text" value="0">
+        </td>
+      </tr>
+      <tr>
+        <td colspan="5" class="sum-label">มัดจำ / ชำระแล้ว (Deposit)</td>
+        <td colspan="2">
+          <input id="sumDeposit" class="sum-input" type="text" value="0">
+        </td>
+      </tr>
+      <tr>
+        <td colspan="5" class="sum-label">ยอดคงเหลือสุทธิ (Total)</td>
+        <td colspan="2">
+          <input id="sumTotal" class="sum-input" type="text" readonly>
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <p style="font-size:12px;margin-top:10px;">
+    * ราคานี้ยังไม่รวมค่าจัดส่ง (ถ้ามี) และเป็นเพียงใบเสนอราคา ลูกค้าสามารถสอบถาม/ปรับแก้ได้ก่อนยืนยันการสั่งซื้อ
+  </p>
+
+</div>
+
 <script>
 /* ============================
    1) CONFIG GOOGLE SHEET ITEM
    ============================ */
-
-// ชีตที่เก็บ item ทั้งหมด
 const ITEM_SPREADSHEET_ID = "1U4d5PqBMQ1GfTahwvbvzDFQrEikT5sYCOwZIx8FabMI";
 const ITEM_GID = "942187814";
 const ITEM_URL =
@@ -12,85 +273,81 @@ const ITEM_URL =
 let allItems = [];
 
 /*
-  ปรับ index คอลัมน์ให้ตรงกับชีตจริงถ้าจำเป็น:
+  mapping column จากชีต:
 
-  c[0] = item_code
-  c[1] = product_name
-  c[2] = unit_desc
-  c[3] = cost_price_per_unit
-  c[4] = category_desc
+  A: product_barcode
+  B: product_name
+  C: category_desc
+  D: unit_desc
+  E: stock
+  F: cost_price_per_unit
+  G: price
 */
-function parseItemRow(row) {
+function parseItemRow(row){
   const c = row.c || [];
   return {
-    item_code: (c[0]?.v || "").toString(),
-    product_name: (c[1]?.v || "").toString(),
-    unit_desc: (c[2]?.v || "").toString(),
-    cost_price_per_unit: Number(c[3]?.v ?? 0),
-    category_desc: (c[4]?.v || "").toString()
+    barcode:        (c[0]?.v || "").toString(),
+    product_name:   (c[1]?.v || "").toString(),
+    category_desc:  (c[2]?.v || "").toString(),
+    unit_desc:      (c[3]?.v || "").toString(),
+    cost_price:     Number(c[5]?.v ?? 0),   // ใช้ cost_price_per_unit ตามที่ขอ
+    price:          Number(c[6]?.v ?? 0)
   };
 }
 
-function loadItemsFromSheet() {
+function loadItemsFromSheet(){
   fetch(ITEM_URL)
     .then(res => res.text())
     .then(txt => {
-      const jsonStr = txt.substring(txt.indexOf("{"), txt.lastIndexOf("}") + 1);
+      const jsonStr = txt.substring(txt.indexOf("{"), txt.lastIndexOf("}")+1);
       const data = JSON.parse(jsonStr);
       const rows = data.table.rows || [];
-      allItems = rows.map(parseItemRow)
-                     .filter(it => it.item_code || it.product_name);
-
+      allItems = rows.map(parseItemRow).filter(it => it.barcode || it.product_name);
       buildItemDatalists();
     })
-    .catch(err => {
-      console.error("โหลด Item จากชีตไม่สำเร็จ:", err);
-    });
+    .catch(err => console.error("โหลด Item ไม่สำเร็จ:", err));
 }
 
-/* datalist: 1) code  2) category+ชื่อสินค้า */
+/* datalist */
 const codeListEl    = document.getElementById("itemCodeList");
 const productListEl = document.getElementById("productList");
 
-function buildItemDatalists() {
-  if (codeListEl)    codeListEl.innerHTML    = "";
-  if (productListEl) productListEl.innerHTML = "";
+function buildItemDatalists(){
+  codeListEl.innerHTML = "";
+  productListEl.innerHTML = "";
 
   allItems.forEach(it => {
-    if (codeListEl) {
-      const opt = document.createElement("option");
-      opt.value = it.item_code;
-      opt.label = `${it.item_code} : ${it.product_name}`;
-      codeListEl.appendChild(opt);
-    }
-    if (productListEl) {
-      const opt2 = document.createElement("option");
-      opt2.value = it.product_name; // ใช้ชื่อสินค้าเป็นค่าที่เลือก
-      opt2.label = `${it.category_desc} · ${it.product_name}`;
-      productListEl.appendChild(opt2);
-    }
+    // datalist สำหรับ item code
+    const optCode = document.createElement("option");
+    optCode.value = it.barcode;
+    optCode.label = `${it.barcode} : ${it.product_name}`;
+    codeListEl.appendChild(optCode);
+
+    // datalist สำหรับ product_name แสดง category ด้วย
+    const optProd = document.createElement("option");
+    optProd.value = it.product_name;
+    optProd.label = `${it.category_desc} · ${it.product_name}`;
+    productListEl.appendChild(optProd);
   });
 }
 
-function findItemByCode(code) {
-  if (!code) return null;
-  const c = code.trim().toLowerCase();
-  return allItems.find(it => it.item_code.toLowerCase() === c) || null;
+function findItemByCode(code){
+  if(!code) return null;
+  const k = code.trim().toLowerCase();
+  return allItems.find(it => it.barcode.toLowerCase() === k) || null;
 }
-
-function findItemByName(name) {
-  if (!name) return null;
-  const n = name.trim().toLowerCase();
-  return allItems.find(it => it.product_name.toLowerCase() === n) || null;
+function findItemByName(name){
+  if(!name) return null;
+  const k = name.trim().toLowerCase();
+  return allItems.find(it => it.product_name.toLowerCase() === k) || null;
 }
 
 /* ============================
    2) แถวรายการสินค้า
    ============================ */
-
 const itemBody = document.getElementById("itemBody");
 
-function createItemRow(index) {
+function createItemRow(index){
   const tr = document.createElement("tr");
   tr.innerHTML = `
     <td class="text-right">${index}</td>
@@ -99,15 +356,15 @@ function createItemRow(index) {
     <td><input class="cell-input cell-qty" type="number" min="0" step="0.01"></td>
     <td><input class="cell-input cell-unit"></td>
     <td><input class="cell-input cell-price" type="number" min="0" step="0.01"></td>
-    <td><input class="cell-input cell-amount" type="number" step="0.01"></td>
+    <td><input class="cell-input cell-amount" type="number" step="0.01" readonly></td>
   `;
   attachRowEvents(tr);
   return tr;
 }
 
-function buildInitialRows(count = 10) {
+function buildInitialRows(count=10){
   itemBody.innerHTML = "";
-  for (let i = 1; i <= count; i++) {
+  for(let i=1;i<=count;i++){
     itemBody.appendChild(createItemRow(i));
   }
 }
@@ -115,21 +372,19 @@ function buildInitialRows(count = 10) {
 /* ============================
    3) การคำนวณ
    ============================ */
-
 const sumSubtotal = document.getElementById("sumSubtotal");
 const sumDiscount = document.getElementById("sumDiscount");
 const sumDeposit  = document.getElementById("sumDeposit");
-const sumRemain   = document.getElementById("sumRemain");
 const sumTotal    = document.getElementById("sumTotal");
 
-function parseNumber(val) {
-  if (typeof val !== "string") val = String(val ?? "");
-  val = val.replace(/,/g, "");
+function parseNumber(val){
+  if(typeof val !== "string") val = String(val ?? "");
+  val = val.replace(/,/g,"");
   const n = parseFloat(val);
   return isNaN(n) ? 0 : n;
 }
 
-function recalcRowAmount(tr) {
+function recalcRowAmount(tr){
   const qtyInput    = tr.querySelector(".cell-qty");
   const priceInput  = tr.querySelector(".cell-price");
   const amountInput = tr.querySelector(".cell-amount");
@@ -141,155 +396,133 @@ function recalcRowAmount(tr) {
   amountInput.value = amount ? amount.toFixed(2) : "";
 }
 
-function recalcTotals() {
+function recalcTotals(){
   let subtotal = 0;
-  const rows = itemBody.querySelectorAll("tr");
-  rows.forEach(tr => {
+  itemBody.querySelectorAll("tr").forEach(tr=>{
     const amountInput = tr.querySelector(".cell-amount");
-    const val = parseNumber(amountInput.value);
-    subtotal += val;
+    subtotal += parseNumber(amountInput.value);
   });
 
   const discount = parseNumber(sumDiscount.value);
   const deposit  = parseNumber(sumDeposit.value);
 
-  const remain = subtotal - discount - deposit;
-  const total  = remain;
+  const total = subtotal - discount - deposit;
 
   sumSubtotal.value = subtotal ? subtotal.toFixed(2) : "";
-  sumRemain.value   = remain   ? remain.toFixed(2)   : "";
   sumTotal.value    = total    ? total.toFixed(2)    : "";
 }
 
 /* ============================
-   4) Event ของแต่ละแถว
+   4) Event แถวสินค้า
    ============================ */
-
-function autoFillFromItem(tr, item) {
+function autoFillFromItem(tr, item){
+  if(!item) return;
   const codeInput  = tr.querySelector(".cell-code");
   const descInput  = tr.querySelector(".cell-desc");
   const unitInput  = tr.querySelector(".cell-unit");
   const priceInput = tr.querySelector(".cell-price");
   const qtyInput   = tr.querySelector(".cell-qty");
 
-  if (!item) return;
-
-  codeInput.value  = item.item_code;
+  codeInput.value  = item.barcode;
   descInput.value  = item.product_name;
   unitInput.value  = item.unit_desc;
-  priceInput.value = item.cost_price_per_unit
-    ? item.cost_price_per_unit.toFixed(2)
-    : "";
+  priceInput.value = item.cost_price ? item.cost_price.toFixed(2) : "";
 
-  // ถ้ายังไม่เคยใส่จำนวน ให้เริ่มต้นเป็น 1
-  const currentQty = parseNumber(qtyInput.value);
-  if (!currentQty) qtyInput.value = "1";
-
+  if(!parseNumber(qtyInput.value)){
+    qtyInput.value = "1";
+  }
   recalcRowAmount(tr);
   recalcTotals();
 }
 
-function attachRowEvents(tr) {
+function attachRowEvents(tr){
   const codeInput   = tr.querySelector(".cell-code");
   const descInput   = tr.querySelector(".cell-desc");
-  const unitInput   = tr.querySelector(".cell-unit");
-  const priceInput  = tr.querySelector(".cell-price");
   const qtyInput    = tr.querySelector(".cell-qty");
+  const priceInput  = tr.querySelector(".cell-price");
 
-  // เลือกจาก Item Code
-  codeInput.addEventListener("change", () => {
+  codeInput.addEventListener("change",()=>{
     const item = findItemByCode(codeInput.value);
     autoFillFromItem(tr, item);
   });
 
-  // เลือกจาก dropdown รายละเอียดสินค้า (category_desc + product_name)
-  descInput.addEventListener("change", () => {
+  descInput.addEventListener("change",()=>{
     const item = findItemByName(descInput.value);
     autoFillFromItem(tr, item);
   });
 
-  // เปลี่ยนจำนวน/ราคา → คำนวณใหม่
-  [qtyInput, priceInput].forEach(inp => {
-    inp.addEventListener("input", () => {
+  [qtyInput, priceInput].forEach(inp=>{
+    inp.addEventListener("input",()=>{
       recalcRowAmount(tr);
       recalcTotals();
     });
   });
 }
 
-/* ============================
-   5) ส่วนลด/มัดจำ เปลี่ยน → คำนวณใหม่
-   ============================ */
-
-[sumDiscount, sumDeposit].forEach(inp => {
-  if (!inp) return;
-  inp.addEventListener("input", () => {
-    recalcTotals();
-  });
+/* ส่วนลด/มัดจำ คำนวณใหม่ */
+[sumDiscount, sumDeposit].forEach(inp=>{
+  inp.addEventListener("input", recalcTotals);
 });
 
 /* ============================
-   6) AUTO DATE / RUN NO / VALID +30
+   5) AUTO DATE / RUN NO / VALID +30
    ============================ */
-
 const quoteNumberEl  = document.getElementById("quoteNumber");
 const quoteDateEl    = document.getElementById("quoteDate");
 const quoteValidEl   = document.getElementById("quoteValidUntil");
 const contactNameEl  = document.getElementById("contactName");
 const contactPhoneEl = document.getElementById("contactPhone");
 
-function formatDateDDMMYYYY(d) {
-  const dd = String(d.getDate()).padStart(2, "0");
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
+function formatDateDDMMYYYY(d){
+  const dd = String(d.getDate()).padStart(2,"0");
+  const mm = String(d.getMonth()+1).padStart(2,"0");
   const yyyy = d.getFullYear();
   return `${dd}/${mm}/${yyyy}`;
 }
 
-function generateRunningQuotationNumber() {
+function generateRunningQuotationNumber(){
   const today = new Date();
   const yyyy = today.getFullYear();
-  const mm   = String(today.getMonth() + 1).padStart(2, "0");
+  const mm   = String(today.getMonth()+1).padStart(2,"0");
   const key  = `QT-${yyyy}${mm}-RUN`;
 
   let run = localStorage.getItem(key);
-  if (!run) run = 1;
-  else run = Number(run) + 1;
+  if(!run) run = 1;
+  else run = Number(run)+1;
 
   localStorage.setItem(key, run);
-  return `QT-${yyyy}${mm}-${String(run).padStart(3, "0")}`;
+  return `QT-${yyyy}${mm}-${String(run).padStart(3,"0")}`;
 }
 
-function initHeaderDefaults() {
+function initHeaderDefaults(){
   const today = new Date();
   const todayStr = formatDateDDMMYYYY(today);
 
   const valid = new Date(today);
-  valid.setDate(valid.getDate() + 30);
+  valid.setDate(valid.getDate()+30);
   const validStr = formatDateDDMMYYYY(valid);
 
-  if (quoteDateEl && !quoteDateEl.textContent.trim()) {
+  if(quoteDateEl && !quoteDateEl.textContent.trim()){
     quoteDateEl.textContent = todayStr;
   }
-  if (quoteValidEl && !quoteValidEl.textContent.trim()) {
+  if(quoteValidEl && !quoteValidEl.textContent.trim()){
     quoteValidEl.textContent = validStr;
   }
-  if (quoteNumberEl && !quoteNumberEl.textContent.trim()) {
+  if(quoteNumberEl && !quoteNumberEl.textContent.trim()){
     quoteNumberEl.textContent = generateRunningQuotationNumber();
   }
-
-  if (contactNameEl && !contactNameEl.textContent.trim()) {
+  if(contactNameEl && !contactNameEl.textContent.trim()){
     contactNameEl.textContent = "คุณพัฒน์นรี";
   }
-  if (contactPhoneEl && !contactPhoneEl.textContent.trim()) {
+  if(contactPhoneEl && !contactPhoneEl.textContent.trim()){
     contactPhoneEl.textContent = "090-413-7894, 090-967-4207";
   }
 }
 
 /* ============================
-   7) init ทั้งหมด
+   6) init ทั้งหน้า
    ============================ */
-
-function initPage() {
+function initPage(){
   buildInitialRows(10);
   loadItemsFromSheet();
   initHeaderDefaults();
@@ -298,3 +531,5 @@ function initPage() {
 
 window.addEventListener("DOMContentLoaded", initPage);
 </script>
+</body>
+</html>
