@@ -76,7 +76,7 @@
       margin-top: 8px;
     }
 
-    /* ปุ่มลัด ขย9 / ขย11 */
+    /* ปุ่มลัดด้านบน */
     .top-buttons {
       display: flex;
       gap: 8px;
@@ -93,46 +93,32 @@
       border: none;
       cursor: pointer;
       box-shadow: 0 2px 4px rgba(0,0,0,0.12);
-      transition: opacity 0.15s ease, transform 0.1s ease;
     }
-    .btn-ky9 {
-      background: #00c853;
-      color: #ffffff;
-    }
-    .btn-ky11 {
-      background: #1976d2;
-      color: #ffffff;
-    }
-    .top-buttons .btn:hover {
-      opacity: 0.9;
-      transform: translateY(-1px);
-    }
+    .btn-ky9-list { background:#00c853; color:#fff; }
+    .btn-ky9-form { background:#43a047; color:#fff; }
+    .btn-ky11     { background:#1976d2; color:#fff; }
+
+    /* ปุ่มใบเสนอราคา */
+    .btn-qt { background:#ff9800; color:#fff; }
 
     @media (max-width: 768px) {
-      table {
-        font-size: 0.8rem;
-      }
-      th, td {
-        padding: 4px 6px;
-      }
+      table { font-size: 0.8rem; }
+      th, td { padding: 4px 6px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- ปุ่มลัดไปหน้า ขย9 / ขย11 -->
+  <!-- ปุ่มลัด -->
  <div class="top-buttons">
-  <!-- หน้า ky9.html คือ "ข้อมูลดิบ" -->
   <a href="./ky9.html" class="btn btn-ky9-list">ขย.9 (ข้อมูลดิบ)</a>
   <a href="./ky9-form.html" class="btn btn-ky9-form">ขย.9 (แบบฟอร์ม)</a>
   <a href="./ky11.html" class="btn btn-ky11">ขย.11 (บัญชีการขายยา)</a>
+  <a href="./Quotation.html" class="btn btn-qt">🧾 ใบเสนอราคา</a>
 </div>
 
-
   <h1>บัญชีการซื้อยา (ขย.9)</h1>
-  <div class="subtitle">
-    ดึงข้อมูลจาก Google Sheet แบบอ่านอย่างเดียว
-  </div>
+  <div class="subtitle">ดึงข้อมูลจาก Google Sheet แบบอ่านอย่างเดียว</div>
 
   <div class="card">
     <div class="toolbar">
@@ -153,10 +139,10 @@
           <th>ชื่อผู้ขาย</th>
           <th>ITEMCODE</th>
           <th>ชื่อยา</th>
-          <th>เลขที่/อักษร ครั้งที่ผลิต (LOT)</th>
-          <th>จำนวน/ปริมาณ</th>
+          <th>LOT</th>
+          <th>จำนวน</th>
           <th>หน่วย</th>
-          <th>ลายมือชื่อผู้มีหน้าที่ปฏิบัติการ</th>
+          <th>ผู้ปฏิบัติการ</th>
           <th>หมายเหตุ</th>
         </tr>
       </thead>
@@ -164,129 +150,91 @@
     </table>
   </div>
 
-  <script>
-    // ข้อมูลชีตของคุณ
-    const SPREADSHEET_ID = "1Fqq6zxoM8Qw-hNbl5U7hwmezdzxT32ek43qX70uQAZc";
-    const GID = "136320859";
+<script>
+const SPREADSHEET_ID = "1Fqq6zxoM8Qw-hNbl5U7hwmezdzxT32ek43qX70uQAZc";
+const GID = "136320859";
+const SHEET_URL =
+`https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
 
-    const SHEET_URL =
-      `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=${GID}`;
+let allRows = [];
 
-    let allRows = []; // เก็บข้อมูลไว้สำหรับค้นหา
+async function loadKy9() {
+  const loadingEl = document.getElementById("loading");
+  const errorEl   = document.getElementById("error");
+  const tableEl   = document.getElementById("ky9Table");
 
-    async function loadKy9() {
-      const loadingEl = document.getElementById("loading");
-      const errorEl = document.getElementById("error");
-      const tableEl = document.getElementById("ky9Table");
+  try {
+    const res = await fetch(SHEET_URL);
+    const text = await res.text();
+    const jsonStr = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
+    const data = JSON.parse(jsonStr);
 
-      try {
-        const res = await fetch(SHEET_URL);
-        const text = await res.text();
+    allRows = data.table.rows || [];
+    renderTable(allRows);
 
-        // gviz จะห่อ JSON ด้วยข้อความอื่น ต้องตัดออก
-        const jsonStr = text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1);
-        const data = JSON.parse(jsonStr);
+    loadingEl.style.display = "none";
+    tableEl.style.display = "table";
 
-        const rows = data.table.rows || [];
-        allRows = rows; // เก็บไว้สำหรับ filter
+  } catch (err) {
+    loadingEl.style.display = "none";
+    errorEl.style.display = "block";
+    errorEl.textContent = "โหลดข้อมูลไม่สำเร็จ";
+  }
+}
 
-        renderTable(rows);
+function renderTable(rows) {
+  const tbody = document.querySelector("#ky9Table tbody");
+  tbody.innerHTML = "";
 
-        loadingEl.style.display = "none";
-        tableEl.style.display = "table";
-      } catch (err) {
-        console.error(err);
-        loadingEl.style.display = "none";
-        errorEl.style.display = "block";
-        errorEl.textContent = "ดึงข้อมูลจาก Google Sheet ไม่สำเร็จ กรุณาตรวจสอบสิทธิ์การแชร์ หรือค่า SPREADSHEET_ID / gid";
-      }
+  rows.forEach((r) => {
+    const c = r.c || [];
+    const tr = document.createElement("tr");
+
+    function td(v) {
+      const td = document.createElement("td");
+      td.textContent = v;
+      tr.appendChild(td);
     }
 
-    function renderTable(rows) {
-      const tableEl = document.getElementById("ky9Table");
-      const tbody = tableEl.querySelector("tbody");
-      tbody.innerHTML = "";
+    td(c[0]?.v ?? "");
+    td(c[1]?.f || c[1]?.v || "");
+    td(c[2]?.v ?? "");
+    td(c[3]?.v ?? "");
+    td(c[4]?.v ?? "");
+    td(c[5]?.v ?? "");
+    td(c[6]?.v ?? "");
+    td(c[7]?.v ?? "");
+    td(c[8]?.v ?? "");
+    td(c[9]?.v ?? "");
 
-      rows.forEach((row) => {
-        const c = row.c || [];
+    tbody.appendChild(tr);
+  });
+}
 
-        // map คอลัมน์ตาม ขย9:
-        // 0: ลำดับที่
-        // 1: วันที่รับสินค้า
-        // 2: ชื่อผู้ขาย
-        // 3: ITEMCODE
-        // 4: ชื่อยา
-        // 5: เลขที่หรืออักษรครั้งที่ผลิต
-        // 6: จำนวน/ปริมาณ
-        // 7: หน่วย
-        // 8: ลายมือชื่อผู้มีหน้าที่ปฏิบัติการ
-        // 9: หมายเหตุ
+function setupSearch() {
+  const input = document.getElementById("searchText");
+  input.addEventListener("input", () => {
+    const kw = input.value.trim().toLowerCase();
+    if (!kw) return renderTable(allRows);
 
-        const no        = c[0]?.v ?? "";
-        const dateIn    = c[1]?.f || c[1]?.v || "";
-        const vendor    = c[2]?.v ?? "";
-        const itemCode  = c[3]?.v ?? "";
-        const drugName  = c[4]?.v ?? "";
-        const lot       = c[5]?.v ?? "";
-        const qty       = c[6]?.v ?? "";
-        const unit      = c[7]?.v ?? "";
-        const signer    = c[8]?.v ?? "";
-        const remark    = c[9]?.v ?? "";
-
-        // ถ้าแถวว่างมาก ๆ ข้ามได้
-        if (!itemCode && !drugName && !lot) return;
-
-        const tr = document.createElement("tr");
-
-        function addCell(text) {
-          const td = document.createElement("td");
-          td.textContent = text;
-          tr.appendChild(td);
-        }
-
-        addCell(no);
-        addCell(dateIn);
-        addCell(vendor);
-        addCell(itemCode);
-        addCell(drugName);
-        addCell(lot);
-        addCell(qty);
-        addCell(unit);
-        addCell(signer);
-        addCell(remark);
-
-        tbody.appendChild(tr);
-      });
-    }
-
-    // ฟังก์ชันค้นหาแบบง่าย จากชื่อยา / LOT / ITEMCODE
-    function setupSearch() {
-      const input = document.getElementById("searchText");
-      input.addEventListener("input", () => {
-        const keyword = input.value.trim().toLowerCase();
-        if (!keyword) {
-          renderTable(allRows);
-          return;
-        }
-        const filtered = allRows.filter((row) => {
-          const c = row.c || [];
-          const itemCode = (c[3]?.v ?? "").toString().toLowerCase();
-          const drug     = (c[4]?.v ?? "").toString().toLowerCase();
-          const lot      = (c[5]?.v ?? "").toString().toLowerCase();
-          return (
-            itemCode.includes(keyword) ||
-            drug.includes(keyword) ||
-            lot.includes(keyword)
-          );
-        });
-        renderTable(filtered);
-      });
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      setupSearch();
-      loadKy9();
+    const filtered = allRows.filter(r => {
+      const c = r.c || [];
+      return (
+        (c[3]?.v ?? "").toString().toLowerCase().includes(kw) ||
+        (c[4]?.v ?? "").toString().toLowerCase().includes(kw) ||
+        (c[5]?.v ?? "").toString().toLowerCase().includes(kw)
+      );
     });
-  </script>
+
+    renderTable(filtered);
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  setupSearch();
+  loadKy9();
+});
+</script>
+
 </body>
 </html>
