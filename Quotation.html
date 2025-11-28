@@ -2,114 +2,619 @@
 <html lang="th">
 <head>
   <meta charset="utf-8" />
-  <title>Quotation · JP Pharmacy</title>
+  <title>ใบเสนอราคา · JP Medical So Supply</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    /* ใช้สไตล์เหมือน po.html ย่อได้ */
-    body{font-family:"TH SarabunPSK",system-ui,sans-serif;margin:0;padding:8px;background:#f5f5f5;}
-    .page{max-width:900px;margin:0 auto;background:#fff;padding:16px 22px 24px;box-shadow:0 2px 6px rgba(0,0,0,.08);}
-    .top-buttons{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;margin-bottom:8px;}
-    .btn{padding:4px 12px;border-radius:20px;border:none;background:#0ea5e9;color:#fff;cursor:pointer;font-size:.9rem;}
-    .btn-secondary{background:#6b7280;}
-    h1{text-align:center;margin:4px 0 2px;font-size:1.6rem;}
-    h2{text-align:center;margin:0 0 12px;font-size:1.1rem;font-weight:400;}
-    .row{display:flex;justify-content:space-between;gap:16px;font-size:.9rem;margin-bottom:6px;}
-    .block{flex:1;border:1px solid #ddd;border-radius:8px;padding:6px 10px;}
-    .block-title{font-weight:bold;margin-bottom:4px;}
-    .editable{border-bottom:1px dotted #666;min-width:80px;display:inline-block;padding:0 2px;}
-    table{width:100%;border-collapse:collapse;font-size:.9rem;margin-top:10px;}
-    th,td{border:1px solid #444;padding:3px 5px;vertical-align:top;}
-    th{background:#e0f2fe;text-align:center;}
-    tfoot td{border:none;padding-top:8px;}
-    .text-right{text-align:right;}
-    .signature-row{display:flex;justify-content:flex-end;gap:24px;margin-top:18px;font-size:.9rem;}
-    .signature-box{text-align:center;}
-    @media print{body{background:#fff;padding:0}.page{box-shadow:none;margin:0}.top-buttons{display:none}@page{size:A4 portrait;margin:10mm}}
+    body {
+      font-family: "TH SarabunPSK", system-ui, sans-serif;
+      margin: 0;
+      padding: 8px;
+      background: #f5f5f5;
+    }
+
+    .page {
+      max-width: 960px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 16px 22px 24px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      border: 2px solid #0ea5e9;
+    }
+
+    .top-bar {
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:8px;
+      font-size:0.9rem;
+    }
+
+    .top-buttons {
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    .btn {
+      padding:4px 12px;
+      border-radius:20px;
+      border:none;
+      cursor:pointer;
+      font-size:0.9rem;
+      font-family:inherit;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      white-space:nowrap;
+    }
+
+    .btn-back { background:#6b7280; color:#fff; }
+    .btn-print { background:#0ea5e9; color:#fff; }
+
+    select {
+      padding:4px 8px;
+      border-radius:6px;
+      border:1px solid #d4d4d8;
+      font-size:0.9rem;
+      min-width:210px;
+    }
+
+    h1 {
+      text-align:center;
+      margin:4px 0 2px;
+      font-size:1.8rem;
+    }
+
+    h2 {
+      text-align:center;
+      margin:0 0 12px;
+      font-size:1.1rem;
+      font-weight:400;
+    }
+
+    .shop-name {
+      text-align:center;
+      font-size:1rem;
+      margin-bottom:4px;
+      font-weight:700;
+    }
+
+    .shop-sub {
+      text-align:center;
+      font-size:0.9rem;
+      margin-bottom:12px;
+    }
+
+    .row {
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      font-size:0.9rem;
+      margin-bottom:6px;
+    }
+
+    .block {
+      flex:1;
+      border:1px solid #d4d4d8;
+      border-radius:8px;
+      padding:6px 10px;
+    }
+
+    .block-title {
+      font-weight:bold;
+      margin-bottom:4px;
+      font-size:0.95rem;
+    }
+
+    .editable {
+      border-bottom:1px dotted #666;
+      min-width:80px;
+      display:inline-block;
+      padding:0 2px;
+    }
+
+    table {
+      width:100%;
+      border-collapse:collapse;
+      font-size:0.9rem;
+      margin-top:10px;
+    }
+
+    th, td {
+      border:1px solid #444;
+      padding:3px 5px;
+      vertical-align:top;
+    }
+
+    th {
+      background:#e0f2fe;
+      text-align:center;
+    }
+
+    .text-right { text-align:right; }
+
+    .cell-input {
+      width:100%;
+      border:none;
+      padding:2px 3px;
+      font-family:inherit;
+      font-size:0.9rem;
+      box-sizing:border-box;
+    }
+
+    .cell-input:focus {
+      outline:1px solid #0ea5e9;
+      background:#eff6ff;
+    }
+
+    /* กล่องสรุปยอดด้านขวา */
+    .summary-wrapper {
+      margin-top:6px;
+      display:flex;
+      justify-content:flex-end;
+    }
+
+    .summary-table {
+      border-collapse:collapse;
+      font-size:0.9rem;
+      min-width:260px;
+    }
+
+    .summary-table th,
+    .summary-table td {
+      border:1px solid #444;
+      padding:2px 5px;
+      white-space:nowrap;
+    }
+
+    .summary-table th {
+      background:#f1f5f9;
+      text-align:left;
+    }
+
+    .sum-input {
+      width:100%;
+      text-align:right;
+      border:none;
+      padding:0 2px;
+      font-family:inherit;
+      font-size:0.9rem;
+    }
+
+    .sum-input[readonly] {
+      background:#f9fafb;
+    }
+
+    /* ศูนย์บาทถ้วน */
+    .amount-words-box {
+      border:1px solid #444;
+      margin-top:6px;
+      padding:6px 10px;
+      text-align:center;
+      font-size:1rem;
+      font-weight:bold;
+    }
+
+    /* ส่วนล่าง – ลายเซ็นซ้าย/ขวา */
+    .bottom-row {
+      display:flex;
+      gap:12px;
+      margin-top:10px;
+      font-size:0.9rem;
+    }
+
+    .bottom-left,
+    .bottom-right {
+      flex:1;
+      border:1px solid #444;
+      padding:8px 10px 14px;
+      box-sizing:border-box;
+    }
+
+    .bottom-left-title {
+      text-align:center;
+      margin-bottom:4px;
+    }
+
+    .bottom-left-sub {
+      text-align:center;
+      font-size:0.8rem;
+      margin-bottom:12px;
+    }
+
+    .sign-line {
+      margin-top:16px;
+      margin-bottom:2px;
+      text-align:center;
+    }
+
+    .sign-line span {
+      display:inline-block;
+      border-bottom:1px solid #444;
+      min-width:160px;
+      height:18px;
+    }
+
+    .sign-caption {
+      text-align:center;
+      font-size:0.85rem;
+    }
+
+    .small-center {
+      text-align:center;
+      font-size:0.85rem;
+    }
+
+    @media print {
+      body { background:#fff; padding:0; }
+      .page { box-shadow:none; margin:0; border:none; }
+      .top-bar { display:none; }
+      @page { size:A4 portrait; margin:10mm; }
+    }
   </style>
 </head>
 <body>
 <div class="page">
 
-  <div class="top-buttons">
-    <a href="./ky9.html"><button class="btn btn-secondary">← กลับหน้าเอกสาร</button></a>
-    <button class="btn" onclick="window.print()">🖨 พิมพ์ / PDF</button>
+  <!-- แถบด้านบน -->
+  <div class="top-bar">
+    <div class="top-buttons">
+      <a href="./ky9.html">
+        <button class="btn btn-back">← หน้าเอกสาร (ขย.9)</button>
+      </a>
+      <button class="btn btn-print" onclick="window.print()">🖨 พิมพ์ / PDF</button>
+    </div>
+    <div>
+      สาขา:
+      <select id="branchSelect">
+        <option value="chonburi">สาขา ชลบุรี</option>
+        <option value="branch2">สาขา 2 (แก้ไขชื่อได้)</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- หัวฟอร์ม -->
+  <div class="shop-name" id="shopName">
+    ร้านอุปกรณ์การแพทย์เจพีเมดิคอลโซ ซัพพลาย สาขา ชลบุรี
+  </div>
+  <div class="shop-sub" id="shopAddress">
+    51/49 ถนนสุขุมวิท หมู่ 4 ต.บ้านสวน อ.เมือง จ.ชลบุรี 20000 โทร. 090-413-7894, 090-967-4207
   </div>
 
   <h1>QUOTATION</h1>
-  <h2>ใบเสนอราคา · JP Pharmacy</h2>
+  <h2>ใบเสนอราคา</h2>
 
+  <!-- ข้อมูลลูกค้า / ใบเสนอราคา -->
   <div class="row">
     <div class="block">
-      <div class="block-title">เรียน (To)</div>
-      ชื่อลูกค้า: <span class="editable" contenteditable="true">..............................</span><br>
-      ที่อยู่: <span class="editable" contenteditable="true">............................................................</span><br>
+      <div class="block-title">เรียน (Customer)</div>
+      ชื่อผู้รับ: <span class="editable" contenteditable="true">..............................................</span><br>
+      ชื่อหน่วยงาน / ร้าน: <span class="editable" contenteditable="true">..............................................</span><br>
+      ที่อยู่: <span class="editable" contenteditable="true">.................................................................</span><br>
       โทร: <span class="editable" contenteditable="true">.......................</span>
     </div>
     <div class="block">
       <div class="block-title">รายละเอียดใบเสนอราคา</div>
-      เลขที่ใบเสนอราคา: <span class="editable" contenteditable="true">QT-......</span><br>
+      เลขที่ใบเสนอราคา: <span class="editable" contenteditable="true">QT-....../......</span><br>
       วันที่: <span class="editable" contenteditable="true">.... / .... / ....</span><br>
-      ผู้ติดต่อ: <span class="editable" contenteditable="true">เภสัชกร</span><br>
+      ราคาใช้ได้ถึงวันที่: <span class="editable" contenteditable="true">.... / .... / ....</span><br>
+      ผู้ติดต่อ: <span class="editable" contenteditable="true">................................</span><br>
       โทร: <span class="editable" contenteditable="true">098-444-1614</span>
     </div>
   </div>
 
+  <!-- datalist Item Code -->
+  <datalist id="itemCodeList"></datalist>
+
+  <!-- ตารางรายการสินค้า -->
   <table>
     <thead>
       <tr>
         <th style="width:40px;">ลำดับ</th>
-        <th>รายละเอียดสินค้า / บริการ</th>
+        <th style="width:100px;">Item Code</th>
+        <th>รายละเอียดสินค้า</th>
         <th style="width:70px;">จำนวน</th>
         <th style="width:70px;">หน่วย</th>
-        <th style="width:80px;">ราคา/หน่วย</th>
-        <th style="width:90px;">จำนวนเงิน</th>
+        <th style="width:90px;">ราคา/หน่วย</th>
+        <th style="width:100px;">จำนวนเงิน</th>
       </tr>
     </thead>
-    <tbody id="qtBody"></tbody>
-    <tfoot>
-      <tr>
-        <td colspan="5" class="text-right">รวมเป็นเงิน (Subtotal)</td>
-        <td contenteditable="true"></td>
-      </tr>
-      <tr>
-        <td colspan="5" class="text-right">ส่วนลด (Discount)</td>
-        <td contenteditable="true"></td>
-      </tr>
-      <tr>
-        <td colspan="5" class="text-right">ภาษีมูลค่าเพิ่ม (VAT)</td>
-        <td contenteditable="true"></td>
-      </tr>
-      <tr>
-        <td colspan="5" class="text-right">รวมสุทธิ (Total)</td>
-        <td contenteditable="true"></td>
-      </tr>
-    </tfoot>
+    <tbody id="itemBody">
+      <!-- แถวสร้างด้วย JS -->
+    </tbody>
   </table>
 
-  <div class="signature-row">
-    <div class="signature-box">
-      ลงชื่อ <span class="editable" contenteditable="true">................................</span><br>
-      ผู้เสนอราคา / QUOTED BY<br>
-      วันที่ <span class="editable" contenteditable="true">.... / .... / ....</span>
+  <!-- กล่องสรุปยอดด้านขวา -->
+  <div class="summary-wrapper">
+    <table class="summary-table">
+      <tr>
+        <th>รวมเป็นเงิน</th>
+        <td><input id="sumSubtotal" class="sum-input" type="number" readonly></td>
+      </tr>
+      <tr>
+        <th>ส่วนลด</th>
+        <td><input id="sumDiscount" class="sum-input" type="number" value="0"></td>
+      </tr>
+      <tr>
+        <th>หัก เงินมัดจำ</th>
+        <td><input id="sumDeposit" class="sum-input" type="number" value="0"></td>
+      </tr>
+      <tr>
+        <th>ยอดคงเหลือ</th>
+        <td class="small-center">
+          <input id="sumRemain" class="sum-input" type="number" readonly>
+        </td>
+      </tr>
+      <tr>
+        <th><strong>รวมเป็นเงินทั้งสิ้น</strong></th>
+        <td><input id="sumTotal" class="sum-input" type="number" readonly></td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ศูนย์บาทถ้วน -->
+  <div class="amount-words-box">
+    <span class="editable" contenteditable="true" id="amountWords">
+      ศูนย์บาทถ้วน
+    </span>
+  </div>
+
+  <!-- ส่วนล่าง – เซ็นชื่อ -->
+  <div class="bottom-row">
+    <!-- ซ้าย: ผู้สั่งซื้อ -->
+    <div class="bottom-left">
+      <div class="bottom-left-title">
+        กรุณาเซ็นยืนยันการสั่งซื้อตามล่างนี้
+      </div>
+      <div class="bottom-left-sub">
+        Please sign below purchasing confirmation.
+      </div>
+
+      <div class="sign-line">
+        <span></span>
+      </div>
+      <div class="small-center">
+        ( <span class="editable" contenteditable="true">........................................</span> )
+      </div>
+      <div class="sign-caption">
+        ผู้สั่งซื้อ
+      </div>
+    </div>
+
+    <!-- ขวา: ผู้เตรียมเอกสาร -->
+    <div class="bottom-right">
+      <div class="bottom-left-title">
+        ขอแสดงความนับถือ
+      </div>
+      <div class="small-center">
+        JP Medical So Supply
+      </div>
+
+      <div class="sign-line" style="margin-top:24px;">
+        <span></span>
+      </div>
+      <div class="small-center">
+        <span class="editable" contenteditable="true">
+          คุณพัฒน์นรี เบอร์ 090-967-4207
+        </span>
+      </div>
+      <div class="sign-caption">
+        ผู้เตรียมเอกสาร / Prepared by
+      </div>
     </div>
   </div>
 
 </div>
 
 <script>
-const qtBody = document.getElementById("qtBody");
-for (let i = 1; i <= 8; i++) {
+/* ============================
+   1) CONFIG GOOGLE SHEET ITEM
+   ============================ */
+
+const ITEM_SPREADSHEET_ID = "1U4d5PqBMQ1GfTahwvbvzDFQrEikT5sYCOwZIx8FabMI";
+const ITEM_GID = "942187814";
+const ITEM_URL =
+  `https://docs.google.com/spreadsheets/d/${ITEM_SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=${ITEM_GID}`;
+
+let allItems = [];
+let branch = "chonburi";
+
+/* ปรับ index คอลัมน์ให้ตรงกับชีตจริงถ้าจำเป็น */
+function parseItemRow(row) {
+  const c = row.c || [];
+  return {
+    code: (c[0]?.v || "").toString(),
+    name: (c[1]?.v || "").toString(),
+    unit: (c[2]?.v || "").toString(),
+    price: Number(c[3]?.v ?? 0)
+  };
+}
+
+function loadItemsFromSheet() {
+  fetch(ITEM_URL)
+    .then(res => res.text())
+    .then(txt => {
+      const jsonStr = txt.substring(txt.indexOf("{"), txt.lastIndexOf("}") + 1);
+      const data = JSON.parse(jsonStr);
+      const rows = data.table.rows || [];
+      allItems = rows.map(parseItemRow).filter(it => it.code || it.name);
+      buildItemCodeDatalist();
+    })
+    .catch(err => {
+      console.error("โหลด Item จากชีตไม่สำเร็จ:", err);
+    });
+}
+
+function buildItemCodeDatalist() {
+  const dl = document.getElementById("itemCodeList");
+  dl.innerHTML = "";
+  allItems.forEach(it => {
+    const opt = document.createElement("option");
+    opt.value = it.code;
+    opt.label = `${it.code} : ${it.name}`;
+    dl.appendChild(opt);
+  });
+}
+
+function findItemByCode(code) {
+  if (!code) return null;
+  const c = code.trim().toLowerCase();
+  return allItems.find(it => it.code.toLowerCase() === c) || null;
+}
+
+/* ============================
+   2) แถวรายการสินค้า
+   ============================ */
+
+const itemBody = document.getElementById("itemBody");
+
+function createItemRow(index) {
   const tr = document.createElement("tr");
   tr.innerHTML = `
-    <td class="text-right">${i}</td>
-    <td contenteditable="true"></td>
-    <td contenteditable="true"></td>
-    <td contenteditable="true"></td>
-    <td contenteditable="true"></td>
-    <td contenteditable="true"></td>
+    <td class="text-right">${index}</td>
+    <td><input list="itemCodeList" class="cell-input cell-code"></td>
+    <td><input class="cell-input cell-desc"></td>
+    <td><input class="cell-input cell-qty" type="number" min="0" step="0.01"></td>
+    <td><input class="cell-input cell-unit"></td>
+    <td><input class="cell-input cell-price" type="number" min="0" step="0.01"></td>
+    <td><input class="cell-input cell-amount" type="number" step="0.01" readonly></td>
   `;
-  qtBody.appendChild(tr);
+  attachRowEvents(tr);
+  return tr;
 }
+
+function buildInitialRows(count = 10) {
+  itemBody.innerHTML = "";
+  for (let i = 1; i <= count; i++) {
+    itemBody.appendChild(createItemRow(i));
+  }
+}
+
+/* ============================
+   3) การคำนวณ
+   ============================ */
+
+const sumSubtotal = document.getElementById("sumSubtotal");
+const sumDiscount = document.getElementById("sumDiscount");
+const sumDeposit  = document.getElementById("sumDeposit");
+const sumRemain   = document.getElementById("sumRemain");
+const sumTotal    = document.getElementById("sumTotal");
+
+function parseNumber(val) {
+  if (typeof val !== "string") val = String(val ?? "");
+  val = val.replace(/,/g, "");
+  const n = parseFloat(val);
+  return isNaN(n) ? 0 : n;
+}
+
+function recalcRowAmount(tr) {
+  const qtyInput = tr.querySelector(".cell-qty");
+  const priceInput = tr.querySelector(".cell-price");
+  const amountInput = tr.querySelector(".cell-amount");
+  const qty = parseNumber(qtyInput.value);
+  const price = parseNumber(priceInput.value);
+  const amount = qty * price;
+  amountInput.value = amount ? amount.toFixed(2) : "";
+}
+
+function recalcTotals() {
+  let subtotal = 0;
+  const rows = itemBody.querySelectorAll("tr");
+  rows.forEach(tr => {
+    const amountInput = tr.querySelector(".cell-amount");
+    const val = parseNumber(amountInput.value);
+    subtotal += val;
+  });
+  const discount = parseNumber(sumDiscount.value);
+  const deposit  = parseNumber(sumDeposit.value);
+
+  const remain = subtotal - discount - deposit;
+  const total  = remain;
+
+  sumSubtotal.value = subtotal ? subtotal.toFixed(2) : "";
+  sumRemain.value   = remain ? remain.toFixed(2)   : "";
+  sumTotal.value    = total ? total.toFixed(2)     : "";
+}
+
+/* ============================
+   4) Event ของแต่ละแถว
+   ============================ */
+
+function attachRowEvents(tr) {
+  const codeInput   = tr.querySelector(".cell-code");
+  const descInput   = tr.querySelector(".cell-desc");
+  const unitInput   = tr.querySelector(".cell-unit");
+  const priceInput  = tr.querySelector(".cell-price");
+  const qtyInput    = tr.querySelector(".cell-qty");
+
+  codeInput.addEventListener("change", () => {
+    const item = findItemByCode(codeInput.value);
+    if (item) {
+      descInput.value = item.name;
+      unitInput.value = item.unit;
+      priceInput.value = item.price ? item.price.toFixed(2) : "";
+      recalcRowAmount(tr);
+      recalcTotals();
+    }
+  });
+
+  [qtyInput, priceInput].forEach(inp => {
+    inp.addEventListener("input", () => {
+      recalcRowAmount(tr);
+      recalcTotals();
+    });
+  });
+}
+
+/* ============================
+   5) สาขา
+   ============================ */
+
+const BRANCHES = {
+  chonburi: {
+    name: "ร้านอุปกรณ์การแพทย์เจพีเมดิคอลโซ ซัพพลาย สาขา ชลบุรี",
+    address: "51/49 ถนนสุขุมวิท หมู่ 4 ต.บ้านสวน อ.เมือง จ.ชลบุรี 20000 โทร. 090-413-7894, 090-967-4207"
+  },
+  branch2: {
+    name: "ร้านอุปกรณ์การแพทย์เจพีเมดิคอลโซ ซัพพลาย สาขา 2",
+    address: "กรุณาแก้ไขที่อยู่นี้ตามจริง โทร. ................."
+  }
+};
+
+const shopNameEl = document.getElementById("shopName");
+const shopAddressEl = document.getElementById("shopAddress");
+const branchSelect = document.getElementById("branchSelect");
+
+function applyBranch(b) {
+  branch = b;
+  const info = BRANCHES[b] || BRANCHES.chonburi;
+  shopNameEl.textContent = info.name;
+  shopAddressEl.textContent = info.address;
+}
+
+branchSelect.addEventListener("change", (e) => {
+  applyBranch(e.target.value);
+});
+
+/* ============================
+   6) ส่วนลด/มัดจำ เปลี่ยน → คำนวณใหม่
+   ============================ */
+
+[sumDiscount, sumDeposit].forEach(inp => {
+  inp.addEventListener("input", () => {
+    recalcTotals();
+  });
+});
+
+/* ============================
+   7) init
+   ============================ */
+
+applyBranch("chonburi");
+buildInitialRows(10);
+loadItemsFromSheet();
 </script>
 </body>
 </html>
