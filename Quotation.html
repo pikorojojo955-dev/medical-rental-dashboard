@@ -1,434 +1,33 @@
-<!doctype html>
-<html lang="th">
-<head>
-  <meta charset="utf-8" />
-  <title>ใบเสนอราคา · JP Medical So Supply</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <style>
-    body {
-      font-family: "TH SarabunPSK", system-ui, sans-serif;
-      margin: 0;
-      padding: 8px;
-      background: #f5f5f5;
-    }
-
-    .page {
-      max-width: 960px;
-      margin: 0 auto;
-      background: #fff;
-      padding: 16px 22px 24px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-      border: 2px solid #0ea5e9;
-    }
-
-    .top-bar {
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:8px;
-      font-size:0.9rem;
-    }
-
-    .top-buttons {
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-    }
-
-    .btn {
-      padding:4px 12px;
-      border-radius:20px;
-      border:none;
-      cursor:pointer;
-      font-size:0.9rem;
-      font-family:inherit;
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      white-space:nowrap;
-    }
-
-    .btn-back { background:#6b7280; color:#fff; }
-    .btn-print { background:#0ea5e9; color:#fff; }
-
-    select {
-      padding:4px 8px;
-      border-radius:6px;
-      border:1px solid #d4d4d8;
-      font-size:0.9rem;
-      min-width:230px;
-    }
-
-    h1 {
-      text-align:center;
-      margin:4px 0 2px;
-      font-size:1.8rem;
-    }
-
-    h2 {
-      text-align:center;
-      margin:0 0 12px;
-      font-size:1.1rem;
-      font-weight:400;
-    }
-
-    .shop-name {
-      text-align:center;
-      font-size:1rem;
-      margin-bottom:4px;
-      font-weight:700;
-    }
-
-    .shop-sub {
-      text-align:center;
-      font-size:0.9rem;
-      margin-bottom:12px;
-    }
-
-    .row {
-      display:flex;
-      justify-content:space-between;
-      gap:16px;
-      font-size:0.9rem;
-      margin-bottom:6px;
-    }
-
-    .block {
-      flex:1;
-      border:1px solid #d4d4d8;
-      border-radius:8px;
-      padding:6px 10px;
-    }
-
-    .block-title {
-      font-weight:bold;
-      margin-bottom:4px;
-      font-size:0.95rem;
-    }
-
-    .editable {
-      border-bottom:1px dotted #666;
-      min-width:80px;
-      display:inline-block;
-      padding:0 2px;
-    }
-
-    table {
-      width:100%;
-      border-collapse:collapse;
-      font-size:0.9rem;
-      margin-top:10px;
-    }
-
-    th, td {
-      border:1px solid #444;
-      padding:3px 5px;
-      vertical-align:top;
-    }
-
-    th {
-      background:#e0f2fe;
-      text-align:center;
-    }
-
-    .text-right { text-align:right; }
-
-    .cell-input {
-      width:100%;
-      border:none;
-      padding:2px 3px;
-      font-family:inherit;
-      font-size:0.9rem;
-      box-sizing:border-box;
-    }
-
-    .cell-input:focus {
-      outline:1px solid #0ea5e9;
-      background:#eff6ff;
-    }
-
-    /* กล่องสรุปยอดด้านขวา */
-    .summary-wrapper {
-      margin-top:6px;
-      display:flex;
-      justify-content:flex-end;
-    }
-
-    .summary-table {
-      border-collapse:collapse;
-      font-size:0.9rem;
-      min-width:260px;
-    }
-
-    .summary-table th,
-    .summary-table td {
-      border:1px solid #444;
-      padding:2px 5px;
-      white-space:nowrap;
-    }
-
-    .summary-table th {
-      background:#f1f5f9;
-      text-align:left;
-    }
-
-    .sum-input {
-      width:100%;
-      text-align:right;
-      border:none;
-      padding:0 2px;
-      font-family:inherit;
-      font-size:0.9rem;
-    }
-
-    .sum-input[readonly] {
-      background:#f9fafb;
-    }
-
-    /* ศูนย์บาทถ้วน */
-    .amount-words-box {
-      border:1px solid #444;
-      margin-top:6px;
-      padding:6px 10px;
-      text-align:center;
-      font-size:1rem;
-      font-weight:bold;
-    }
-
-    /* ส่วนล่าง – ลายเซ็นซ้าย/ขวา */
-    .bottom-row {
-      display:flex;
-      gap:12px;
-      margin-top:10px;
-      font-size:0.9rem;
-    }
-
-    .bottom-left,
-    .bottom-right {
-      flex:1;
-      border:1px solid #444;
-      padding:8px 10px 14px;
-      box-sizing:border-box;
-    }
-
-    .bottom-left-title {
-      text-align:center;
-      margin-bottom:4px;
-    }
-
-    .bottom-left-sub {
-      text-align:center;
-      font-size:0.8rem;
-      margin-bottom:12px;
-    }
-
-    .sign-line {
-      margin-top:16px;
-      margin-bottom:2px;
-      text-align:center;
-    }
-
-    .sign-line span {
-      display:inline-block;
-      border-bottom:1px solid #444;
-      min-width:160px;
-      height:18px;
-    }
-
-    .sign-caption {
-      text-align:center;
-      font-size:0.85rem;
-    }
-
-    .small-center {
-      text-align:center;
-      font-size:0.85rem;
-    }
-
-    @media print {
-      body { background:#fff; padding:0; }
-      .page { box-shadow:none; margin:0; border:none; }
-      .top-bar { display:none; }
-      @page { size:A4 portrait; margin:10mm; }
-    }
-  </style>
-</head>
-<body>
-<div class="page">
-
-  <!-- แถบด้านบน -->
-  <div class="top-bar">
-    <div class="top-buttons">
-      <a href="./index.html">
-        <button class="btn btn-back">← กลับหน้าเอกสาร</button>
-      </a>
-      <button class="btn btn-print" onclick="window.print()">🖨 พิมพ์ / PDF</button>
-    </div>
-    <div>
-      สาขา:
-      <select id="branchSelect">
-        <option value="hq">สำนักงานใหญ่ (ศรีสะเกษ)</option>
-        <option value="chonburi">สาขา ชลบุรี</option>
-      </select>
-    </div>
-  </div>
-
-  <!-- หัวฟอร์ม -->
-  <div class="shop-name" id="shopName">
-    ร้านอุปกรณ์การแพทย์ เจพี เมดิคอล โซ ซัพพลาย (สำนักงานใหญ่)
-  </div>
-  <div class="shop-sub" id="shopAddress">
-    เลขที่ 871/1 ถนนอุบล ตำบลเมืองใต้ อำเภอเมือง จังหวัดศรีสะเกษ 33000 โทร. 090-413-7894, 090-967-4207
-  </div>
-
-  <h1>QUOTATION</h1>
-  <h2>ใบเสนอราคา</h2>
-
-  <!-- ข้อมูลลูกค้า / ใบเสนอราคา -->
-  <div class="row">
-    <div class="block">
-      <div class="block-title">เรียน (Customer)</div>
-      ชื่อผู้รับ: <span class="editable" contenteditable="true">..............................................</span><br>
-      ชื่อหน่วยงาน / ร้าน: <span class="editable" contenteditable="true">..............................................</span><br>
-      ที่อยู่: <span class="editable" contenteditable="true">.................................................................</span><br>
-      โทร: <span class="editable" contenteditable="true">.......................</span>
-    </div>
-    <div class="block">
-      <div class="block-title">รายละเอียดใบเสนอราคา</div>
-      เลขที่ใบเสนอราคา: <span class="editable" contenteditable="true">QT-....../......</span><br>
-      วันที่: <span class="editable" contenteditable="true">.... / .... / ....</span><br>
-      ราคาใช้ได้ถึงวันที่: <span class="editable" contenteditable="true">.... / .... / ....</span><br>
-      ผู้ติดต่อ: <span class="editable" contenteditable="true">................................</span><br>
-      โทร: <span class="editable" contenteditable="true">098-444-1614</span>
-    </div>
-  </div>
-
-  <!-- datalist Item Code -->
-  <datalist id="itemCodeList"></datalist>
-
-  <!-- ตารางรายการสินค้า -->
-  <table>
-    <thead>
-      <tr>
-        <th style="width:40px;">ลำดับ</th>
-        <th style="width:100px;">Item Code</th>
-        <th>รายละเอียดสินค้า</th>
-        <th style="width:70px;">จำนวน</th>
-        <th style="width:70px;">หน่วย</th>
-        <th style="width:90px;">ราคา/หน่วย</th>
-        <th style="width:100px;">จำนวนเงิน</th>
-      </tr>
-    </thead>
-    <tbody id="itemBody">
-      <!-- แถวสร้างด้วย JS -->
-    </tbody>
-  </table>
-
-  <!-- กล่องสรุปยอดด้านขวา -->
-  <div class="summary-wrapper">
-    <table class="summary-table">
-      <tr>
-        <th>รวมเป็นเงิน</th>
-        <td><input id="sumSubtotal" class="sum-input" type="number" readonly></td>
-      </tr>
-      <tr>
-        <th>ส่วนลด</th>
-        <td><input id="sumDiscount" class="sum-input" type="number" value="0"></td>
-      </tr>
-      <tr>
-        <th>หัก เงินมัดจำ</th>
-        <td><input id="sumDeposit" class="sum-input" type="number" value="0"></td>
-      </tr>
-      <tr>
-        <th>ยอดคงเหลือ</th>
-        <td class="small-center">
-          <input id="sumRemain" class="sum-input" type="number" readonly>
-        </td>
-      </tr>
-      <tr>
-        <th><strong>รวมเป็นเงินทั้งสิ้น</strong></th>
-        <td><input id="sumTotal" class="sum-input" type="number" readonly></td>
-      </tr>
-    </table>
-  </div>
-
-  <!-- ศูนย์บาทถ้วน -->
-  <div class="amount-words-box">
-    <span class="editable" contenteditable="true" id="amountWords">
-      ศูนย์บาทถ้วน
-    </span>
-  </div>
-
-  <!-- ส่วนล่าง – เซ็นชื่อ -->
-  <div class="bottom-row">
-    <!-- ซ้าย: ผู้สั่งซื้อ -->
-    <div class="bottom-left">
-      <div class="bottom-left-title">
-        กรุณาเซ็นยืนยันการสั่งซื้อตามล่างนี้
-      </div>
-      <div class="bottom-left-sub">
-        Please sign below purchasing confirmation.
-      </div>
-
-      <div class="sign-line">
-        <span></span>
-      </div>
-      <div class="small-center">
-        ( <span class="editable" contenteditable="true">........................................</span> )
-      </div>
-      <div class="sign-caption">
-        ผู้สั่งซื้อ
-      </div>
-    </div>
-
-    <!-- ขวา: ผู้เตรียมเอกสาร -->
-    <div class="bottom-right">
-      <div class="bottom-left-title">
-        ขอแสดงความนับถือ
-      </div>
-      <div class="small-center">
-        JP Medical So Supply
-      </div>
-
-      <div class="sign-line" style="margin-top:24px;">
-        <span></span>
-      </div>
-      <div class="small-center">
-        <span class="editable" contenteditable="true">
-          คุณพัฒน์นรี เบอร์ 090-967-4207
-        </span>
-      </div>
-      <div class="sign-caption">
-        ผู้เตรียมเอกสาร / Prepared by
-      </div>
-    </div>
-  </div>
-
-</div>
-
 <script>
 /* ============================
    1) CONFIG GOOGLE SHEET ITEM
    ============================ */
 
+// ชีตที่เก็บ item ทั้งหมด
 const ITEM_SPREADSHEET_ID = "1U4d5PqBMQ1GfTahwvbvzDFQrEikT5sYCOwZIx8FabMI";
 const ITEM_GID = "942187814";
 const ITEM_URL =
   `https://docs.google.com/spreadsheets/d/${ITEM_SPREADSHEET_ID}/gviz/tq?tqx=out:json&gid=${ITEM_GID}`;
 
 let allItems = [];
-let currentBranch = "hq";
 
-/* ปรับ index คอลัมน์ให้ตรงกับชีตจริงถ้าจำเป็น */
+/*
+  ปรับ index คอลัมน์ให้ตรงกับชีตจริงถ้าจำเป็น:
+
+  c[0] = item_code
+  c[1] = product_name
+  c[2] = unit_desc
+  c[3] = cost_price_per_unit
+  c[4] = category_desc
+*/
 function parseItemRow(row) {
   const c = row.c || [];
   return {
-    code: (c[0]?.v || "").toString(),
-    name: (c[1]?.v || "").toString(),
-    unit: (c[2]?.v || "").toString(),
-    price: Number(c[3]?.v ?? 0)
+    item_code: (c[0]?.v || "").toString(),
+    product_name: (c[1]?.v || "").toString(),
+    unit_desc: (c[2]?.v || "").toString(),
+    cost_price_per_unit: Number(c[3]?.v ?? 0),
+    category_desc: (c[4]?.v || "").toString()
   };
 }
 
@@ -439,29 +38,50 @@ function loadItemsFromSheet() {
       const jsonStr = txt.substring(txt.indexOf("{"), txt.lastIndexOf("}") + 1);
       const data = JSON.parse(jsonStr);
       const rows = data.table.rows || [];
-      allItems = rows.map(parseItemRow).filter(it => it.code || it.name);
-      buildItemCodeDatalist();
+      allItems = rows.map(parseItemRow)
+                     .filter(it => it.item_code || it.product_name);
+
+      buildItemDatalists();
     })
     .catch(err => {
       console.error("โหลด Item จากชีตไม่สำเร็จ:", err);
     });
 }
 
-function buildItemCodeDatalist() {
-  const dl = document.getElementById("itemCodeList");
-  dl.innerHTML = "";
+/* datalist: 1) code  2) category+ชื่อสินค้า */
+const codeListEl    = document.getElementById("itemCodeList");
+const productListEl = document.getElementById("productList");
+
+function buildItemDatalists() {
+  if (codeListEl)    codeListEl.innerHTML    = "";
+  if (productListEl) productListEl.innerHTML = "";
+
   allItems.forEach(it => {
-    const opt = document.createElement("option");
-    opt.value = it.code;
-    opt.label = `${it.code} : ${it.name}`;
-    dl.appendChild(opt);
+    if (codeListEl) {
+      const opt = document.createElement("option");
+      opt.value = it.item_code;
+      opt.label = `${it.item_code} : ${it.product_name}`;
+      codeListEl.appendChild(opt);
+    }
+    if (productListEl) {
+      const opt2 = document.createElement("option");
+      opt2.value = it.product_name; // ใช้ชื่อสินค้าเป็นค่าที่เลือก
+      opt2.label = `${it.category_desc} · ${it.product_name}`;
+      productListEl.appendChild(opt2);
+    }
   });
 }
 
 function findItemByCode(code) {
   if (!code) return null;
   const c = code.trim().toLowerCase();
-  return allItems.find(it => it.code.toLowerCase() === c) || null;
+  return allItems.find(it => it.item_code.toLowerCase() === c) || null;
+}
+
+function findItemByName(name) {
+  if (!name) return null;
+  const n = name.trim().toLowerCase();
+  return allItems.find(it => it.product_name.toLowerCase() === n) || null;
 }
 
 /* ============================
@@ -475,11 +95,11 @@ function createItemRow(index) {
   tr.innerHTML = `
     <td class="text-right">${index}</td>
     <td><input list="itemCodeList" class="cell-input cell-code"></td>
-    <td><input class="cell-input cell-desc"></td>
+    <td><input list="productList" class="cell-input cell-desc"></td>
     <td><input class="cell-input cell-qty" type="number" min="0" step="0.01"></td>
     <td><input class="cell-input cell-unit"></td>
     <td><input class="cell-input cell-price" type="number" min="0" step="0.01"></td>
-    <td><input class="cell-input cell-amount" type="number" step="0.01" readonly></td>
+    <td><input class="cell-input cell-amount" type="number" step="0.01"></td>
   `;
   attachRowEvents(tr);
   return tr;
@@ -510,12 +130,14 @@ function parseNumber(val) {
 }
 
 function recalcRowAmount(tr) {
-  const qtyInput = tr.querySelector(".cell-qty");
-  const priceInput = tr.querySelector(".cell-price");
+  const qtyInput    = tr.querySelector(".cell-qty");
+  const priceInput  = tr.querySelector(".cell-price");
   const amountInput = tr.querySelector(".cell-amount");
-  const qty = parseNumber(qtyInput.value);
+
+  const qty   = parseNumber(qtyInput.value);
   const price = parseNumber(priceInput.value);
   const amount = qty * price;
+
   amountInput.value = amount ? amount.toFixed(2) : "";
 }
 
@@ -527,6 +149,7 @@ function recalcTotals() {
     const val = parseNumber(amountInput.value);
     subtotal += val;
   });
+
   const discount = parseNumber(sumDiscount.value);
   const deposit  = parseNumber(sumDeposit.value);
 
@@ -534,13 +157,37 @@ function recalcTotals() {
   const total  = remain;
 
   sumSubtotal.value = subtotal ? subtotal.toFixed(2) : "";
-  sumRemain.value   = remain ? remain.toFixed(2)   : "";
-  sumTotal.value    = total ? total.toFixed(2)     : "";
+  sumRemain.value   = remain   ? remain.toFixed(2)   : "";
+  sumTotal.value    = total    ? total.toFixed(2)    : "";
 }
 
 /* ============================
    4) Event ของแต่ละแถว
    ============================ */
+
+function autoFillFromItem(tr, item) {
+  const codeInput  = tr.querySelector(".cell-code");
+  const descInput  = tr.querySelector(".cell-desc");
+  const unitInput  = tr.querySelector(".cell-unit");
+  const priceInput = tr.querySelector(".cell-price");
+  const qtyInput   = tr.querySelector(".cell-qty");
+
+  if (!item) return;
+
+  codeInput.value  = item.item_code;
+  descInput.value  = item.product_name;
+  unitInput.value  = item.unit_desc;
+  priceInput.value = item.cost_price_per_unit
+    ? item.cost_price_per_unit.toFixed(2)
+    : "";
+
+  // ถ้ายังไม่เคยใส่จำนวน ให้เริ่มต้นเป็น 1
+  const currentQty = parseNumber(qtyInput.value);
+  if (!currentQty) qtyInput.value = "1";
+
+  recalcRowAmount(tr);
+  recalcTotals();
+}
 
 function attachRowEvents(tr) {
   const codeInput   = tr.querySelector(".cell-code");
@@ -549,17 +196,19 @@ function attachRowEvents(tr) {
   const priceInput  = tr.querySelector(".cell-price");
   const qtyInput    = tr.querySelector(".cell-qty");
 
+  // เลือกจาก Item Code
   codeInput.addEventListener("change", () => {
     const item = findItemByCode(codeInput.value);
-    if (item) {
-      descInput.value = item.name;
-      unitInput.value = item.unit;
-      priceInput.value = item.price ? item.price.toFixed(2) : "";
-      recalcRowAmount(tr);
-      recalcTotals();
-    }
+    autoFillFromItem(tr, item);
   });
 
+  // เลือกจาก dropdown รายละเอียดสินค้า (category_desc + product_name)
+  descInput.addEventListener("change", () => {
+    const item = findItemByName(descInput.value);
+    autoFillFromItem(tr, item);
+  });
+
+  // เปลี่ยนจำนวน/ราคา → คำนวณใหม่
   [qtyInput, priceInput].forEach(inp => {
     inp.addEventListener("input", () => {
       recalcRowAmount(tr);
@@ -569,54 +218,83 @@ function attachRowEvents(tr) {
 }
 
 /* ============================
-   5) สาขา / หัวกระดาษ
-   ============================ */
-
-const BRANCHES = {
-  hq: {
-    name: "ร้านอุปกรณ์การแพทย์ เจพี เมดิคอล โซ ซัพพลาย (สำนักงานใหญ่)",
-    address:
-      "เลขที่ 871/1 ถนนอุบล ตำบลเมืองใต้ อำเภอเมือง จังหวัดศรีสะเกษ 33000 โทร. 090-413-7894, 090-967-4207"
-  },
-  chonburi: {
-    name: "ร้านอุปกรณ์การแพทย์ เจพี เมดิคอล โซ ซัพพลาย สาขา ชลบุรี",
-    address:
-      "เลขที่ 51/49 ถนนสุขุมวิท หมู่ 4 ตำบลบ้านสวน อำเภอเมือง จังหวัดชลบุรี 20000 โทร. 090-413-7894, 090-967-4207"
-  }
-};
-
-const shopNameEl = document.getElementById("shopName");
-const shopAddressEl = document.getElementById("shopAddress");
-const branchSelect = document.getElementById("branchSelect");
-
-function applyBranch(b) {
-  currentBranch = b;
-  const info = BRANCHES[b] || BRANCHES.hq;
-  shopNameEl.textContent = info.name;
-  shopAddressEl.textContent = info.address;
-}
-
-branchSelect.addEventListener("change", (e) => {
-  applyBranch(e.target.value);
-});
-
-/* ============================
-   6) ส่วนลด/มัดจำ เปลี่ยน → คำนวณใหม่
+   5) ส่วนลด/มัดจำ เปลี่ยน → คำนวณใหม่
    ============================ */
 
 [sumDiscount, sumDeposit].forEach(inp => {
+  if (!inp) return;
   inp.addEventListener("input", () => {
     recalcTotals();
   });
 });
 
 /* ============================
-   7) init
+   6) AUTO DATE / RUN NO / VALID +30
    ============================ */
 
-applyBranch("hq");
-buildInitialRows(10);
-loadItemsFromSheet();
+const quoteNumberEl  = document.getElementById("quoteNumber");
+const quoteDateEl    = document.getElementById("quoteDate");
+const quoteValidEl   = document.getElementById("quoteValidUntil");
+const contactNameEl  = document.getElementById("contactName");
+const contactPhoneEl = document.getElementById("contactPhone");
+
+function formatDateDDMMYYYY(d) {
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const yyyy = d.getFullYear();
+  return `${dd}/${mm}/${yyyy}`;
+}
+
+function generateRunningQuotationNumber() {
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm   = String(today.getMonth() + 1).padStart(2, "0");
+  const key  = `QT-${yyyy}${mm}-RUN`;
+
+  let run = localStorage.getItem(key);
+  if (!run) run = 1;
+  else run = Number(run) + 1;
+
+  localStorage.setItem(key, run);
+  return `QT-${yyyy}${mm}-${String(run).padStart(3, "0")}`;
+}
+
+function initHeaderDefaults() {
+  const today = new Date();
+  const todayStr = formatDateDDMMYYYY(today);
+
+  const valid = new Date(today);
+  valid.setDate(valid.getDate() + 30);
+  const validStr = formatDateDDMMYYYY(valid);
+
+  if (quoteDateEl && !quoteDateEl.textContent.trim()) {
+    quoteDateEl.textContent = todayStr;
+  }
+  if (quoteValidEl && !quoteValidEl.textContent.trim()) {
+    quoteValidEl.textContent = validStr;
+  }
+  if (quoteNumberEl && !quoteNumberEl.textContent.trim()) {
+    quoteNumberEl.textContent = generateRunningQuotationNumber();
+  }
+
+  if (contactNameEl && !contactNameEl.textContent.trim()) {
+    contactNameEl.textContent = "คุณพัฒน์นรี";
+  }
+  if (contactPhoneEl && !contactPhoneEl.textContent.trim()) {
+    contactPhoneEl.textContent = "090-413-7894, 090-967-4207";
+  }
+}
+
+/* ============================
+   7) init ทั้งหมด
+   ============================ */
+
+function initPage() {
+  buildInitialRows(10);
+  loadItemsFromSheet();
+  initHeaderDefaults();
+  recalcTotals();
+}
+
+window.addEventListener("DOMContentLoaded", initPage);
 </script>
-</body>
-</html>
