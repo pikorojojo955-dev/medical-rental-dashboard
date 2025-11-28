@@ -19,6 +19,7 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
 
+    /* top bar */
     .top-bar {
       display:flex;
       justify-content:space-between;
@@ -41,10 +42,10 @@
       align-items:center;
       gap:6px;
     }
-    .btn-back   { background:#607d8b; }
-    .btn-print  { background:#ff9800; }
+    .btn-back  { background:#607d8b; }
+    .btn-print { background:#ff9800; }
 
-    /* header */
+    /* header logo + branch (เหมือนใบเสนอราคา) */
     .doc-header {
       display:flex;
       align-items:flex-start;
@@ -76,6 +77,19 @@
     }
     .branch-line {
       white-space:pre-line;
+    }
+    .branch-select-row {
+      margin-top:4px;
+      display:flex;
+      justify-content:flex-end;
+      gap:4px;
+      align-items:center;
+      font-size:0.9rem;
+    }
+    .branch-select-row select {
+      font-family:inherit;
+      font-size:0.9rem;
+      padding:2px 6px;
     }
 
     /* info rows */
@@ -112,6 +126,7 @@
       outline:none;
     }
 
+    /* receipt meta */
     .meta-grid {
       display:grid;
       grid-template-columns:120px 1fr;
@@ -148,13 +163,16 @@
       background:#2196f3;
       color:#fff;
     }
-    .number-cell { text-align:center; width:40px; }
+    .number-cell {
+      text-align:center;
+      width:40px;
+    }
     .itemcode-cell { width:130px; }
-    .desc-cell { width:320px; }
-    .qty-cell { width:70px; text-align:center; }
-    .unit-cell { width:80px; text-align:center; }
-    .price-cell { width:110px; text-align:right; }
-    .amount-cell { width:120px; text-align:right; }
+    .desc-cell     { width:320px; }
+    .qty-cell      { width:70px;  text-align:center; }
+    .unit-cell     { width:80px;  text-align:center; }
+    .price-cell    { width:110px; text-align:right; }
+    .amount-cell   { width:120px; text-align:right; }
 
     .cell-input {
       width:100%;
@@ -168,7 +186,7 @@
     .cell-input.number { text-align:right; }
     .cell-input.center { text-align:center; }
 
-    /* summary */
+    /* summary block */
     .summary-row {
       display:flex;
       border-left:1px solid #000;
@@ -178,7 +196,7 @@
     .summary-left {
       flex:1;
       border-right:1px solid #000;
-      min-height:70px;
+      min-height:90px;
       padding:4px 6px;
       font-size:1rem;
     }
@@ -213,7 +231,7 @@
       outline:none;
     }
 
-    /* sign */
+    /* footer sign */
     .footer-block {
       border:1px solid #000;
       border-top:none;
@@ -280,12 +298,17 @@
 <body>
 <div class="page">
 
+  <!-- TOP BAR -->
   <div class="top-bar">
-    <a href="./ใบเสนอราคา.html" class="btn btn-back">← ใบเสนอราคา</a>
+    <!-- ใช้ history.back() เผื่อไฟล์ใบเสนอราคาชื่อไม่ตายตัว -->
+    <button type="button" class="btn btn-back" onclick="history.back()">
+      ← กลับหน้าก่อนหน้า
+    </button>
+
     <button class="btn btn-print" onclick="window.print()">🖨 พิมพ์ / PDF</button>
   </div>
 
-  <!-- HEADER -->
+  <!-- HEADER (เหมือนใบเสนอราคา แต่เปลี่ยนชื่อเอกสาร) -->
   <div class="doc-header">
     <div class="logo-box">
       <img src="./LOGO.jpg" alt="JP Medical So Supply Logo">
@@ -297,6 +320,13 @@
     <div class="branch-block">
       <div><strong>ร้านอุปกรณ์การแพทย์ JP Medical So Supply</strong></div>
       <div id="branchInfo" class="branch-line"></div>
+      <div class="branch-select-row">
+        <label for="branchSelect">สาขา:</label>
+        <select id="branchSelect">
+          <option value="ssk">สำนักงานใหญ่ (ศรีสะเกษ)</option>
+          <option value="chon">สาขา ชลบุรี</option>
+        </select>
+      </div>
     </div>
   </div>
 
@@ -306,13 +336,13 @@
       <div class="info-title">ผู้ชำระเงิน (Customer)</div>
       <div class="info-grid">
         <label>ชื่อผู้ชำระ:</label>
-        <input id="rcCustName" type="text" />
+        <input id="custName" type="text" />
         <label>ชื่อหน่วยงาน / ร้าน:</label>
-        <input id="rcCustOrg" type="text" />
+        <input id="custOrg" type="text" />
         <label>ที่อยู่:</label>
-        <input id="rcCustAddr" type="text" />
+        <input id="custAddr" type="text" />
         <label>โทร:</label>
-        <input id="rcCustTel" type="text" />
+        <input id="custTel" type="text" />
       </div>
     </div>
     <div class="info-box">
@@ -324,6 +354,8 @@
         <input id="receiptDate" type="text" />
         <label>อ้างอิงใบเสนอราคา:</label>
         <input id="refQuoteNo" type="text" />
+        <label>วิธีชำระเงิน:</label>
+        <input id="payMethod" type="text" value="เงินสด" />
       </div>
     </div>
   </div>
@@ -342,7 +374,7 @@
         <th class="amount-cell">จำนวนเงิน</th>
       </tr>
       </thead>
-      <tbody id="rcItemBody"></tbody>
+      <tbody id="itemBody"></tbody>
     </table>
   </div>
 
@@ -350,23 +382,35 @@
   <div class="summary-row">
     <div class="summary-left">
       จำนวนเงิน (ตัวอักษร):
-      <span id="rcAmountWords" contenteditable="true">ศูนย์บาทถ้วน</span>
+      <span id="amountWords" contenteditable="true">ศูนย์บาทถ้วน</span>
       <br>
-      วิธีชำระเงิน:
-      <span id="rcPayMethod" contenteditable="true">เงินสด</span>
+      หมายเหตุ:
+      <span id="note" contenteditable="true"></span>
     </div>
     <div class="summary-right">
       <table>
         <tr>
-          <td class="label">ยอดตามใบเสนอราคา</td>
+          <td class="label">รวมเป็นเงิน</td>
           <td class="value">
-            <input id="rcQuoteTotal" type="text" value="0.00" readonly>
+            <input id="sumSubTotal" type="text" value="0.00" readonly>
           </td>
         </tr>
         <tr>
-          <td class="label"><strong>ยอดรับชำระครั้งนี้</strong></td>
+          <td class="label">ส่วนลด</td>
           <td class="value">
-            <input id="rcPaid" type="text" value="0.00">
+            <input id="sumDiscount" type="text" value="0.00">
+          </td>
+        </tr>
+        <tr>
+          <td class="label">หัก มัดจำ/อื่น ๆ</td>
+          <td class="value">
+            <input id="sumDeposit" type="text" value="0.00">
+          </td>
+        </tr>
+        <tr>
+          <td class="label"><strong>ยอดรับชำระสุทธิ</strong></td>
+          <td class="value">
+            <input id="sumGrand" type="text" value="0.00" readonly>
           </td>
         </tr>
       </table>
@@ -402,125 +446,182 @@
   </div>
 
   <div id="status" class="status-text">
-    กำลังโหลดข้อมูลจากใบเสนอราคา…
+    พร้อมกรอกข้อมูลใบเสร็จรับเงิน…
   </div>
 </div>
 
 <script>
-  // สร้างแถวว่าง 10 แถว
-  function buildReceiptRows() {
-    const tbody = document.getElementById("rcItemBody");
+  // ===== BRANCH INFO (เหมือนใบเสนอราคา) =====
+  function updateBranchInfo() {
+    const val = document.getElementById("branchSelect").value;
+    const el = document.getElementById("branchInfo");
+
+    if (val === "chon") {
+      el.textContent =
+        "ร้านอุปกรณ์การแพทย์ เจพี เมดิคอล โซ ซัพพลาย (สาขาชลบุรี)\n" +
+        "เลขที่ 51/49 ถนนสุขุมวิท หมู่ 4 ตำบลบ้านสวน อำเภอเมือง จังหวัดชลบุรี 20000\n" +
+        "โทร 090-413-7894, 090-967-4207";
+    } else {
+      el.textContent =
+        "ร้านอุปกรณ์การแพทย์ เจพี เมดิคอล โซ ซัพพลาย (สำนักงานใหญ่)\n" +
+        "เลขที่ 871/1 ถนนอุบล ตำบลเมืองใต้ อำเภอเมือง จังหวัดศรีสะเกษ 33000\n" +
+        "โทร 090-413-7894, 090-967-4207";
+    }
+  }
+
+  // ===== AUTO RUN เลขที่ใบเสร็จ + วันที่ =====
+  function initReceiptMeta() {
+    let seq = parseInt(localStorage.getItem("JP_RC_SEQ") || "0", 10);
+    seq++;
+    localStorage.setItem("JP_RC_SEQ", String(seq).padStart(4,"0"));
+    const seqStr = String(seq).padStart(4,"0");
+
+    const today = new Date();
+    function fmt(d) {
+      const dd = String(d.getDate()).padStart(2,"0");
+      const mm = String(d.getMonth()+1).padStart(2,"0");
+      const yy = d.getFullYear()+543; // พ.ศ.
+      return `${dd}/${mm}/${yy}`;
+    }
+
+    document.getElementById("receiptNo").value = `RC-${seqStr}`;
+    document.getElementById("receiptDate").value = fmt(today);
+  }
+
+  // ===== สร้างแถวรายการสินค้า (10 แถว) =====
+  function buildItemRows() {
+    const tbody = document.getElementById("itemBody");
     tbody.innerHTML = "";
     for (let i = 0; i < 10; i++) {
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td class="number-cell">
-          <span>${i+1}</span>
+          <span id="idx_${i}">${i+1}</span>
         </td>
         <td class="itemcode-cell">
-          <input class="cell-input" id="rcCode_${i}" type="text">
+          <input class="cell-input" id="code_${i}" type="text">
         </td>
         <td class="desc-cell">
-          <input class="cell-input" id="rcDesc_${i}" type="text">
+          <input class="cell-input" id="desc_${i}" type="text">
         </td>
         <td class="qty-cell">
-          <input class="cell-input center" id="rcQty_${i}" type="number" min="0" step="1">
+          <input class="cell-input center" id="qty_${i}" type="number" min="0" step="1">
         </td>
         <td class="unit-cell">
-          <input class="cell-input center" id="rcUnit_${i}" type="text">
+          <input class="cell-input center" id="unit_${i}" type="text">
         </td>
         <td class="price-cell">
-          <input class="cell-input number" id="rcPrice_${i}" type="number" step="0.01">
+          <input class="cell-input number" id="price_${i}" type="number" step="0.01">
         </td>
         <td class="amount-cell">
-          <input class="cell-input number" id="rcAmount_${i}" type="number" step="0.01">
+          <input class="cell-input number" id="amount_${i}" type="number" step="0.01" readonly>
         </td>
       `;
       tbody.appendChild(tr);
     }
   }
 
-  function fmtThaiDate(date) {
-    const dd = String(date.getDate()).padStart(2, "0");
-    const mm = String(date.getMonth()+1).padStart(2, "0");
-    const yy = date.getFullYear() + 543;
-    return `${dd}/${mm}/${yy}`;
+  function attachRowEvents() {
+    for (let i = 0; i < 10; i++) {
+      const qty   = document.getElementById(`qty_${i}`);
+      const price = document.getElementById(`price_${i}`);
+
+      qty.addEventListener("input", () => { updateRowAmount(i); recalcTotals(); });
+      price.addEventListener("input", () => { updateRowAmount(i); recalcTotals(); });
+    }
+
+    document.getElementById("sumDiscount").addEventListener("input", recalcTotals);
+    document.getElementById("sumDeposit").addEventListener("input", recalcTotals);
   }
 
-  function initReceiptNoAndDate() {
-    let seq = parseInt(localStorage.getItem("JP_RC_SEQ") || "0", 10);
-    seq++;
-    localStorage.setItem("JP_RC_SEQ", String(seq).padStart(4, "0"));
-    const seqStr = String(seq).padStart(4, "0");
-
-    document.getElementById("receiptNo").value = `RC-${seqStr}`;
-    document.getElementById("receiptDate").value = fmtThaiDate(new Date());
+  function updateRowAmount(row) {
+    const qty   = parseFloat(document.getElementById(`qty_${row}`).value || "0");
+    const price = parseFloat(document.getElementById(`price_${row}`).value || "0");
+    const amt   = qty * price;
+    document.getElementById(`amount_${row}`).value = amt ? amt.toFixed(2) : "";
   }
 
-  function fillFromQuoteData(data) {
-    const status = document.getElementById("status");
-
-    // สาขา
-    if (data.branch && data.branch.infoText) {
-      document.getElementById("branchInfo").textContent = data.branch.infoText;
-    }
-
-    // ลูกค้า
-    if (data.customer) {
-      document.getElementById("rcCustName").value = data.customer.name || "";
-      document.getElementById("rcCustOrg").value  = data.customer.org  || "";
-      document.getElementById("rcCustAddr").value = data.customer.addr || "";
-      document.getElementById("rcCustTel").value  = data.customer.tel  || "";
-    }
-
-    // อ้างอิงใบเสนอราคา
-    if (data.quoteMeta) {
-      document.getElementById("refQuoteNo").value = data.quoteMeta.quoteNo || "";
-    }
-
-    // รายการสินค้า
-    if (Array.isArray(data.items)) {
-      data.items.forEach((item, idx) => {
-        if (idx >= 10) return; // รองรับแค่ 10 แถวเหมือนใบเสนอราคา
-        document.getElementById(`rcCode_${idx}`).value   = item.code   || "";
-        document.getElementById(`rcDesc_${idx}`).value   = item.desc   || "";
-        document.getElementById(`rcQty_${idx}`).value    = item.qty    || "";
-        document.getElementById(`rcUnit_${idx}`).value   = item.unit   || "";
-        document.getElementById(`rcPrice_${idx}`).value  = item.price  || "";
-        document.getElementById(`rcAmount_${idx}`).value = item.amount || "";
-      });
-    }
-
-    // ยอดเงิน
-    if (data.totals) {
-      document.getElementById("rcQuoteTotal").value = data.totals.grand || "0.00";
-      document.getElementById("rcPaid").value       = data.totals.grand || "0.00";
-      document.getElementById("rcAmountWords").textContent =
-        data.totals.words || "ศูนย์บาทถ้วน";
-    }
-
-    status.textContent = "ดึงข้อมูลจากใบเสนอราคาเรียบร้อยแล้ว";
+  // ===== TOTALS & THAI TEXT =====
+  function parseMoney(str) {
+    const n = parseFloat((str || "0").toString().replace(/,/g,""));
+    return isNaN(n) ? 0 : n;
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    buildReceiptRows();
-    initReceiptNoAndDate();
+  function recalcTotals() {
+    let sub = 0;
+    for (let i = 0; i < 10; i++) {
+      const amt = parseMoney(document.getElementById(`amount_${i}`).value);
+      sub += amt;
+    }
 
-    const status = document.getElementById("status");
-    try {
-      const raw = localStorage.getItem("JP_QUOTE_TO_RECEIPT");
-      if (!raw) {
-        status.textContent = "ไม่พบข้อมูลใบเสนอราคาที่ส่งมา (กรุณากลับไปหน้าใบเสนอราคาแล้วลองกดปุ่มใบเสร็จใหม่อีกครั้ง)";
-        return;
+    document.getElementById("sumSubTotal").value = sub.toFixed(2);
+
+    const discount = parseMoney(document.getElementById("sumDiscount").value);
+    const deposit  = parseMoney(document.getElementById("sumDeposit").value);
+    const grand    = sub - discount - deposit;
+
+    document.getElementById("sumGrand").value = grand.toFixed(2);
+    document.getElementById("amountWords").textContent =
+      numberToThaiBahtText(grand);
+  }
+
+  function numberToThaiBahtText(amount) {
+    amount = parseFloat(amount);
+    if (isNaN(amount) || amount === 0) return "ศูนย์บาทถ้วน";
+
+    const thNum  = ["ศูนย์","หนึ่ง","สอง","สาม","สี่","ห้า","หก","เจ็ด","แปด","เก้า"];
+    const thUnit = ["","สิบ","ร้อย","พัน","หมื่น","แสน","ล้าน"];
+
+    function readNumber(numStr) {
+      numStr = numStr.replace(/^0+/,"");
+      if (numStr === "") return "";
+      if (numStr.length > 6) {
+        const head = numStr.slice(0, numStr.length - 6);
+        const tail = numStr.slice(-6);
+        return readNumber(head) + "ล้าน" + readNumber(tail);
       }
-      const data = JSON.parse(raw);
-      fillFromQuoteData(data);
-      // ถ้าอยากให้ใช้ครั้งเดียวแล้วลบทิ้ง:
-      // localStorage.removeItem("JP_QUOTE_TO_RECEIPT");
-    } catch (e) {
-      console.error(e);
-      status.textContent = "ไม่สามารถอ่านข้อมูลใบเสนอราคาที่ส่งมาได้";
+      let result = "";
+      const digits = numStr.split("").map(d => parseInt(d,10));
+      const len = digits.length;
+      for (let i = 0; i < len; i++) {
+        const d   = digits[i];
+        const pos = len - i - 1;
+        if (d === 0) continue;
+        if (pos === 0) {
+          if (d === 1 && len > 1) result += "เอ็ด";
+          else result += thNum[d];
+        } else if (pos === 1) {
+          if (d === 1) result += "สิบ";
+          else if (d === 2) result += "ยี่สิบ";
+          else result += thNum[d] + "สิบ";
+        } else {
+          result += thNum[d] + thUnit[pos];
+        }
+      }
+      return result;
     }
+
+    const fixed = amount.toFixed(2);
+    const [bahtStr, satangStr] = fixed.split(".");
+    let text = "";
+    const bahtNum   = parseInt(bahtStr,10);
+    const satangNum = parseInt(satangStr,10);
+
+    if (bahtNum > 0) text += readNumber(bahtStr) + "บาท";
+    if (satangNum === 0) text += "ถ้วน";
+    else text += readNumber(satangStr) + "สตางค์";
+    return text;
+  }
+
+  // ===== INIT =====
+  document.addEventListener("DOMContentLoaded", () => {
+    buildItemRows();
+    attachRowEvents();
+    initReceiptMeta();
+    updateBranchInfo();
+
+    document.getElementById("branchSelect")
+      .addEventListener("change", updateBranchInfo);
   });
 </script>
 </body>
