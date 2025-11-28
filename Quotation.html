@@ -44,7 +44,26 @@
     }
     .btn-back    { background:#607d8b; }
     .btn-print   { background:#ff9800; }
-    .btn-receipt { background:#4caf50; }
+
+    /* language switch */
+    .lang-switch {
+      display:flex;
+      gap:4px;
+    }
+    .btn-lang {
+      border-radius:16px;
+      border:1px solid #ccc;
+      background:#fff;
+      color:#333;
+      font-size:0.8rem;
+      padding:4px 10px;
+      cursor:pointer;
+    }
+    .btn-lang.active {
+      background:#00c853;
+      color:#fff;
+      border-color:#00c853;
+    }
 
     /* header logo + branch */
     .doc-header {
@@ -232,6 +251,12 @@
       outline:none;
     }
 
+    .vat-toggle-row {
+      text-align:right;
+      font-size:0.85rem;
+      margin-bottom:2px;
+    }
+
     /* footer sign */
     .footer-block {
       border:1px solid #000;
@@ -290,10 +315,25 @@
       margin-top:4px;
     }
 
+    .page-number {
+      margin-top:4px;
+      text-align:right;
+      font-size:0.85rem;
+    }
+
+    /* print container */
+    #printContainer {
+      display:none;
+    }
+
     @media print {
       body { background:#fff; padding:0; }
-      .page { box-shadow:none; margin:0; padding:0 5mm 5mm; }
+      #editPage { display:none; }
+      #printContainer { display:block; }
       .top-bar { display:none; }
+      .page { box-shadow:none; margin:0; padding:0 5mm 5mm; }
+      .print-page { page-break-after:always; }
+      .print-page:last-child { page-break-after:auto; }
       @page { size:A4 portrait; margin:5mm; }
 
       /* ซ่อน placeholder เวลา print / PDF */
@@ -304,17 +344,19 @@
   </style>
 </head>
 <body>
-<div class="page">
+
+<!-- หน้าสำหรับกรอกจริง -->
+<div class="page" id="editPage">
 
   <div class="top-bar">
-    <a href="./ky9.html" class="btn btn-back">← หน้าเอกสาร (ขย.9)</a>
+    <a href="./ky9.html" class="btn btn-back" data-i18n="btn_back_ky9">← หน้าเอกสาร (ขย.9)</a>
 
-    <!-- ปุ่มไปหน้าใบเสร็จรับเงิน -->
-    <a href="#" id="btnToReceipt" class="btn btn-receipt">
-      🧾 ใบเสร็จรับเงิน
-    </a>
+    <div class="lang-switch">
+      <button type="button" class="btn-lang" data-lang="th">TH</button>
+      <button type="button" class="btn-lang" data-lang="en">EN</button>
+    </div>
 
-    <button class="btn btn-print" onclick="window.print()">🖨 พิมพ์ / PDF</button>
+    <button class="btn btn-print" onclick="window.print()">🖨 <span data-i18n="btn_print">พิมพ์ / PDF</span></button>
   </div>
 
   <!-- HEADER -->
@@ -323,17 +365,17 @@
       <img src="./LOGO.jpg" alt="JP Medical So Supply Logo">
     </div>
     <div class="header-main">
-      <h1>QUOTATION</h1>
-      <div class="sub">ใบเสนอราคา</div>
+      <h1 data-i18n="title_quotation">QUOTATION</h1>
+      <div class="sub" data-i18n="subtitle_quotation">ใบเสนอราคา</div>
     </div>
     <div class="branch-block">
       <div><strong>ร้านอุปกรณ์การแพทย์ JP Medical So Supply</strong></div>
       <div id="branchInfo" class="branch-line"></div>
       <div class="branch-select-row">
-        <label for="branchSelect">สาขา:</label>
+        <label for="branchSelect" data-i18n="label_branch">สาขา:</label>
         <select id="branchSelect">
-          <option value="ssk">สำนักงานใหญ่ (ศรีสะเกษ)</option>
-          <option value="chon">สาขา ชลบุรี</option>
+          <option value="ssk" data-i18n="branch_ssk">สำนักงานใหญ่ (ศรีสะเกษ)</option>
+          <option value="chon" data-i18n="branch_chon">สาขา ชลบุรี</option>
         </select>
       </div>
     </div>
@@ -342,30 +384,30 @@
   <!-- CUSTOMER + META -->
   <div class="info-row">
     <div class="info-box">
-      <div class="info-title">เรียน (Customer)</div>
+      <div class="info-title" data-i18n="box_customer">เรียน (Customer)</div>
       <div class="info-grid">
-        <label>ชื่อผู้รับ:</label>
+        <label data-i18n="label_customer_name">ชื่อผู้รับ:</label>
         <input id="custName" type="text" />
-        <label>ชื่อหน่วยงาน / ร้าน:</label>
+        <label data-i18n="label_org">ชื่อหน่วยงาน / ร้าน:</label>
         <input id="custOrg" type="text" />
-        <label>ที่อยู่:</label>
+        <label data-i18n="label_address">ที่อยู่:</label>
         <input id="custAddr" type="text" />
-        <label>โทร:</label>
+        <label data-i18n="label_tel">โทร:</label>
         <input id="custTel" type="text" />
       </div>
     </div>
     <div class="info-box">
-      <div class="info-title">รายละเอียดใบเสนอราคา</div>
+      <div class="info-title" data-i18n="box_quote_detail">รายละเอียดใบเสนอราคา</div>
       <div class="meta-grid">
-        <label>เลขที่ใบเสนอราคา:</label>
+        <label data-i18n="label_quote_no">เลขที่ใบเสนอราคา:</label>
         <input id="quoteNo" type="text" />
-        <label>วันที่:</label>
+        <label data-i18n="label_quote_date">วันที่:</label>
         <input id="quoteDate" type="text" />
-        <label>ราคาใช้ได้ถึงวันที่:</label>
+        <label data-i18n="label_valid_until">ราคาใช้ได้ถึงวันที่:</label>
         <input id="validUntil" type="text" />
-        <label>ผู้ติดต่อ:</label>
+        <label data-i18n="label_contact">ผู้ติดต่อ:</label>
         <input id="contactName" type="text" />
-        <label>เบอร์โทร:</label>
+        <label data-i18n="label_contact_tel">เบอร์โทร:</label>
         <input id="contactTel" type="text" />
       </div>
     </div>
@@ -376,13 +418,13 @@
     <table>
       <thead>
       <tr>
-        <th class="number-cell">ลำดับ</th>
-        <th class="itemcode-cell">Item Code</th>
-        <th class="desc-cell">รายละเอียดสินค้า</th>
-        <th class="qty-cell">จำนวน</th>
-        <th class="unit-cell">หน่วย</th>
-        <th class="price-cell">ราคา/หน่วย</th>
-        <th class="amount-cell">จำนวนเงิน</th>
+        <th class="number-cell" data-i18n="th_no">ลำดับ</th>
+        <th class="itemcode-cell" data-i18n="th_itemcode">Item Code</th>
+        <th class="desc-cell" data-i18n="th_desc">รายละเอียดสินค้า</th>
+        <th class="qty-cell" data-i18n="th_qty">จำนวน</th>
+        <th class="unit-cell" data-i18n="th_unit">หน่วย</th>
+        <th class="price-cell" data-i18n="th_price">ราคา/หน่วย</th>
+        <th class="amount-cell" data-i18n="th_amount">จำนวนเงิน</th>
       </tr>
       </thead>
       <tbody id="itemBody"></tbody>
@@ -392,37 +434,44 @@
   <!-- SUMMARY -->
   <div class="summary-row">
     <div class="summary-left">
-      จำนวนเงิน (ตัวอักษร):
+      <span data-i18n="summary_amount_words">จำนวนเงิน (ตัวอักษร):</span>
+      &nbsp;
       <span id="amountWords" contenteditable="true">ศูนย์บาทถ้วน</span>
     </div>
     <div class="summary-right">
+      <div class="vat-toggle-row">
+        <label>
+          <input type="checkbox" id="chkVat" checked>
+          <span data-i18n="vat_toggle_label">คิดภาษีมูลค่าเพิ่ม 7%</span>
+        </label>
+      </div>
       <table>
         <tr>
-          <td class="label">รวมเป็นเงิน</td>
+          <td class="label" data-i18n="summary_subtotal">รวมเป็นเงิน</td>
           <td class="value">
             <input id="sumSubTotal" type="text" value="0.00" readonly>
           </td>
         </tr>
         <tr>
-          <td class="label">ส่วนลด</td>
+          <td class="label" data-i18n="summary_discount">ส่วนลด</td>
           <td class="value">
             <input id="sumDiscount" type="text" value="0.00">
           </td>
         </tr>
         <tr>
-          <td class="label">ภาษีมูลค่าเพิ่ม 7.00%</td>
+          <td class="label" data-i18n="summary_vat">ภาษีมูลค่าเพิ่ม 7.00%</td>
           <td class="value">
             <input id="sumVat" type="text" value="0.00" readonly>
           </td>
         </tr>
         <tr>
-          <td class="label">หัก มัดจำ/อื่น ๆ</td>
+          <td class="label" data-i18n="summary_deposit">หัก มัดจำ/อื่น ๆ</td>
           <td class="value">
             <input id="sumDeposit" type="text" value="0.00">
           </td>
         </tr>
         <tr>
-          <td class="label"><strong>ยอดคงเหลือ</strong></td>
+          <td class="label"><strong data-i18n="summary_grand">ยอดคงเหลือ</strong></td>
           <td class="value">
             <input id="sumGrand" type="text" value="0.00" readonly>
           </td>
@@ -434,26 +483,28 @@
   <!-- FOOTER -->
   <div class="footer-block">
     <div class="footer-left">
-      <p>กรุณาเซ็นยืนยันการสั่งซื้อด้านล่างนี้</p>
-      <p>Please sign below purchasing confirmation.</p>
+      <p data-i18n="sign_please_th">กรุณาเซ็นยืนยันการสั่งซื้อด้านล่างนี้</p>
+      <p data-i18n="sign_please_en">Please sign below purchasing confirmation.</p>
 
       <div class="footer-sign-row">
         <div class="sign-box">
           <div class="sign-line"></div>
           ( <span id="buyerName" contenteditable="true"></span> )<br>
-          ผู้สั่งซื้อ
+          <span data-i18n="label_buyer">ผู้สั่งซื้อ</span>
         </div>
         <div class="sign-box">
           <div class="sign-line"></div>
           ( พัฒน์นรี โพธิราช )<br>
-          ผู้จัดทำเอกสาร / Prepared by
+          <span data-i18n="label_prepared_by">ผู้จัดทำเอกสาร / Prepared by</span>
         </div>
       </div>
     </div>
     <div class="footer-right">
-      <div>ขอแสดงความนับถือ<br>JP Medical So Supply</div>
+      <div data-i18n="respectfully">
+        ขอแสดงความนับถือ<br>JP Medical So Supply
+      </div>
       <img src="./ORCODE%20OFFice.png" alt="Line QR">
-      <div class="footer-note">
+      <div class="footer-note" data-i18n="footer_note">
         สแกน QR เพื่อแอดไลน์ / ติดต่อสอบถาม
       </div>
     </div>
@@ -462,27 +513,143 @@
   <div id="status" class="status-text">
     กำลังดึงข้อมูลสินค้า จาก Google Sheet…
   </div>
+
+  <div class="page-number"></div>
 </div>
+
+<!-- หน้าสำหรับพิมพ์หลายหน้า -->
+<div id="printContainer"></div>
 
 <!-- datalist สำหรับค้นหาสินค้า -->
 <datalist id="productList"></datalist>
 
 <script>
+  // ===== CONFIG =====
   const PRODUCT_SHEET_ID = "1U4d5PqBMQ1GfTahwvbvzDFQrEikT5sYCOwZIx8FabMI";
   const PRODUCT_GID = "942187814";
   const PRODUCT_URL =
     `https://docs.google.com/spreadsheets/d/${PRODUCT_SHEET_ID}/gviz/tq?tqx=out:json&gid=${PRODUCT_GID}`;
-  const RECEIPT_URL = "./Receipt%20Form.html";
-  const STORAGE_KEY = "JP_LAST_QUOTATION";
-  const VAT_RATE = 0.07; // 7%
+
+  const MAX_ROWS = 30;   // จำนวนแถวที่กรอกได้บนฟอร์ม
+  const PAGE_SIZE = 10;  // 10 รายการต่อหน้าเวลาพิมพ์
+  const VAT_RATE = 0.07;
 
   let products = [];
+  let currentLang = "th";
 
+  // ===== I18N =====
+  const I18N = {
+    th: {
+      btn_back_ky9: "← หน้าเอกสาร (ขย.9)",
+      btn_print: "พิมพ์ / PDF",
+      title_quotation: "QUOTATION",
+      subtitle_quotation: "ใบเสนอราคา",
+      label_branch: "สาขา:",
+      branch_ssk: "สำนักงานใหญ่ (ศรีสะเกษ)",
+      branch_chon: "สาขา ชลบุรี",
+      box_customer: "เรียน (Customer)",
+      label_customer_name: "ชื่อผู้รับ:",
+      label_org: "ชื่อหน่วยงาน / ร้าน:",
+      label_address: "ที่อยู่:",
+      label_tel: "โทร:",
+      box_quote_detail: "รายละเอียดใบเสนอราคา",
+      label_quote_no: "เลขที่ใบเสนอราคา:",
+      label_quote_date: "วันที่:",
+      label_valid_until: "ราคาใช้ได้ถึงวันที่:",
+      label_contact: "ผู้ติดต่อ:",
+      label_contact_tel: "เบอร์โทร:",
+      th_no: "ลำดับ",
+      th_itemcode: "Item Code",
+      th_desc: "รายละเอียดสินค้า",
+      th_qty: "จำนวน",
+      th_unit: "หน่วย",
+      th_price: "ราคา/หน่วย",
+      th_amount: "จำนวนเงิน",
+      summary_amount_words: "จำนวนเงิน (ตัวอักษร):",
+      vat_toggle_label: "คิดภาษีมูลค่าเพิ่ม 7%",
+      summary_subtotal: "รวมเป็นเงิน",
+      summary_discount: "ส่วนลด",
+      summary_vat: "ภาษีมูลค่าเพิ่ม 7.00%",
+      summary_deposit: "หัก มัดจำ/อื่น ๆ",
+      summary_grand: "ยอดคงเหลือ",
+      sign_please_th: "กรุณาเซ็นยืนยันการสั่งซื้อด้านล่างนี้",
+      sign_please_en: "Please sign below purchasing confirmation.",
+      label_buyer: "ผู้สั่งซื้อ",
+      label_prepared_by: "ผู้จัดทำเอกสาร / Prepared by",
+      respectfully: "ขอแสดงความนับถือ<br>JP Medical So Supply",
+      footer_note: "สแกน QR เพื่อแอดไลน์ / ติดต่อสอบถาม",
+      page_prefix: "หน้า "
+    },
+    en: {
+      btn_back_ky9: "← KY9 Document",
+      btn_print: "Print / PDF",
+      title_quotation: "QUOTATION",
+      subtitle_quotation: "Quotation",
+      label_branch: "Branch:",
+      branch_ssk: "Head Office (Sisaket)",
+      branch_chon: "Chonburi Branch",
+      box_customer: "To (Customer)",
+      label_customer_name: "Attention:",
+      label_org: "Company / Shop:",
+      label_address: "Address:",
+      label_tel: "Tel:",
+      box_quote_detail: "Quotation Details",
+      label_quote_no: "Quotation No.:",
+      label_quote_date: "Date:",
+      label_valid_until: "Valid until:",
+      label_contact: "Contact person:",
+      label_contact_tel: "Phone:",
+      th_no: "No.",
+      th_itemcode: "Item Code",
+      th_desc: "Description",
+      th_qty: "Qty",
+      th_unit: "Unit",
+      th_price: "Unit price",
+      th_amount: "Amount",
+      summary_amount_words: "Amount in words:",
+      vat_toggle_label: "Apply VAT 7%",
+      summary_subtotal: "Sub total",
+      summary_discount: "Discount",
+      summary_vat: "VAT 7.00%",
+      summary_deposit: "Deposit / Others",
+      summary_grand: "Total due",
+      sign_please_th: "Please sign below purchasing confirmation.",
+      sign_please_en: "",
+      label_buyer: "Buyer",
+      label_prepared_by: "Prepared by",
+      respectfully: "Yours faithfully<br>JP Medical So Supply",
+      footer_note: "Scan QR to add Line / Contact us",
+      page_prefix: "Page "
+    }
+  };
+
+  function switchLanguage(lang) {
+    currentLang = lang;
+    const dict = I18N[lang] || I18N.th;
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+      const key = el.getAttribute("data-i18n");
+      if (dict[key] !== undefined) {
+        // บางตัวมี HTML เช่น <br>
+        if (key === "respectfully") {
+          el.innerHTML = dict[key];
+        } else {
+          el.textContent = dict[key];
+        }
+      }
+    });
+    document.querySelectorAll(".btn-lang").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.lang === lang);
+    });
+    localStorage.setItem("JP_QUO_LANG", lang);
+  }
+
+  // ===== INITIAL UI BUILD =====
   function buildItemRows() {
     const tbody = document.getElementById("itemBody");
     tbody.innerHTML = "";
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < MAX_ROWS; i++) {
       const tr = document.createElement("tr");
+      tr.setAttribute("data-row", i);
       tr.innerHTML = `
         <td class="number-cell">
           <input class="cell-input center" id="idx_${i}" type="text" value="${i+1}">
@@ -511,6 +678,7 @@
     }
   }
 
+  // ===== BRANCH INFO =====
   function updateBranchInfo() {
     const val = document.getElementById("branchSelect").value;
     const el = document.getElementById("branchInfo");
@@ -528,6 +696,7 @@
     }
   }
 
+  // ===== QUOTE META AUTO FILL =====
   function initQuoteMeta() {
     let seq = parseInt(localStorage.getItem("JP_QUO_SEQ") || "0", 10);
     seq++;
@@ -540,7 +709,7 @@
     function fmt(d) {
       const dd = String(d.getDate()).padStart(2,"0");
       const mm = String(d.getMonth()+1).padStart(2,"0");
-      const yy = d.getFullYear()+543;
+      const yy = d.getFullYear()+543; // พ.ศ.
       return `${dd}/${mm}/${yy}`;
     }
 
@@ -551,6 +720,7 @@
     document.getElementById("contactTel").value = "090-413-7894, 090-967-4207";
   }
 
+  // ===== FETCH PRODUCTS FROM SHEET =====
   async function loadProducts() {
     const status = document.getElementById("status");
     try {
@@ -591,8 +761,9 @@
     });
   }
 
+  // ===== ROW HANDLERS =====
   function attachRowEvents() {
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < MAX_ROWS; i++) {
       const desc  = document.getElementById(`desc_${i}`);
       const code  = document.getElementById(`code_${i}`);
       const qty   = document.getElementById(`qty_${i}`);
@@ -654,6 +825,7 @@
       amt ? amt.toFixed(2) : "";
   }
 
+  // ===== TOTALS & THAI TEXT =====
   function parseMoney(str) {
     const n = parseFloat((str || "0").toString().replace(/,/g,""));
     return isNaN(n) ? 0 : n;
@@ -661,16 +833,17 @@
 
   function recalcTotals() {
     let sub = 0;
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < MAX_ROWS; i++) {
       const amt = parseMoney(document.getElementById(`amount_${i}`).value);
       sub += amt;
     }
 
     const discount = parseMoney(document.getElementById("sumDiscount").value);
     const deposit  = parseMoney(document.getElementById("sumDeposit").value);
+    const useVat   = document.getElementById("chkVat")?.checked ?? true;
 
     const afterDiscount = sub - discount;
-    const vat = afterDiscount * VAT_RATE;
+    const vat = useVat ? afterDiscount * VAT_RATE : 0;
     const grand = afterDiscount + vat - deposit;
 
     document.getElementById("sumSubTotal").value = sub.toFixed(2);
@@ -729,93 +902,116 @@
     return text;
   }
 
-  // === บันทึกข้อมูลไป localStorage เพื่อใช้ใน Receipt Form ===
-  function saveQuotationToStorage() {
-    const data = {
-      timestamp: Date.now(),
-      branchCode: document.getElementById("branchSelect").value,
-      customer: {
-        name:  document.getElementById("custName").value || "",
-        org:   document.getElementById("custOrg").value || "",
-        addr:  document.getElementById("custAddr").value || "",
-        tel:   document.getElementById("custTel").value || ""
-      },
-      meta: {
-        quoteNo:     document.getElementById("quoteNo").value || "",
-        quoteDate:   document.getElementById("quoteDate").value || "",
-        validUntil:  document.getElementById("validUntil").value || "",
-        contactName: document.getElementById("contactName").value || "",
-        contactTel:  document.getElementById("contactTel").value || ""
-      },
-      totals: {
-        subTotal:  document.getElementById("sumSubTotal").value || "",
-        discount:  document.getElementById("sumDiscount").value || "",
-        deposit:   document.getElementById("sumDeposit").value || "",
-        vat:       document.getElementById("sumVat").value || "",
-        grand:     document.getElementById("sumGrand").value || "",
-        words:     document.getElementById("amountWords").textContent || ""
-      },
-      items: []
-    };
+  // ===== MULTI-PAGE PRINT =====
+  function syncInputAttributes() {
+    // ให้ clone แล้วมี value ตามที่กรอก
+    document.querySelectorAll("#editPage input").forEach(inp => {
+      inp.setAttribute("value", inp.value);
+    });
+  }
 
-    for (let i = 0; i < 10; i++) {
-      const item = {
-        idx:    document.getElementById(`idx_${i}`).value || "",
-        code:   document.getElementById(`code_${i}`).value || "",
-        desc:   document.getElementById(`desc_${i}`).value || "",
-        qty:    document.getElementById(`qty_${i}`).value || "",
-        unit:   document.getElementById(`unit_${i}`).value || "",
-        price:  document.getElementById(`price_${i}`).value || "",
-        amount: document.getElementById(`amount_${i}`).value || ""
-      };
-      const hasData = item.code || item.desc || item.qty || item.amount;
-      if (hasData) data.items.push(item);
+  function buildPrintPages() {
+    recalcTotals();            // คำนวณตัวเลขล่าสุด
+    syncInputAttributes();     // sync value -> attribute
+
+    const printContainer = document.getElementById("printContainer");
+    printContainer.innerHTML = "";
+
+    const editPage = document.getElementById("editPage");
+    if (!editPage) return;
+
+    // หา row สุดท้ายที่มีข้อมูลจริง
+    let lastRow = -1;
+    for (let i = 0; i < MAX_ROWS; i++) {
+      const code = (document.getElementById(`code_${i}`).value || "").trim();
+      const desc = (document.getElementById(`desc_${i}`).value || "").trim();
+      const amt  = (document.getElementById(`amount_${i}`).value || "").trim();
+      if (code || desc || amt) lastRow = i;
     }
+    if (lastRow < 0) lastRow = 0;
 
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    } catch (e) {
-      console.error("Save quotation failed:", e);
+    const totalItems = lastRow + 1;
+    const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+    const dict = I18N[currentLang] || I18N.th;
+    const pagePrefix = dict.page_prefix || "";
+
+    for (let p = 0; p < totalPages; p++) {
+      const clone = editPage.cloneNode(true);
+      clone.id = "";
+      clone.classList.add("print-page");
+
+      // ซ่อนแถวที่ไม่อยู่ในหน้านี้
+      const tbody = clone.querySelector("#itemBody");
+      const rows = tbody.querySelectorAll("tr");
+      rows.forEach((tr, idx) => {
+        const start = p * PAGE_SIZE;
+        const end   = start + PAGE_SIZE;
+        if (idx < start || idx >= end) {
+          tr.style.display = "none";
+        }
+      });
+
+      // ใส่เลขหน้า
+      const pn = clone.querySelector(".page-number");
+      if (pn) {
+        pn.textContent = `${pagePrefix}${p+1}/${totalPages}`;
+      }
+
+      printContainer.appendChild(clone);
     }
   }
 
+  function cleanupPrintPages() {
+    document.getElementById("printContainer").innerHTML = "";
+  }
+
+  // ===== INIT =====
   document.addEventListener("DOMContentLoaded", () => {
     buildItemRows();
     attachRowEvents();
     updateBranchInfo();
     initQuoteMeta();
-    loadProducts().then(recalcTotals);
+    loadProducts().then(() => {
+      recalcTotals();
+    });
 
     document.getElementById("branchSelect")
       .addEventListener("change", updateBranchInfo);
 
-    // ปุ่มไปหน้า Receipt Form
-    const btnToReceipt = document.getElementById("btnToReceipt");
-    if (btnToReceipt) {
-      btnToReceipt.addEventListener("click", (ev) => {
-        ev.preventDefault();
-        saveQuotationToStorage();
-        window.location.href = RECEIPT_URL;
+    // language
+    const savedLang = localStorage.getItem("JP_QUO_LANG") || "th";
+    switchLanguage(savedLang);
+    document.querySelectorAll(".btn-lang").forEach(btn => {
+      btn.addEventListener("click", () => {
+        switchLanguage(btn.dataset.lang);
       });
+    });
+
+    // VAT toggle
+    const chkVat = document.getElementById("chkVat");
+    if (chkVat) {
+      chkVat.addEventListener("change", recalcTotals);
     }
 
-    // === AUTO FILL ผู้สั่งซื้อจาก "ชื่อผู้รับ" แต่ยังแก้เองได้ ===
+    // AUTO FILL ผู้สั่งซื้อจาก "ชื่อผู้รับ" แต่แก้เองได้
     let buyerEdited = false;
     const custNameInput = document.getElementById("custName");
     const buyerSpan = document.getElementById("buyerName");
 
     if (custNameInput && buyerSpan) {
-      // พิมพ์/แก้ไขที่ "ชื่อผู้รับ"
       custNameInput.addEventListener("input", () => {
         if (buyerEdited && buyerSpan.textContent.trim() !== "") return;
         buyerSpan.textContent = custNameInput.value;
       });
 
-      // ถ้ามีการพิมพ์แก้ที่ช่องผู้สั่งซื้อเอง
       buyerSpan.addEventListener("input", () => {
         buyerEdited = buyerSpan.textContent.trim() !== "";
       });
     }
+
+    // multi-page print hooks
+    window.addEventListener("beforeprint", buildPrintPages);
+    window.addEventListener("afterprint", cleanupPrintPages);
   });
 </script>
 </body>
