@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <title>Quotation · JP Pharmacy</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    /* ใช้สไตล์เหมือน po.html ย่อได้ */
+    body{font-family:"TH SarabunPSK",system-ui,sans-serif;margin:0;padding:8px;background:#f5f5f5;}
+    .page{max-width:900px;margin:0 auto;background:#fff;padding:16px 22px 24px;box-shadow:0 2px 6px rgba(0,0,0,.08);}
+    .top-buttons{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;margin-bottom:8px;}
+    .btn{padding:4px 12px;border-radius:20px;border:none;background:#0ea5e9;color:#fff;cursor:pointer;font-size:.9rem;}
+    .btn-secondary{background:#6b7280;}
+    h1{text-align:center;margin:4px 0 2px;font-size:1.6rem;}
+    h2{text-align:center;margin:0 0 12px;font-size:1.1rem;font-weight:400;}
+    .row{display:flex;justify-content:space-between;gap:16px;font-size:.9rem;margin-bottom:6px;}
+    .block{flex:1;border:1px solid #ddd;border-radius:8px;padding:6px 10px;}
+    .block-title{font-weight:bold;margin-bottom:4px;}
+    .editable{border-bottom:1px dotted #666;min-width:80px;display:inline-block;padding:0 2px;}
+    table{width:100%;border-collapse:collapse;font-size:.9rem;margin-top:10px;}
+    th,td{border:1px solid #444;padding:3px 5px;vertical-align:top;}
+    th{background:#e0f2fe;text-align:center;}
+    tfoot td{border:none;padding-top:8px;}
+    .text-right{text-align:right;}
+    .signature-row{display:flex;justify-content:flex-end;gap:24px;margin-top:18px;font-size:.9rem;}
+    .signature-box{text-align:center;}
+    @media print{body{background:#fff;padding:0}.page{box-shadow:none;margin:0}.top-buttons{display:none}@page{size:A4 portrait;margin:10mm}}
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <div class="top-buttons">
+    <a href="./ky9.html"><button class="btn btn-secondary">← กลับหน้าเอกสาร</button></a>
+    <button class="btn" onclick="window.print()">🖨 พิมพ์ / PDF</button>
+  </div>
+
+  <h1>QUOTATION</h1>
+  <h2>ใบเสนอราคา · JP Pharmacy</h2>
+
+  <div class="row">
+    <div class="block">
+      <div class="block-title">เรียน (To)</div>
+      ชื่อลูกค้า: <span class="editable" contenteditable="true">..............................</span><br>
+      ที่อยู่: <span class="editable" contenteditable="true">............................................................</span><br>
+      โทร: <span class="editable" contenteditable="true">.......................</span>
+    </div>
+    <div class="block">
+      <div class="block-title">รายละเอียดใบเสนอราคา</div>
+      เลขที่ใบเสนอราคา: <span class="editable" contenteditable="true">QT-......</span><br>
+      วันที่: <span class="editable" contenteditable="true">.... / .... / ....</span><br>
+      ผู้ติดต่อ: <span class="editable" contenteditable="true">เภสัชกร</span><br>
+      โทร: <span class="editable" contenteditable="true">098-444-1614</span>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:40px;">ลำดับ</th>
+        <th>รายละเอียดสินค้า / บริการ</th>
+        <th style="width:70px;">จำนวน</th>
+        <th style="width:70px;">หน่วย</th>
+        <th style="width:80px;">ราคา/หน่วย</th>
+        <th style="width:90px;">จำนวนเงิน</th>
+      </tr>
+    </thead>
+    <tbody id="qtBody"></tbody>
+    <tfoot>
+      <tr>
+        <td colspan="5" class="text-right">รวมเป็นเงิน (Subtotal)</td>
+        <td contenteditable="true"></td>
+      </tr>
+      <tr>
+        <td colspan="5" class="text-right">ส่วนลด (Discount)</td>
+        <td contenteditable="true"></td>
+      </tr>
+      <tr>
+        <td colspan="5" class="text-right">ภาษีมูลค่าเพิ่ม (VAT)</td>
+        <td contenteditable="true"></td>
+      </tr>
+      <tr>
+        <td colspan="5" class="text-right">รวมสุทธิ (Total)</td>
+        <td contenteditable="true"></td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <div class="signature-row">
+    <div class="signature-box">
+      ลงชื่อ <span class="editable" contenteditable="true">................................</span><br>
+      ผู้เสนอราคา / QUOTED BY<br>
+      วันที่ <span class="editable" contenteditable="true">.... / .... / ....</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const qtBody = document.getElementById("qtBody");
+for (let i = 1; i <= 8; i++) {
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
+    <td class="text-right">${i}</td>
+    <td contenteditable="true"></td>
+    <td contenteditable="true"></td>
+    <td contenteditable="true"></td>
+    <td contenteditable="true"></td>
+    <td contenteditable="true"></td>
+  `;
+  qtBody.appendChild(tr);
+}
+</script>
+</body>
+</html>
