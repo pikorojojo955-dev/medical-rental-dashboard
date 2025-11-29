@@ -391,7 +391,8 @@
       <button type="button" class="btn-lang" data-lang="en">EN</button>
     </div>
 
-    <a href="./Receipt%20Form.html" class="btn btn-receipt">
+    <!-- เพิ่ม id="btnReceipt" ตรงนี้อย่างเดียว -->
+    <a href="./Receipt%20Form.html" id="btnReceipt" class="btn btn-receipt">
       🧾 <span data-i18n="btn_receipt">ใบเสร็จรับเงิน</span>
     </a>
 
@@ -411,7 +412,7 @@
       <div><strong>ร้านอุปกรณ์การแพทย์ JP Medical So Supply</strong></div>
       <div id="branchInfo" class="branch-line"></div>
       <div class="branch-select-row">
-        <label for="branchSelect" data-i18n="label_branch">สาขา:</label>
+        <label for="branchSelect" data-i18n="label_branch">สาข:</label>
         <select id="branchSelect">
           <option value="ssk" data-i18n="branch_ssk">สำนักงานใหญ่ (ศรีสะเกษ)</option>
           <option value="chon" data-i18n="branch_chon">สาขา ชลบุรี</option>
@@ -572,6 +573,9 @@
   const MAX_ROWS = 30;   // จำนวนแถวให้กรอก
   const PAGE_SIZE = 10;  // 10 รายการต่อหน้าพิมพ์
   const VAT_RATE = 0.07;
+
+  // KEY สำหรับแชร์ข้อมูลไปใบเสร็จ
+  const STORAGE_KEY = "JP_LAST_QUOTATION";
 
   let products = [];
   let currentLang = "th";
@@ -972,6 +976,54 @@
     return text;
   }
 
+  // ===== บันทึกข้อมูลไป localStorage สำหรับใบเสร็จ =====
+  function saveQuotationToStorage() {
+    const branchCode = document.getElementById("branchSelect").value;
+
+    const customer = {
+      name: document.getElementById("custName").value || "",
+      org : document.getElementById("custOrg").value  || "",
+      addr: document.getElementById("custAddr").value || "",
+      tel : document.getElementById("custTel").value  || ""
+    };
+
+    const meta = {
+      quoteNo   : document.getElementById("quoteNo").value   || "",
+      quoteDate : document.getElementById("quoteDate").value || "",
+      validUntil: document.getElementById("validUntil").value || "",
+      contactName: document.getElementById("contactName").value || "",
+      contactTel : document.getElementById("contactTel").value  || ""
+    };
+
+    const items = [];
+    for (let i = 0; i < MAX_ROWS; i++) {
+      const code = (document.getElementById(`code_${i}`).value || "").trim();
+      const desc = (document.getElementById(`desc_${i}`).value || "").trim();
+      const amt  = (document.getElementById(`amount_${i}`).value || "").trim();
+      const qty  = (document.getElementById(`qty_${i}`).value || "").trim();
+      const unit = (document.getElementById(`unit_${i}`).value || "").trim();
+      const price= (document.getElementById(`price_${i}`).value || "").trim();
+
+      if (!code && !desc && !amt) continue;
+
+      items.push({
+        idx   : document.getElementById(`idx_${i}`).value || (i+1),
+        code, desc, qty, unit, price, amount: amt
+      });
+    }
+
+    const totals = {
+      subTotal: document.getElementById("sumSubTotal").value || "0.00",
+      discount: document.getElementById("sumDiscount").value || "0.00",
+      deposit : document.getElementById("sumDeposit").value  || "0.00",
+      grand   : document.getElementById("sumGrand").value    || "0.00",
+      words   : document.getElementById("amountWords").textContent || ""
+    };
+
+    const payload = { branchCode, customer, meta, items, totals };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+  }
+
   // ===== MULTI-PAGE PRINT =====
   function syncInputAttributes() {
     document.querySelectorAll("#editPage input").forEach(inp => {
@@ -1075,8 +1127,18 @@
     // multi-page print hooks
     window.addEventListener("beforeprint", buildPrintPages);
     window.addEventListener("afterprint", cleanupPrintPages);
+
+    // ปุ่มไปใบเสร็จ: เซฟข้อมูลล่าสุดแล้วค่อยเปิดหน้า Receipt
+    const btnReceipt = document.getElementById("btnReceipt");
+    if (btnReceipt) {
+      btnReceipt.addEventListener("click", (e) => {
+        e.preventDefault();
+        recalcTotals();
+        saveQuotationToStorage();
+        window.location.href = "./Receipt%20Form.html";
+      });
+    }
   });
 </script>
 </body>
 </html>
-
