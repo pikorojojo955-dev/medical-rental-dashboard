@@ -204,6 +204,15 @@
     .cell-input.number { text-align:right; }
     .cell-input.center { text-align:center; }
 
+    /* บล็อกข้อความรายละเอียดสินค้า ใช้เฉพาะตอน print (multi-line 2 บรรทัด) */
+    .desc-print {
+      display:none;             /* บนจอไม่ให้เห็น */
+      white-space:normal;
+      line-height:1.1;
+      max-height:2.4em;        /* ~ 2 บรรทัด */
+      overflow:hidden;         /* เกิน 2 บรรทัดจะถูกตัด */
+    }
+
     /* summary block */
     .summary-row {
       display:flex;
@@ -340,6 +349,31 @@
       /* ซ่อน placeholder เวลา print / PDF */
       input::placeholder {
         color: transparent;
+      }
+
+      /* ตอนพิมพ์: ซ่อน input รายละเอียดสินค้า แล้วโชว์ข้อความ desc-print */
+      input[id^="desc_"] {
+        display:none;
+      }
+      .desc-print {
+        display:block;
+      }
+
+      /* ===== ให้เส้น “แถว” ในตารางรายการหาย เหลือแต่เส้นคอลัมน์ ===== */
+      .table-wrapper table thead th {
+        border-top:1px solid #000;
+        border-bottom:1px solid #000;   /* เส้นใต้หัวตาราง */
+        border-left:1px solid #000;
+        border-right:1px solid #000;
+      }
+      .table-wrapper table tbody td {
+        border-top:none;
+        border-bottom:none;
+        border-left:1px solid #000;
+        border-right:1px solid #000;
+      }
+      .table-wrapper table tbody tr:last-child td {
+        border-bottom:1px solid #000;   /* ปิดเส้นล่างสุดของตาราง */
       }
     }
   </style>
@@ -550,7 +584,7 @@
       btn_receipt: "ใบเสร็จรับเงิน",
       title_quotation: "QUOTATION",
       subtitle_quotation: "ใบเสนอราคา",
-      label_branch: "สาขา:",
+      label_branch: "สาข:",
       branch_ssk: "สำนักงานใหญ่ (ศรีสะเกษ)",
       branch_chon: "สาขา ชลบุรี",
       box_customer: "เรียน (Customer)",
@@ -666,6 +700,7 @@
         <td class="desc-cell">
           <input class="cell-input" id="desc_${i}" list="productList"
                  placeholder="พิมพ์หมวด / ชื่อสินค้า / รหัสสินค้า เพื่อค้นหา">
+          <div class="desc-print" id="desc_print_${i}"></div>
         </td>
         <td class="qty-cell">
           <input class="cell-input center" id="qty_${i}" type="text">
@@ -776,7 +811,8 @@
       const qty   = document.getElementById(`qty_${i}`);
       const price = document.getElementById(`price_${i}`);
 
-      desc.addEventListener("change", () => handleDescSelect(i));
+      desc.addEventListener("change", () => { handleDescSelect(i); syncDescPrint(i); });
+      desc.addEventListener("input",  () => { syncDescPrint(i); });
       code.addEventListener("change", () => handleCodeInput(i));
 
       qty.addEventListener("input", () => { updateRowAmount(i); recalcTotals(); });
@@ -785,6 +821,19 @@
 
     document.getElementById("sumDiscount").addEventListener("input", recalcTotals);
     document.getElementById("sumDeposit").addEventListener("input", recalcTotals);
+  }
+
+  function syncDescPrint(row) {
+    const src = document.getElementById(`desc_${row}`);
+    const dst = document.getElementById(`desc_print_${row}`);
+    if (!src || !dst) return;
+    dst.textContent = src.value;
+  }
+
+  function syncAllDescPrint() {
+    for (let i = 0; i < MAX_ROWS; i++) {
+      syncDescPrint(i);
+    }
   }
 
   function findProductByCode(code) {
@@ -821,6 +870,7 @@
     const qtyInput = document.getElementById(`qty_${row}`);
     if (!qtyInput.value) qtyInput.value = "1";
 
+    syncDescPrint(row);
     updateRowAmount(row);
     recalcTotals();
   }
@@ -931,6 +981,7 @@
 
   function buildPrintPages() {
     recalcTotals();
+    syncAllDescPrint();
     syncInputAttributes();
 
     const printContainer = document.getElementById("printContainer");
