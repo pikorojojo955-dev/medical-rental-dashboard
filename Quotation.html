@@ -743,7 +743,8 @@
           productName: c[1]?.v ?? "",
           category: c[2]?.v ?? "",
           unit: c[3]?.v ?? "",
-          cost: Number(c[5]?.v ?? 0)
+          cost: Number(c[5]?.v ?? 0),   // ราคาทุน (เก็บไว้เผื่อใช้)
+          price: Number(c[6]?.v ?? 0)   // ราคาขายจาก column G
         };
       }).filter(p => p.itemCode || p.productName);
 
@@ -813,8 +814,9 @@
     document.getElementById(`code_${row}`).value = p.itemCode || "";
     document.getElementById(`desc_${row}`).value = p.productName || "";
     document.getElementById(`unit_${row}`).value = p.unit || "";
+    // ใช้ราคาขาย (price) จากคอลัมน์ G
     document.getElementById(`price_${row}`).value =
-      p.cost ? formatMoney(p.cost) : "";
+      p.price ? formatMoney(p.price) : "";
 
     const qtyInput = document.getElementById(`qty_${row}`);
     if (!qtyInput.value) qtyInput.value = "1";
@@ -1026,4 +1028,3 @@
 </script>
 </body>
 </html>
-
