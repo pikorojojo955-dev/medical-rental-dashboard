@@ -185,11 +185,8 @@
       color:#fff;
     }
     .number-cell { text-align:center; width:40px; }
-
-    /* ปรับความกว้างคอลัมน์ */
-    .itemcode-cell { width:90px; }   /* แคบลง ~4 ตัวอักษร */
-    .desc-cell     { width:360px; }  /* กว้างขึ้น */
-
+    .itemcode-cell { width:130px; }
+    .desc-cell   { width:320px; }
     .qty-cell    { width:70px;  text-align:center; }
     .unit-cell   { width:80px;  text-align:center; }
     .price-cell  { width:110px; text-align:right; }
@@ -206,21 +203,6 @@
     }
     .cell-input.number { text-align:right; }
     .cell-input.center { text-align:center; }
-
-    /* textarea สำหรับรายละเอียดสินค้า (สูงสุด ~2 บรรทัด) */
-    .cell-textarea {
-      width:100%;
-      border:none;
-      font-family:inherit;
-      font-size:0.95rem;
-      padding:0 2px;
-      box-sizing:border-box;
-      outline:none;
-      resize:none;
-      line-height:1.2rem;
-      height:2.4rem;      /* ประมาณ 2 บรรทัด */
-      overflow:hidden;    /* ถ้าเกิน 2 บรรทัดจะถูกซ่อน */
-    }
 
     /* summary block */
     .summary-row {
@@ -355,7 +337,10 @@
       .print-page:last-child { page-break-after:auto; }
       @page { size:A4 portrait; margin:5mm; }
 
-      input::placeholder { color: transparent; }
+      /* ซ่อน placeholder เวลา print / PDF */
+      input::placeholder {
+        color: transparent;
+      }
     }
   </style>
 </head>
@@ -679,8 +664,8 @@
           <input class="cell-input" id="code_${i}" type="text">
         </td>
         <td class="desc-cell">
-          <textarea class="cell-textarea" id="desc_${i}"
-            placeholder="พิมพ์หมวด / ชื่อสินค้า / รหัสสินค้า เพื่อค้นหา"></textarea>
+          <input class="cell-input" id="desc_${i}" list="productList"
+                 placeholder="พิมพ์หมวด / ชื่อสินค้า / รหัสสินค้า เพื่อค้นหา">
         </td>
         <td class="qty-cell">
           <input class="cell-input center" id="qty_${i}" type="text">
@@ -758,8 +743,8 @@
           productName: c[1]?.v ?? "",
           category: c[2]?.v ?? "",
           unit: c[3]?.v ?? "",
-          cost: Number(c[5]?.v ?? 0),
-          price: Number(c[6]?.v ?? 0)   // ใช้ราคาขายจาก column G
+          cost: Number(c[5]?.v ?? 0),   // ราคาทุน (เก็บไว้เผื่อใช้)
+          price: Number(c[6]?.v ?? 0)   // ราคาขายจาก column G
         };
       }).filter(p => p.itemCode || p.productName);
 
@@ -829,7 +814,7 @@
     document.getElementById(`code_${row}`).value = p.itemCode || "";
     document.getElementById(`desc_${row}`).value = p.productName || "";
     document.getElementById(`unit_${row}`).value = p.unit || "";
-
+    // ใช้ราคาขาย (price) จากคอลัมน์ G
     document.getElementById(`price_${row}`).value =
       p.price ? formatMoney(p.price) : "";
 
@@ -942,9 +927,6 @@
     document.querySelectorAll("#editPage input").forEach(inp => {
       inp.setAttribute("value", inp.value);
     });
-    document.querySelectorAll("#editPage textarea").forEach(ta => {
-      ta.textContent = ta.value;
-    });
   }
 
   function buildPrintPages() {
@@ -957,6 +939,7 @@
     const editPage = document.getElementById("editPage");
     if (!editPage) return;
 
+    // หา row สุดท้ายที่มีข้อมูลจริง
     let lastRow = -1;
     for (let i = 0; i < MAX_ROWS; i++) {
       const code = (document.getElementById(`code_${i}`).value || "").trim();
@@ -1010,6 +993,7 @@
     document.getElementById("branchSelect")
       .addEventListener("change", updateBranchInfo);
 
+    // language
     const savedLang = localStorage.getItem("JP_QUO_LANG") || "th";
     switchLanguage(savedLang);
     document.querySelectorAll(".btn-lang").forEach(btn => {
@@ -1018,6 +1002,7 @@
       });
     });
 
+    // VAT toggle
     const chkVat = document.getElementById("chkVat");
     if (chkVat) chkVat.addEventListener("change", recalcTotals);
 
@@ -1036,6 +1021,7 @@
       });
     }
 
+    // multi-page print hooks
     window.addEventListener("beforeprint", buildPrintPages);
     window.addEventListener("afterprint", cleanupPrintPages);
   });
