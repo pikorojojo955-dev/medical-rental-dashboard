@@ -50,8 +50,8 @@
       gap:6px;
       box-shadow:0 2px 4px rgba(0,0,0,0.2);
     }
-    .btn-back  { background:#607d8b; }
-    .btn-print { background:#ff9800; }
+    .btn-back   { background:#607d8b; }
+    .btn-print  { background:#ff9800; }
 
     /* language switch */
     .lang-switch {
@@ -73,6 +73,7 @@
       border-color:#00c853;
     }
 
+    /* HEADER */
     .doc-header {
       display:flex;
       align-items:flex-start;
@@ -117,6 +118,7 @@
       padding:2px 6px;
     }
 
+    /* INFO ROWS */
     .info-row {
       display:flex;
       gap:8px;
@@ -163,6 +165,7 @@
       outline:none;
     }
 
+    /* TABLE */
     .table-wrapper {
       margin-top:8px;
       border:1px solid #000;
@@ -184,8 +187,8 @@
       color:#fff;
     }
     .number-cell { text-align:center; width:40px; }
-    .itemcode-cell { width:130px; }
-    .desc-cell   { width:320px; }
+    .itemcode-cell { width:110px; }    /* ขยับมาทางซ้ายเล็กน้อย */
+    .desc-cell   { width:340px; }      /* ให้ช่องรายละเอียดกว้างขึ้น */
     .qty-cell    { width:70px; text-align:center; }
     .unit-cell   { width:80px; text-align:center; }
     .price-cell  { width:110px; text-align:right; }
@@ -207,10 +210,11 @@
     .cell-textarea {
       resize:none;
       line-height:1.15;
-      height:2.3em; /* ~2 บรรทัด */
+      height:2.3em;   /* ประมาณ 2 บรรทัด */
       overflow:hidden;
     }
 
+    /* SUMMARY */
     .summary-row {
       display:flex;
       border-left:1px solid #000;
@@ -225,6 +229,7 @@
       align-items:center;
       justify-content:center;
       font-size:1.2rem;
+      text-align:center;
     }
     .summary-left span[contenteditable] {
       border-bottom:1px dotted #555;
@@ -264,6 +269,7 @@
       margin-bottom:2px;
     }
 
+    /* FOOTER */
     .footer-block {
       border:1px solid #000;
       border-top:none;
@@ -320,16 +326,35 @@
     }
 
     @media print {
-      body { background:#fff; padding:0; }
+      /* ย่อทั้งหน้าให้ไม่ล้นขอบ */
+      body {
+        background:#fff;
+        padding:0;
+        margin:0;
+        zoom:0.96;
+      }
+
       #editPage { display:none; }
       #printContainer { display:block; }
-      .page { box-shadow:none; margin:0; padding:0 5mm 5mm; }
-      .print-page { page-break-after:always; }
-      .print-page:last-child { page-break-after:auto; }
+      .page {
+        box-shadow:none;
+        margin:0;
+        padding:0 5mm 5mm;
+      }
+      .print-page {
+        page-break-after:always;
+      }
+      .print-page:last-child {
+        page-break-after:auto;
+      }
       .top-bar { display:none; }
-      @page { size:A4 portrait; margin:5mm; }
 
-      /* เวลา print: เส้นแนวนอนหาย เหลือแต่เส้นตั้ง */
+      @page {
+        size:A4 portrait;
+        margin:8mm;
+      }
+
+      /* เวลา print: ลบเส้นแนวนอน เหลือเฉพาะเส้นตั้ง */
       table th, table td {
         border-width:0 1px;
       }
@@ -341,14 +366,15 @@
 </head>
 <body>
 
-<!-- หน้าแก้ไขจริง -->
+<!-- หน้าที่ใช้กรอก -->
 <div class="page" id="editPage">
 
   <div class="top-bar">
     <div class="top-left">
-      <a href="./Quotation.html" class="btn btn-back" id="btnBackQuote" data-i18n="btn_back_quo">← ใบเสนอราคา</a>
-      <a href="./ky9.html" class="btn btn-back" id="btnBackKy9" data-i18n="btn_back_ky9">← เอกสาร (ขย.9)</a>
+      <a href="./Quotation.html" class="btn btn-back">← Quotation</a>
+      <a href="./ky9.html" class="btn btn-back">← ขย.9</a>
     </div>
+
     <div class="top-right">
       <div class="lang-switch">
         <button type="button" class="btn-lang" data-lang="th">TH</button>
@@ -358,6 +384,7 @@
     </div>
   </div>
 
+  <!-- HEADER -->
   <div class="doc-header">
     <div class="logo-box">
       <img src="./LOGO.jpg" alt="JP Medical So Supply Logo">
@@ -395,7 +422,7 @@
       </div>
     </div>
     <div class="info-box">
-      <div class="info-title" data-i18n="box_rcpt_detail">รายละเอียดใบเสร็จรับเงิน</div>
+      <div class="info-title" data-i18n="box_receipt_detail">รายละเอียดใบเสร็จรับเงิน</div>
       <div class="meta-grid">
         <label data-i18n="label_rcpt_no">เลขที่ใบเสร็จ:</label>
         <input id="rcptNo" type="text" />
@@ -404,7 +431,7 @@
         <label data-i18n="label_ref_quote">อ้างอิงใบเสนอราคา:</label>
         <input id="refQuoteNo" type="text" />
         <label data-i18n="label_rcpt_grand">ยอดสุทธิ:</label>
-        <input id="rcptGrand" type="text" readonly />
+        <input id="rcptGrand" type="text" />
       </div>
     </div>
   </div>
@@ -414,17 +441,16 @@
     <table>
       <thead>
       <tr>
-        <th class="number-cell" data-i18n="th_no">ลำดับ</th>
+        <th class="number-cell"  data-i18n="th_no">ลำดับ</th>
         <th class="itemcode-cell" data-i18n="th_itemcode">Item Code</th>
-        <th class="desc-cell" data-i18n="th_desc">รายละเอียดสินค้า</th>
-        <th class="qty-cell" data-i18n="th_qty">จำนวน</th>
-        <th class="unit-cell" data-i18n="th_unit">หน่วย</th>
-        <th class="price-cell" data-i18n="th_price">ราคา/หน่วย</th>
-        <th class="amount-cell" data-i18n="th_amount">จำนวนเงิน</th>
+        <th class="desc-cell"     data-i18n="th_desc">รายละเอียดสินค้า</th>
+        <th class="qty-cell"      data-i18n="th_qty">จำนวน</th>
+        <th class="unit-cell"     data-i18n="th_unit">หน่วย</th>
+        <th class="price-cell"    data-i18n="th_price">ราคา/หน่วย</th>
+        <th class="amount-cell"   data-i18n="th_amount">จำนวนเงิน</th>
       </tr>
       </thead>
-      <tbody id="itemBody">
-      </tbody>
+      <tbody id="itemBody"></tbody>
     </table>
   </div>
 
@@ -470,7 +496,7 @@
         <tr>
           <td class="label"><strong data-i18n="summary_grand">ยอดคงเหลือ</strong></td>
           <td class="value">
-            <input id="sumGrand" type="text" value="0.00" readonly>
+            <input id="sumGrand" type="text" value="0.00">
           </td>
         </tr>
       </table>
@@ -480,19 +506,19 @@
   <!-- FOOTER -->
   <div class="footer-block">
     <div class="footer-left">
-      <p data-i18n="sign_received_th">ได้รับสินค้าตามรายการข้างต้นเรียบร้อยแล้ว</p>
-      <p data-i18n="sign_received_en">Received goods as listed above in good condition.</p>
+      <p data-i18n="footer_received_th">ได้รับสินค้าตามรายการข้างต้นเรียบร้อยแล้ว</p>
+      <p data-i18n="footer_received_en">Received goods as listed above in good condition.</p>
 
       <div class="footer-sign-row">
         <div class="sign-box">
           <div class="sign-line"></div>
           ( .................................................. )<br>
-          <span data-i18n="label_receiver">ผู้รับสินค้า / ผู้ชำระเงิน</span>
+          <span data-i18n="footer_buyer">ผู้รับสินค้า / ผู้ชำระเงิน</span>
         </div>
         <div class="sign-box">
           <div class="sign-line"></div>
           ( พัฒน์นรี โพธิรัตน์ )<br>
-          <span data-i18n="label_prepared_by">ผู้จัดทำเอกสาร / Prepared by</span>
+          <span data-i18n="footer_prepared">ผู้จัดทำเอกสาร / Prepared by</span>
         </div>
       </div>
     </div>
@@ -514,22 +540,21 @@
   <div class="page-number"></div>
 </div>
 
-<!-- หน้าสำหรับพิมพ์หลายหน้า -->
+<!-- สำหรับ clone เวลา print หลายหน้า -->
 <div id="printContainer"></div>
 
 <script>
-  const STORAGE_KEY_RECEIPT = "JP_QUO_TO_RECEIPT";
-  const LEGACY_STORAGE_KEY  = "JP_LAST_QUOTATION";
-  const MAX_ROWS = 30;
-  const PAGE_SIZE = 10;
-  const VAT_RATE = 0.07;
+  // ===== CONFIG =====
+  const STORAGE_KEY = "JP_LAST_QUOTATION";
+  const MAX_ROWS   = 30;
+  const PAGE_SIZE  = 10;
+  const VAT_RATE   = 0.07;
 
   let currentLang = "th";
 
+  // ===== I18N =====
   const I18N = {
     th: {
-      btn_back_quo: "← ใบเสนอราคา",
-      btn_back_ky9: "← เอกสาร (ขย.9)",
       btn_print: "พิมพ์ / PDF",
       title_receipt: "RECEIPT",
       subtitle_receipt: "ใบเสร็จรับเงิน",
@@ -541,7 +566,7 @@
       label_org: "ชื่อหน่วยงาน / ร้าน:",
       label_address: "ที่อยู่:",
       label_tel: "โทร:",
-      box_rcpt_detail: "รายละเอียดใบเสร็จรับเงิน",
+      box_receipt_detail: "รายละเอียดใบเสร็จรับเงิน",
       label_rcpt_no: "เลขที่ใบเสร็จ:",
       label_rcpt_date: "วันที่:",
       label_ref_quote: "อ้างอิงใบเสนอราคา:",
@@ -560,36 +585,34 @@
       summary_vat: "ภาษีมูลค่าเพิ่ม 7.00%",
       summary_deposit: "หัก มัดจำ/อื่น ๆ",
       summary_grand: "ยอดคงเหลือ",
-      sign_received_th: "ได้รับสินค้าตามรายการข้างต้นเรียบร้อยแล้ว",
-      sign_received_en: "Received goods as listed above in good condition.",
-      label_receiver: "ผู้รับสินค้า / ผู้ชำระเงิน",
-      label_prepared_by: "ผู้จัดทำเอกสาร / Prepared by",
+      footer_received_th: "ได้รับสินค้าตามรายการข้างต้นเรียบร้อยแล้ว",
+      footer_received_en: "Received goods as listed above in good condition.",
+      footer_buyer: "ผู้รับสินค้า / ผู้ชำระเงิน",
+      footer_prepared: "ผู้จัดทำเอกสาร / Prepared by",
       respectfully: "ขอแสดงความนับถือ<br>JP Medical So Supply",
       footer_note: "สแกน QR เพื่อแอดไลน์ / ติดต่อสอบถาม",
       page_prefix: "หน้า "
     },
     en: {
-      btn_back_quo: "← Quotation",
-      btn_back_ky9: "← KY9 Document",
       btn_print: "Print / PDF",
       title_receipt: "RECEIPT",
       subtitle_receipt: "Receipt",
       label_branch: "Branch:",
       branch_ssk: "Head Office (Sisaket)",
       branch_chon: "Chonburi Branch",
-      box_customer: "Buyer (Customer)",
-      label_customer_name: "Attention:",
+      box_customer: "Customer",
+      label_customer_name: "Customer name:",
       label_org: "Company / Shop:",
       label_address: "Address:",
       label_tel: "Tel:",
-      box_rcpt_detail: "Receipt Details",
+      box_receipt_detail: "Receipt details",
       label_rcpt_no: "Receipt No.:",
       label_rcpt_date: "Date:",
-      label_ref_quote: "Reference quotation:",
+      label_ref_quote: "Ref. Quotation:",
       label_rcpt_grand: "Net amount:",
       th_no: "No.",
       th_itemcode: "Item Code",
-      th_desc: "Description",
+      th_desc: "Product detail",
       th_qty: "Qty",
       th_unit: "Unit",
       th_price: "Unit price",
@@ -601,10 +624,10 @@
       summary_vat: "VAT 7.00%",
       summary_deposit: "Deposit / Others",
       summary_grand: "Total due",
-      sign_received_th: "Received goods as listed above in good condition.",
-      sign_received_en: "",
-      label_receiver: "Receiver / Payer",
-      label_prepared_by: "Prepared by",
+      footer_received_th: "Received goods as listed above in good condition.",
+      footer_received_en: "",
+      footer_buyer: "Receiver / Payer",
+      footer_prepared: "Prepared by",
       respectfully: "Yours faithfully<br>JP Medical So Supply",
       footer_note: "Scan QR to add Line / Contact us",
       page_prefix: "Page "
@@ -630,12 +653,13 @@
     localStorage.setItem("JP_RCPT_LANG", lang);
   }
 
-  function buildItemRows(count = 10) {
+  // ===== ROW BUILD =====
+  function buildItemRows() {
     const tbody = document.getElementById("itemBody");
     tbody.innerHTML = "";
-    const rows = Math.min(MAX_ROWS, Math.max(10, count));
-    for (let i = 0; i < rows; i++) {
+    for (let i = 0; i < MAX_ROWS; i++) {
       const tr = document.createElement("tr");
+      tr.setAttribute("data-row", i);
       tr.innerHTML = `
         <td class="number-cell">
           <input class="cell-input center" id="idx_${i}" type="text" value="${i+1}">
@@ -644,7 +668,7 @@
           <input class="cell-input" id="code_${i}" type="text">
         </td>
         <td class="desc-cell">
-          <textarea class="cell-input cell-textarea" id="desc_${i}" rows="2"></textarea>
+          <textarea class="cell-input cell-textarea" id="desc_${i}"></textarea>
         </td>
         <td class="qty-cell">
           <input class="cell-input center" id="qty_${i}" type="text">
@@ -663,6 +687,7 @@
     }
   }
 
+  // ===== BRANCH INFO =====
   function updateBranchInfo() {
     const val = document.getElementById("branchSelect").value;
     const el  = document.getElementById("branchInfo");
@@ -680,11 +705,26 @@
     }
   }
 
+  // ===== MONEY UTIL =====
+  function parseMoney(str) {
+    const n = parseFloat((str || "0").toString().replace(/,/g,""));
+    return isNaN(n) ? 0 : n;
+  }
+
+  function formatMoney(num) {
+    const n = isNaN(num) || num === null ? 0 : Number(num);
+    return n.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
   function numberToThaiBahtText(amount) {
     amount = parseFloat(amount);
     if (isNaN(amount) || amount === 0) return "ศูนย์บาทถ้วน";
     const thNum  = ["ศูนย์","หนึ่ง","สอง","สาม","สี่","ห้า","หก","เจ็ด","แปด","เก้า"];
     const thUnit = ["","สิบ","ร้อย","พัน","หมื่น","แสน","ล้าน"];
+
     function readNumber(numStr) {
       numStr = numStr.replace(/^0+/,"");
       if (numStr === "") return "";
@@ -713,6 +753,7 @@
       }
       return result;
     }
+
     const fixed = amount.toFixed(2);
     const [bahtStr, satangStr] = fixed.split(".");
     let text = "";
@@ -724,25 +765,17 @@
     return text;
   }
 
-  function parseMoney(str) {
-    const n = parseFloat((str || "0").toString().replace(/,/g,""));
-    return isNaN(n) ? 0 : n;
-  }
-
-  function formatMoney(num) {
-    const n = isNaN(num) || num === null ? 0 : Number(num);
-    return n.toLocaleString("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    });
-  }
-
   function recalcTotals() {
-    const sub      = parseMoney(document.getElementById("sumSubTotal").value);
+    // รวมจาก amount ทุกแถว
+    let sub = 0;
+    for (let i = 0; i < MAX_ROWS; i++) {
+      const amt = parseMoney(document.getElementById(`amount_${i}`).value);
+      sub += amt;
+    }
+
     const discount = parseMoney(document.getElementById("sumDiscount").value);
     const deposit  = parseMoney(document.getElementById("sumDeposit").value);
-    const chkVat   = document.getElementById("chkVat");
-    const useVat   = chkVat ? !!chkVat.checked : true;
+    const useVat   = document.getElementById("chkVat")?.checked ?? true;
 
     const afterDiscount = sub - discount;
     const vat = useVat ? afterDiscount * VAT_RATE : 0;
@@ -756,12 +789,33 @@
       numberToThaiBahtText(grand);
   }
 
-  function importFromQuotation() {
+  function attachRowEvents() {
+    for (let i = 0; i < MAX_ROWS; i++) {
+      const qty   = document.getElementById(`qty_${i}`);
+      const price = document.getElementById(`price_${i}`);
+      const amount= document.getElementById(`amount_${i}`);
+
+      function updateAmount() {
+        const q = parseMoney(qty.value);
+        const p = parseMoney(price.value);
+        if (!isNaN(q) && !isNaN(p)) {
+          amount.value = formatMoney(q * p);
+        }
+        recalcTotals();
+      }
+
+      qty.addEventListener("input", updateAmount);
+      price.addEventListener("input", updateAmount);
+      amount.addEventListener("input", recalcTotals);
+    }
+  }
+
+  // ===== LOAD FROM QUOTATION =====
+  function loadFromQuotation() {
     const status = document.getElementById("status");
-    let raw = localStorage.getItem(STORAGE_KEY_RECEIPT);
-    if (!raw) raw = localStorage.getItem(LEGACY_STORAGE_KEY);
+    const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      status.textContent = "ไม่พบข้อมูลใบเสนอราคาที่จะโอนมา (สามารถกรอกเองได้)";
+      status.textContent = "ไม่พบข้อมูลใบเสนอราคาล่าสุด (สามารถกรอกเองได้)";
       return;
     }
 
@@ -770,33 +824,26 @@
       data = JSON.parse(raw);
     } catch (e) {
       console.error(e);
-      status.textContent = "อ่านข้อมูลใบเสนอราคาไม่สำเร็จ (รูปแบบข้อมูลไม่ถูกต้อง)";
+      status.textContent = "อ่านข้อมูลใบเสนอราคาไม่สำเร็จ";
       return;
     }
 
-    const setVal = (id, val) => {
-      if (val === undefined || val === null) return;
-      const el = document.getElementById(id);
-      if (el) el.value = val;
-    };
+    // branch
+    if (data.branchCode) {
+      const sel = document.getElementById("branchSelect");
+      sel.value = data.branchCode;
+    }
+    updateBranchInfo();
 
-    if (data.lang) switchLanguage(data.lang);
-
-    const branchSel = document.getElementById("branchSelect");
-    if (branchSel) {
-      if (data.branch) branchSel.value = data.branch;
-      else if (data.branchCode) branchSel.value = data.branchCode;
-      updateBranchInfo();
+    // customer
+    if (data.customer) {
+      document.getElementById("rcptCustName").value = data.customer.name || "";
+      document.getElementById("rcptCustOrg").value  = data.customer.org  || "";
+      document.getElementById("rcptCustAddr").value = data.customer.addr || "";
+      document.getElementById("rcptCustTel").value  = data.customer.tel  || "";
     }
 
-    const cust = data.customer || data.customerInfo || null;
-    if (cust) {
-      setVal("rcptCustName", cust.name);
-      setVal("rcptCustOrg",  cust.org);
-      setVal("rcptCustAddr", cust.addr);
-      setVal("rcptCustTel",  cust.tel);
-    }
-
+    // meta
     const today = new Date();
     const dd = String(today.getDate()).padStart(2,"0");
     const mm = String(today.getMonth()+1).padStart(2,"0");
@@ -808,82 +855,56 @@
     localStorage.setItem("JP_RCPT_SEQ", String(seq).padStart(4,"0"));
     const seqStr = String(seq).padStart(4,"0");
 
-    setVal("rcptNo", `RC-${seqStr}`);
-    setVal("rcptDate", fmtToday);
+    document.getElementById("rcptNo").value   = `RC-${seqStr}`;
+    document.getElementById("rcptDate").value = fmtToday;
+    document.getElementById("refQuoteNo").value =
+      (data.meta && data.meta.quoteNo) ? data.meta.quoteNo : "";
 
-    let quoteNo = "";
-    if (data.quote && data.quote.no) quoteNo = data.quote.no;
-    else if (data.meta && data.meta.quoteNo) quoteNo = data.meta.quoteNo;
-    setVal("refQuoteNo", quoteNo);
+    // items
+    const items = data.items || [];
+    const needRows = Math.max(10, items.length);
+    if (needRows > MAX_ROWS) {
+      console.warn("จำนวน item เกิน MAX_ROWS ที่ตั้งไว้");
+    }
+    for (let i = 0; i < items.length && i < MAX_ROWS; i++) {
+      const item = items[i];
+      document.getElementById(`idx_${i}`).value    = item.idx    || (i+1);
+      document.getElementById(`code_${i}`).value   = item.code   || "";
+      document.getElementById(`desc_${i}`).value   = item.desc   || "";
+      document.getElementById(`qty_${i}`).value    = item.qty    || "";
+      document.getElementById(`unit_${i}`).value   = item.unit   || "";
+      document.getElementById(`price_${i}`).value  = item.price  || "";
+      document.getElementById(`amount_${i}`).value = item.amount || "";
+    }
 
-    const rowsNew = data.rows || [];
-    const rowsOld = data.items || [];
-    const rowsArr = rowsNew.length ? rowsNew : rowsOld;
-
-    buildItemRows(rowsArr.length);
-
-    rowsArr.forEach((row, i) => {
-      if (i >= MAX_ROWS) return;
-      const idx  = row.index ?? row.idx ?? (i+1);
-      const code = row.code   || "";
-      const desc = row.desc   || "";
-      const qty  = row.qty    || "";
-      const unit = row.unit   || "";
-      const price = row.price || "";
-      const amt   = row.amount|| "";
-
-      setVal(`idx_${i}`,   idx);
-      setVal(`code_${i}`,  code);
-      const descEl = document.getElementById(`desc_${i}`);
-      if (descEl) descEl.value = desc;
-      setVal(`qty_${i}`,   qty);
-      setVal(`unit_${i}`,  unit);
-      setVal(`price_${i}`, price);
-      setVal(`amount_${i}`, amt);
-    });
-
-    const totals = data.totals || {};
-    const sub      = totals.sub      ?? totals.subTotal ?? 0;
-    const discount = totals.discount ?? 0;
-    const vat      = totals.vat      ?? 0;
-    const deposit  = totals.deposit  ?? 0;
-    const grand    = totals.grand    ?? (sub - discount + vat - deposit);
-
-    setVal("sumSubTotal", formatMoney(sub));
-    setVal("sumDiscount", formatMoney(discount));
-    setVal("sumVat",      formatMoney(vat));
-    setVal("sumDeposit",  formatMoney(deposit));
-    setVal("sumGrand",    formatMoney(grand));
-    setVal("rcptGrand",   formatMoney(grand));
-
-    const words = data.amountWords || totals.words || numberToThaiBahtText(grand);
-    const wordsEl = document.getElementById("amountWords");
-    if (wordsEl) wordsEl.textContent = words;
-
-    const chkVat = document.getElementById("chkVat");
-    if (chkVat) {
-      if (typeof data.vatChecked === "boolean") chkVat.checked = data.vatChecked;
-      else chkVat.checked = true;
+    // totals (ถ้ามี)
+    if (data.totals) {
+      document.getElementById("sumSubTotal").value = data.totals.subTotal || "0.00";
+      document.getElementById("sumDiscount").value = data.totals.discount || "0.00";
+      document.getElementById("sumDeposit").value  = data.totals.deposit  || "0.00";
+      document.getElementById("sumGrand").value    = data.totals.grand    || "0.00";
+      document.getElementById("rcptGrand").value   = data.totals.grand    || "0.00";
+      document.getElementById("amountWords").textContent =
+        data.totals.words || numberToThaiBahtText(parseMoney(data.totals.grand || "0"));
     }
 
     recalcTotals();
-    status.textContent = "ดึงข้อมูลจากใบเสนอราคาล่าสุดเรียบร้อย (สามารถแก้ไขเพิ่มเติมได้)";
+    status.textContent = "ดึงข้อมูลจากใบเสนอราคาล่าสุดมาแสดงแล้ว (แก้ไขเพิ่มเติมได้)";
   }
 
-  /* ---- ส่วนจัดหน้าเวลาพิมพ์ ---- */
-
-  function syncFormForPrint() {
-    document.querySelectorAll("#editPage input").forEach(inp => {
+  // ===== MULTI PAGE PRINT =====
+  function syncInputAttributes() {
+    document.querySelectorAll("#editPage input, #editPage textarea").forEach(inp => {
       inp.setAttribute("value", inp.value);
-    });
-    document.querySelectorAll("#editPage textarea").forEach(ta => {
-      ta.textContent = ta.value;
+      if (inp.tagName.toLowerCase() === "textarea") {
+        inp.innerHTML = inp.value;
+      }
     });
   }
 
   function buildPrintPages() {
     recalcTotals();
-    syncFormForPrint();
+    syncInputAttributes();
 
     const printContainer = document.getElementById("printContainer");
     printContainer.innerHTML = "";
@@ -891,15 +912,14 @@
     const editPage = document.getElementById("editPage");
     if (!editPage) return;
 
-    // หาแถวสุดท้ายที่มีข้อมูลจริง
-    const allRows = document.querySelectorAll("#itemBody tr");
+    // หาแถวสุดท้ายที่มีข้อมูล
     let lastRow = -1;
-    allRows.forEach((tr, i) => {
-      const code = (document.getElementById(`code_${i}`)?.value || "").trim();
-      const desc = (document.getElementById(`desc_${i}`)?.value || "").trim();
-      const amt  = (document.getElementById(`amount_${i}`)?.value || "").trim();
+    for (let i = 0; i < MAX_ROWS; i++) {
+      const code = (document.getElementById(`code_${i}`).value || "").trim();
+      const desc = (document.getElementById(`desc_${i}`).value || "").trim();
+      const amt  = (document.getElementById(`amount_${i}`).value || "").trim();
       if (code || desc || amt) lastRow = i;
-    });
+    }
     if (lastRow < 0) lastRow = 0;
 
     const totalItems = lastRow + 1;
@@ -927,10 +947,6 @@
         pn.textContent = `${pagePrefix}${p+1}/${totalPages}`;
       }
 
-      // ซ่อน status ในหน้า print
-      const st = clone.querySelector("#status");
-      if (st) st.style.display = "none";
-
       printContainer.appendChild(clone);
     }
   }
@@ -939,18 +955,17 @@
     document.getElementById("printContainer").innerHTML = "";
   }
 
+  // ===== INIT =====
   document.addEventListener("DOMContentLoaded", () => {
     buildItemRows();
+    attachRowEvents();
+
+    // branch
     document.getElementById("branchSelect")
       .addEventListener("change", updateBranchInfo);
     updateBranchInfo();
 
-    document.getElementById("sumSubTotal").addEventListener("input", recalcTotals);
-    document.getElementById("sumDiscount").addEventListener("input", recalcTotals);
-    document.getElementById("sumDeposit").addEventListener("input", recalcTotals);
-    const chkVat = document.getElementById("chkVat");
-    if (chkVat) chkVat.addEventListener("change", recalcTotals);
-
+    // language
     const savedLang = localStorage.getItem("JP_RCPT_LANG") || "th";
     switchLanguage(savedLang);
     document.querySelectorAll(".btn-lang").forEach(btn => {
@@ -959,9 +974,17 @@
       });
     });
 
-    importFromQuotation();
-    recalcTotals();
+    // summary events
+    document.getElementById("sumDiscount").addEventListener("input", recalcTotals);
+    document.getElementById("sumDeposit").addEventListener("input", recalcTotals);
+    document.getElementById("sumSubTotal").addEventListener("input", recalcTotals);
+    const chkVat = document.getElementById("chkVat");
+    if (chkVat) chkVat.addEventListener("change", recalcTotals);
 
+    // load from quotation
+    loadFromQuotation();
+
+    // multi-page print hooks
     window.addEventListener("beforeprint", buildPrintPages);
     window.addEventListener("afterprint", cleanupPrintPages);
   });
