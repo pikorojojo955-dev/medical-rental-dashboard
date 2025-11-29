@@ -18,6 +18,7 @@
       padding:12px 18px 24px;
       box-shadow:0 2px 6px rgba(0,0,0,0.08);
     }
+    #printContainer { display:none; }
 
     .top-bar {
       display:flex;
@@ -202,11 +203,11 @@
     .cell-input.center { text-align:center; }
     .cell-input.number { text-align:right; }
 
-    /* ชื่อสินค้าพิมพ์ได้ 2 บรรทัด */
+    /* product name 2 บรรทัด */
     .cell-textarea {
       resize:none;
       line-height:1.15;
-      height:2.3em; /* ประมาณ 2 บรรทัด */
+      height:2.3em; /* ~2 บรรทัด */
       overflow:hidden;
     }
 
@@ -312,24 +313,36 @@
       margin-top:4px;
     }
 
+    .page-number {
+      margin-top:4px;
+      text-align:right;
+      font-size:0.85rem;
+    }
+
     @media print {
       body { background:#fff; padding:0; }
+      #editPage { display:none; }
+      #printContainer { display:block; }
       .page { box-shadow:none; margin:0; padding:0 5mm 5mm; }
+      .print-page { page-break-after:always; }
+      .print-page:last-child { page-break-after:auto; }
       .top-bar { display:none; }
       @page { size:A4 portrait; margin:5mm; }
 
-      /* เวลา print: ให้เส้นแนวนอนหาย เหลือแต่เส้นตั้ง */
+      /* เวลา print: เส้นแนวนอนหาย เหลือแต่เส้นตั้ง */
       table th, table td {
-        border-width:0 1px; /* บน/ล่าง 0, ซ้าย/ขวา 1px */
+        border-width:0 1px;
       }
       table thead th {
-        border-width:1px 1px 1px 1px; /* หัวตารางมีกรอบครบ */
+        border-width:1px 1px 1px 1px;
       }
     }
   </style>
 </head>
 <body>
-<div class="page">
+
+<!-- หน้าแก้ไขจริง -->
+<div class="page" id="editPage">
 
   <div class="top-bar">
     <div class="top-left">
@@ -497,13 +510,18 @@
   <div id="status" class="status-text">
     ถ้ามาจากใบเสนอราคา ระบบจะเติมข้อมูลให้อัตโนมัติ
   </div>
+
+  <div class="page-number"></div>
 </div>
 
+<!-- หน้าสำหรับพิมพ์หลายหน้า -->
+<div id="printContainer"></div>
+
 <script>
-  // ใช้ key เดียวกับ Quotation.html
   const STORAGE_KEY_RECEIPT = "JP_QUO_TO_RECEIPT";
-  const LEGACY_STORAGE_KEY  = "JP_LAST_QUOTATION"; // รองรับโครงเก่า (ถ้ายังมี)
+  const LEGACY_STORAGE_KEY  = "JP_LAST_QUOTATION";
   const MAX_ROWS = 30;
+  const PAGE_SIZE = 10;
   const VAT_RATE = 0.07;
 
   let currentLang = "th";
@@ -547,7 +565,8 @@
       label_receiver: "ผู้รับสินค้า / ผู้ชำระเงิน",
       label_prepared_by: "ผู้จัดทำเอกสาร / Prepared by",
       respectfully: "ขอแสดงความนับถือ<br>JP Medical So Supply",
-      footer_note: "สแกน QR เพื่อแอดไลน์ / ติดต่อสอบถาม"
+      footer_note: "สแกน QR เพื่อแอดไลน์ / ติดต่อสอบถาม",
+      page_prefix: "หน้า "
     },
     en: {
       btn_back_quo: "← Quotation",
@@ -587,7 +606,8 @@
       label_receiver: "Receiver / Payer",
       label_prepared_by: "Prepared by",
       respectfully: "Yours faithfully<br>JP Medical So Supply",
-      footer_note: "Scan QR to add Line / Contact us"
+      footer_note: "Scan QR to add Line / Contact us",
+      page_prefix: "Page "
     }
   };
 
@@ -739,10 +759,7 @@
   function importFromQuotation() {
     const status = document.getElementById("status");
     let raw = localStorage.getItem(STORAGE_KEY_RECEIPT);
-    if (!raw) {
-      // เผื่อกรณีใช้โครงเก่า
-      raw = localStorage.getItem(LEGACY_STORAGE_KEY);
-    }
+    if (!raw) raw = localStorage.getItem(LEGACY_STORAGE_KEY);
     if (!raw) {
       status.textContent = "ไม่พบข้อมูลใบเสนอราคาที่จะโอนมา (สามารถกรอกเองได้)";
       return;
@@ -763,12 +780,8 @@
       if (el) el.value = val;
     };
 
-    // ภาษา
-    if (data.lang && typeof switchLanguage === "function") {
-      switchLanguage(data.lang);
-    }
+    if (data.lang) switchLanguage(data.lang);
 
-    // สาขา
     const branchSel = document.getElementById("branchSelect");
     if (branchSel) {
       if (data.branch) branchSel.value = data.branch;
@@ -776,7 +789,6 @@
       updateBranchInfo();
     }
 
-    // ลูกค้า
     const cust = data.customer || data.customerInfo || null;
     if (cust) {
       setVal("rcptCustName", cust.name);
@@ -785,7 +797,6 @@
       setVal("rcptCustTel",  cust.tel);
     }
 
-    // สร้างเลขที่ใบเสร็จ + วันที่ปัจจุบัน
     const today = new Date();
     const dd = String(today.getDate()).padStart(2,"0");
     const mm = String(today.getMonth()+1).padStart(2,"0");
@@ -800,16 +811,11 @@
     setVal("rcptNo", `RC-${seqStr}`);
     setVal("rcptDate", fmtToday);
 
-    // อ้างอิงใบเสนอราคา
     let quoteNo = "";
-    if (data.quote && data.quote.no) {
-      quoteNo = data.quote.no;
-    } else if (data.meta && data.meta.quoteNo) {
-      quoteNo = data.meta.quoteNo;
-    }
+    if (data.quote && data.quote.no) quoteNo = data.quote.no;
+    else if (data.meta && data.meta.quoteNo) quoteNo = data.meta.quoteNo;
     setVal("refQuoteNo", quoteNo);
 
-    // รายการสินค้า
     const rowsNew = data.rows || [];
     const rowsOld = data.items || [];
     const rowsArr = rowsNew.length ? rowsNew : rowsOld;
@@ -836,7 +842,6 @@
       setVal(`amount_${i}`, amt);
     });
 
-    // ยอดรวม
     const totals = data.totals || {};
     const sub      = totals.sub      ?? totals.subTotal ?? 0;
     const discount = totals.discount ?? 0;
@@ -855,19 +860,83 @@
     const wordsEl = document.getElementById("amountWords");
     if (wordsEl) wordsEl.textContent = words;
 
-    // สถานะ VAT
     const chkVat = document.getElementById("chkVat");
     if (chkVat) {
-      if (typeof data.vatChecked === "boolean") {
-        chkVat.checked = data.vatChecked;
-      } else {
-        chkVat.checked = true;
-      }
+      if (typeof data.vatChecked === "boolean") chkVat.checked = data.vatChecked;
+      else chkVat.checked = true;
     }
 
-    // คำนวณเผื่อ format ใหม่
     recalcTotals();
     status.textContent = "ดึงข้อมูลจากใบเสนอราคาล่าสุดเรียบร้อย (สามารถแก้ไขเพิ่มเติมได้)";
+  }
+
+  /* ---- ส่วนจัดหน้าเวลาพิมพ์ ---- */
+
+  function syncFormForPrint() {
+    document.querySelectorAll("#editPage input").forEach(inp => {
+      inp.setAttribute("value", inp.value);
+    });
+    document.querySelectorAll("#editPage textarea").forEach(ta => {
+      ta.textContent = ta.value;
+    });
+  }
+
+  function buildPrintPages() {
+    recalcTotals();
+    syncFormForPrint();
+
+    const printContainer = document.getElementById("printContainer");
+    printContainer.innerHTML = "";
+
+    const editPage = document.getElementById("editPage");
+    if (!editPage) return;
+
+    // หาแถวสุดท้ายที่มีข้อมูลจริง
+    const allRows = document.querySelectorAll("#itemBody tr");
+    let lastRow = -1;
+    allRows.forEach((tr, i) => {
+      const code = (document.getElementById(`code_${i}`)?.value || "").trim();
+      const desc = (document.getElementById(`desc_${i}`)?.value || "").trim();
+      const amt  = (document.getElementById(`amount_${i}`)?.value || "").trim();
+      if (code || desc || amt) lastRow = i;
+    });
+    if (lastRow < 0) lastRow = 0;
+
+    const totalItems = lastRow + 1;
+    const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+    const dict = I18N[currentLang] || I18N.th;
+    const pagePrefix = dict.page_prefix || "";
+
+    for (let p = 0; p < totalPages; p++) {
+      const clone = editPage.cloneNode(true);
+      clone.id = "";
+      clone.classList.add("print-page");
+
+      const tbody = clone.querySelector("#itemBody");
+      const rows = tbody.querySelectorAll("tr");
+      rows.forEach((tr, idx) => {
+        const start = p * PAGE_SIZE;
+        const end   = start + PAGE_SIZE;
+        if (idx < start || idx >= end) {
+          tr.style.display = "none";
+        }
+      });
+
+      const pn = clone.querySelector(".page-number");
+      if (pn) {
+        pn.textContent = `${pagePrefix}${p+1}/${totalPages}`;
+      }
+
+      // ซ่อน status ในหน้า print
+      const st = clone.querySelector("#status");
+      if (st) st.style.display = "none";
+
+      printContainer.appendChild(clone);
+    }
+  }
+
+  function cleanupPrintPages() {
+    document.getElementById("printContainer").innerHTML = "";
   }
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -882,7 +951,6 @@
     const chkVat = document.getElementById("chkVat");
     if (chkVat) chkVat.addEventListener("change", recalcTotals);
 
-    // language init
     const savedLang = localStorage.getItem("JP_RCPT_LANG") || "th";
     switchLanguage(savedLang);
     document.querySelectorAll(".btn-lang").forEach(btn => {
@@ -893,6 +961,9 @@
 
     importFromQuotation();
     recalcTotals();
+
+    window.addEventListener("beforeprint", buildPrintPages);
+    window.addEventListener("afterprint", cleanupPrintPages);
   });
 </script>
 </body>
