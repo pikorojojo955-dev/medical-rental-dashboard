@@ -44,6 +44,7 @@
     }
     .btn-back    { background:#607d8b; }
     .btn-print   { background:#ff9800; }
+    .btn-receipt { background:#4caf50; }
 
     /* language switch */
     .lang-switch {
@@ -356,6 +357,10 @@
       <button type="button" class="btn-lang" data-lang="en">EN</button>
     </div>
 
+    <a href="./Receipt%20Form.html" class="btn btn-receipt">
+      🧾 <span data-i18n="btn_receipt">ใบเสร็จรับเงิน</span>
+    </a>
+
     <button class="btn btn-print" onclick="window.print()">🖨 <span data-i18n="btn_print">พิมพ์ / PDF</span></button>
   </div>
 
@@ -494,7 +499,7 @@
         </div>
         <div class="sign-box">
           <div class="sign-line"></div>
-          ( พัฒน์นรี โพธิรัตน์ )<br>
+          ( พัฒน์นรี โพธิราช )<br>
           <span data-i18n="label_prepared_by">ผู้จัดทำเอกสาร / Prepared by</span>
         </div>
       </div>
@@ -530,8 +535,8 @@
   const PRODUCT_URL =
     `https://docs.google.com/spreadsheets/d/${PRODUCT_SHEET_ID}/gviz/tq?tqx=out:json&gid=${PRODUCT_GID}`;
 
-  const MAX_ROWS = 30;   // จำนวนแถวที่กรอกได้บนฟอร์ม
-  const PAGE_SIZE = 10;  // 10 รายการต่อหน้าเวลาพิมพ์
+  const MAX_ROWS = 30;   // แถวให้กรอก
+  const PAGE_SIZE = 10;  // 10 รายการต่อหน้าพิมพ์
   const VAT_RATE = 0.07;
 
   let products = [];
@@ -542,6 +547,7 @@
     th: {
       btn_back_ky9: "← หน้าเอกสาร (ขย.9)",
       btn_print: "พิมพ์ / PDF",
+      btn_receipt: "ใบเสร็จรับเงิน",
       title_quotation: "QUOTATION",
       subtitle_quotation: "ใบเสนอราคา",
       label_branch: "สาขา:",
@@ -583,6 +589,7 @@
     en: {
       btn_back_ky9: "← KY9 Document",
       btn_print: "Print / PDF",
+      btn_receipt: "Receipt",
       title_quotation: "QUOTATION",
       subtitle_quotation: "Quotation",
       label_branch: "Branch:",
@@ -629,7 +636,6 @@
     document.querySelectorAll("[data-i18n]").forEach(el => {
       const key = el.getAttribute("data-i18n");
       if (dict[key] !== undefined) {
-        // บางตัวมี HTML เช่น <br>
         if (key === "respectfully") {
           el.innerHTML = dict[key];
         } else {
@@ -797,7 +803,7 @@
   function handleCodeInput(row) {
     const codeInput = document.getElementById(`code_${row}`);
     const code = codeInput.value || "";
-    if (code) fillRowByCode(row, code);
+       if (code) fillRowByCode(row, code);
   }
 
   function fillRowByCode(row, code) {
@@ -904,15 +910,14 @@
 
   // ===== MULTI-PAGE PRINT =====
   function syncInputAttributes() {
-    // ให้ clone แล้วมี value ตามที่กรอก
     document.querySelectorAll("#editPage input").forEach(inp => {
       inp.setAttribute("value", inp.value);
     });
   }
 
   function buildPrintPages() {
-    recalcTotals();            // คำนวณตัวเลขล่าสุด
-    syncInputAttributes();     // sync value -> attribute
+    recalcTotals();
+    syncInputAttributes();
 
     const printContainer = document.getElementById("printContainer");
     printContainer.innerHTML = "";
@@ -940,7 +945,6 @@
       clone.id = "";
       clone.classList.add("print-page");
 
-      // ซ่อนแถวที่ไม่อยู่ในหน้านี้
       const tbody = clone.querySelector("#itemBody");
       const rows = tbody.querySelectorAll("tr");
       rows.forEach((tr, idx) => {
@@ -951,7 +955,6 @@
         }
       });
 
-      // ใส่เลขหน้า
       const pn = clone.querySelector(".page-number");
       if (pn) {
         pn.textContent = `${pagePrefix}${p+1}/${totalPages}`;
@@ -971,9 +974,7 @@
     attachRowEvents();
     updateBranchInfo();
     initQuoteMeta();
-    loadProducts().then(() => {
-      recalcTotals();
-    });
+    loadProducts().then(recalcTotals);
 
     document.getElementById("branchSelect")
       .addEventListener("change", updateBranchInfo);
@@ -989,9 +990,7 @@
 
     // VAT toggle
     const chkVat = document.getElementById("chkVat");
-    if (chkVat) {
-      chkVat.addEventListener("change", recalcTotals);
-    }
+    if (chkVat) chkVat.addEventListener("change", recalcTotals);
 
     // AUTO FILL ผู้สั่งซื้อจาก "ชื่อผู้รับ" แต่แก้เองได้
     let buyerEdited = false;
@@ -1003,7 +1002,6 @@
         if (buyerEdited && buyerSpan.textContent.trim() !== "") return;
         buyerSpan.textContent = custNameInput.value;
       });
-
       buyerSpan.addEventListener("input", () => {
         buyerEdited = buyerSpan.textContent.trim() !== "";
       });
@@ -1016,4 +1014,3 @@
 </script>
 </body>
 </html>
-
