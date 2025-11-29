@@ -499,7 +499,7 @@
         </div>
         <div class="sign-box">
           <div class="sign-line"></div>
-          ( พัฒน์นรี โพธิรัตน์ )<br>
+          ( พัฒน์นรี โพธิราช )<br>
           <span data-i18n="label_prepared_by">ผู้จัดทำเอกสาร / Prepared by</span>
         </div>
       </div>
@@ -535,7 +535,7 @@
   const PRODUCT_URL =
     `https://docs.google.com/spreadsheets/d/${PRODUCT_SHEET_ID}/gviz/tq?tqx=out:json&gid=${PRODUCT_GID}`;
 
-  const MAX_ROWS = 30;   // แถวให้กรอก
+  const MAX_ROWS = 30;   // จำนวนแถวให้กรอก
   const PAGE_SIZE = 10;  // 10 รายการต่อหน้าพิมพ์
   const VAT_RATE = 0.07;
 
@@ -668,16 +668,16 @@
                  placeholder="พิมพ์หมวด / ชื่อสินค้า / รหัสสินค้า เพื่อค้นหา">
         </td>
         <td class="qty-cell">
-          <input class="cell-input center" id="qty_${i}" type="number" min="0" step="1" value="">
+          <input class="cell-input center" id="qty_${i}" type="text">
         </td>
         <td class="unit-cell">
           <input class="cell-input center" id="unit_${i}" type="text">
         </td>
         <td class="price-cell">
-          <input class="cell-input number" id="price_${i}" type="number" step="0.01">
+          <input class="cell-input number" id="price_${i}" type="text">
         </td>
         <td class="amount-cell">
-          <input class="cell-input number" id="amount_${i}" type="number" step="0.01" readonly>
+          <input class="cell-input number" id="amount_${i}" type="text" readonly>
         </td>
       `;
       tbody.appendChild(tr);
@@ -803,7 +803,7 @@
   function handleCodeInput(row) {
     const codeInput = document.getElementById(`code_${row}`);
     const code = codeInput.value || "";
-       if (code) fillRowByCode(row, code);
+    if (code) fillRowByCode(row, code);
   }
 
   function fillRowByCode(row, code) {
@@ -814,7 +814,7 @@
     document.getElementById(`desc_${row}`).value = p.productName || "";
     document.getElementById(`unit_${row}`).value = p.unit || "";
     document.getElementById(`price_${row}`).value =
-      p.cost ? p.cost.toFixed(2) : "";
+      p.cost ? formatMoney(p.cost) : "";
 
     const qtyInput = document.getElementById(`qty_${row}`);
     if (!qtyInput.value) qtyInput.value = "1";
@@ -823,18 +823,30 @@
     recalcTotals();
   }
 
-  function updateRowAmount(row) {
-    const qty   = parseFloat(document.getElementById(`qty_${row}`).value || "0");
-    const price = parseFloat(document.getElementById(`price_${row}`).value || "0");
-    const amt   = qty * price;
-    document.getElementById(`amount_${row}`).value =
-      amt ? amt.toFixed(2) : "";
-  }
-
-  // ===== TOTALS & THAI TEXT =====
+  // ===== MONEY UTIL =====
   function parseMoney(str) {
     const n = parseFloat((str || "0").toString().replace(/,/g,""));
     return isNaN(n) ? 0 : n;
+  }
+
+  function formatMoney(num) {
+    const n = isNaN(num) || num === null ? 0 : Number(num);
+    return n.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  function updateRowAmount(row) {
+    const qtyStr   = document.getElementById(`qty_${row}`).value || "0";
+    const priceStr = document.getElementById(`price_${row}`).value || "0";
+
+    const qty   = parseMoney(qtyStr);
+    const price = parseMoney(priceStr);
+    const amt   = qty * price;
+
+    document.getElementById(`amount_${row}`).value =
+      amt ? formatMoney(amt) : "";
   }
 
   function recalcTotals() {
@@ -852,9 +864,9 @@
     const vat = useVat ? afterDiscount * VAT_RATE : 0;
     const grand = afterDiscount + vat - deposit;
 
-    document.getElementById("sumSubTotal").value = sub.toFixed(2);
-    document.getElementById("sumVat").value       = vat.toFixed(2);
-    document.getElementById("sumGrand").value     = grand.toFixed(2);
+    document.getElementById("sumSubTotal").value = formatMoney(sub);
+    document.getElementById("sumVat").value      = formatMoney(vat);
+    document.getElementById("sumGrand").value    = formatMoney(grand);
 
     document.getElementById("amountWords").textContent =
       numberToThaiBahtText(grand);
@@ -992,7 +1004,7 @@
     const chkVat = document.getElementById("chkVat");
     if (chkVat) chkVat.addEventListener("change", recalcTotals);
 
-    // AUTO FILL ผู้สั่งซื้อจาก "ชื่อผู้รับ" แต่แก้เองได้
+    // AUTO FILL ผู้สั่งซื้อจาก "ชื่อผู้รับ" แต่ยังแก้ไขเองได้
     let buyerEdited = false;
     const custNameInput = document.getElementById("custName");
     const buyerSpan = document.getElementById("buyerName");
@@ -1014,4 +1026,3 @@
 </script>
 </body>
 </html>
-
