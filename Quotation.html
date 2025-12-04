@@ -408,7 +408,7 @@ function buildItemRows(count = MAX_ROWS) {
         <div class="desc-print" id="desc_print_${i}"></div>
       </td>
       <td class="qty-cell">
-        <input class="cell-input center" id="qty_${i}" type="number" min="1" value="1">
+       <input class="cell-input center" id="qty_${i}" type="number" min="0" value="">
       </td>
       <td class="unit-cell">
         <input class="cell-input center" id="unit_${i}">
@@ -745,10 +745,79 @@ function buildPrintPages() {
     printContainer.appendChild(page);
   }
 }
+function buildPrintPages() {
+  recalcTotals();
+  syncAllDescPrint();
+  syncInputAttributes();
+
+  const printContainer = document.getElementById("printContainer");
+  printContainer.innerHTML = "";
+
+  const editPage = document.getElementById("editPage");
+
+  // เก็บเฉพาะแถวที่มีข้อมูลจริง
+  let filledRows = [];
+  for (let i = 0; i < ROW_COUNT; i++) {
+    const desc = document.getElementById(`desc_${i}`).value.trim();
+    const price = document.getElementById(`price_${i}`).value.trim();
+    if (desc || price) {
+      filledRows.push(i);
+    }
+  }
+
+  if (filledRows.length === 0) filledRows = [0]; //อย่างน้อยหน้าเดียว
+
+  const totalPages = Math.ceil(filledRows.length / PAGE_SIZE);
+
+  for (let p = 0; p < totalPages; p++) {
+    const page = editPage.cloneNode(true);
+    page.id = "";
+    page.classList.add("print-page");
+
+    const tbody = page.querySelector("#itemBody");
+    const allRows = [...tbody.querySelectorAll("tr")];
+
+    // ล้างตารางก่อน (ลบ 30 แถวออก)
+    tbody.innerHTML = "";
+
+    // ดึงเฉพาะแถวที่ต้องใช้
+    const start = p * PAGE_SIZE;
+    const end = start + PAGE_SIZE;
+
+    filledRows.slice(start, end).forEach((rowIndex) => {
+      const row = allRows[rowIndex].cloneNode(true);
+      tbody.appendChild(row);
+    });
+
+    // ถ้าแถวน้อยกว่า 10 → เติมแถวว่างให้นิ่ง 10 แถว
+    let existing = tbody.querySelectorAll("tr").length;
+    while (existing < PAGE_SIZE) {
+      const emptyRow = document.createElement("tr");
+      emptyRow.innerHTML = `
+        <td class="number-cell"></td>
+        <td class="itemcode-cell"></td>
+        <td class="desc-cell"></td>
+        <td class="qty-cell"></td>
+        <td class="unit-cell"></td>
+        <td class="price-cell"></td>
+        <td class="amount-cell"></td>
+      `;
+      tbody.appendChild(emptyRow);
+      existing++;
+    }
+
+    // ใส่เลขหน้า
+    const pn = page.querySelector(".page-number");
+    if (pn) pn.textContent = `หน้า ${p + 1}/${totalPages}`;
+
+    printContainer.appendChild(page);
+  }
+}
 
 </script>
 
 </body>
 </html>
+
 
 
