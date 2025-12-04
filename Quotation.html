@@ -388,7 +388,9 @@ const PAGE_SIZE = 10;
 const MAX_ROWS = 30;
 let ROW_COUNT = MAX_ROWS;
 
-/* สร้างแถวสินค้า 30 แถว */
+/* ======================================================
+   สร้างแถวสินค้า (30 แถวสำหรับหน้าแก้ไข)
+====================================================== */
 function buildItemRows(count = MAX_ROWS) {
   ROW_COUNT = count;
   const tbody = document.getElementById("itemBody");
@@ -408,7 +410,7 @@ function buildItemRows(count = MAX_ROWS) {
         <div class="desc-print" id="desc_print_${i}"></div>
       </td>
       <td class="qty-cell">
-       <input class="cell-input center" id="qty_${i}" type="number" min="0" value="">
+        <input class="cell-input center" id="qty_${i}" type="number" min="0" value="">
       </td>
       <td class="unit-cell">
         <input class="cell-input center" id="unit_${i}">
@@ -423,7 +425,10 @@ function buildItemRows(count = MAX_ROWS) {
     tbody.appendChild(tr);
   }
 }
-/* แปลงตัวเลข → บาทเป็นข้อความ */
+
+/* ======================================================
+   Convert number → Thai text
+====================================================== */
 function numberToThaiBahtText(amount) {
   amount = parseFloat(amount);
   if (isNaN(amount) || amount === 0) return "ศูนย์บาทถ้วน";
@@ -432,96 +437,102 @@ function numberToThaiBahtText(amount) {
   const thUnit = ["","สิบ","ร้อย","พัน","หมื่น","แสน","ล้าน"];
 
   function readNumber(numStr) {
-    numStr = numStr.replace(/^0+/,"");
+    numStr = numStr.replace(/^0+/, "");
     if (numStr === "") return "";
 
     if (numStr.length > 6) {
-      const head = numStr.slice(0, numStr.length - 6);
-      const tail = numStr.slice(-6);
-      return readNumber(head) + "ล้าน" + readNumber(tail);
+      return readNumber(numStr.slice(0, -6)) + "ล้าน" + readNumber(numStr.slice(-6));
     }
 
-    let result = "";
-    const digits = numStr.split("").map(d => parseInt(d,10));
+    let text = "";
+    const digits = numStr.split("").map(n => parseInt(n, 10));
     const len = digits.length;
 
     for (let i = 0; i < len; i++) {
       const d = digits[i];
       const pos = len - i - 1;
-      if (d === 0) continue;
 
+      if (d === 0) continue;
       if (pos === 0) {
-        if (d === 1 && len > 1) result += "เอ็ด";
-        else result += thNum[d];
+        text += (d === 1 && len > 1) ? "เอ็ด" : thNum[d];
       } else if (pos === 1) {
-        if (d === 1) result += "สิบ";
-        else if (d === 2) result += "ยี่สิบ";
-        else result += thNum[d] + "สิบ";
+        if (d === 1) text += "สิบ";
+        else if (d === 2) text += "ยี่สิบ";
+        else text += thNum[d] + "สิบ";
       } else {
-        result += thNum[d] + thUnit[pos];
+        text += thNum[d] + thUnit[pos];
       }
     }
-    return result;
+    return text;
   }
 
   const fixed = amount.toFixed(2);
   const [baht, satang] = fixed.split(".");
-  let text = "";
+  let result = "";
 
-  if (parseInt(baht,10) > 0) text += readNumber(baht) + "บาท";
-  if (parseInt(satang,10) === 0) text += "ถ้วน";
-  else text += readNumber(satang) + "สตางค์";
+  if (parseInt(baht,10) > 0) result += readNumber(baht) + "บาท";
+  if (parseInt(satang,10) === 0) result += "ถ้วน";
+  else result += readNumber(satang) + "สตางค์";
 
-  return text;
+  return result;
 }
 
 function parseMoney(str) {
-  const n = parseFloat((str || "0").toString().replace(/,/g,""));
+  const n = parseFloat((str || "0").replace(/,/g, ""));
   return isNaN(n) ? 0 : n;
 }
 
-/* คำนวณยอดรวม */
+/* ======================================================
+   คำนวณยอดรวม
+====================================================== */
 function recalcTotals() {
   let subtotal = 0;
+
   for (let i = 0; i < ROW_COUNT; i++) {
     const qty = parseFloat(document.getElementById(`qty_${i}`).value) || 0;
     const price = parseFloat(document.getElementById(`price_${i}`).value) || 0;
-    const amt = qty * price;
-    document.getElementById(`amount_${i}`).value = amt.toFixed(2);
-    subtotal += amt;
+    const amount = qty * price;
+
+    document.getElementById(`amount_${i}`).value = amount.toFixed(2);
+    subtotal += amount;
   }
 
   document.getElementById("sumSubTotal").value = subtotal.toFixed(2);
-
   const discount = parseMoney(document.getElementById("sumDiscount").value);
   const vat = subtotal * 0.07;
+
   document.getElementById("sumVat").value = vat.toFixed(2);
-
   const grand = subtotal - discount + vat;
-  document.getElementById("sumGrand").value = grand.toFixed(2);
 
-  document.getElementById("amountWords").textContent =
-    numberToThaiBahtText(grand);
+  document.getElementById("sumGrand").value = grand.toFixed(2);
+  document.getElementById("amountWords").textContent = numberToThaiBahtText(grand);
 }
 
-/* sync text สำหรับ print mode */
+/* ======================================================
+   Sync description text for print
+====================================================== */
 function syncDescPrint(row) {
-  const src = document.getElementById(`desc_${row}`);
-  const dst = document.getElementById(`desc_print_${row}`);
-  dst.textContent = src.value || "";
+  document.getElementById(`desc_print_${row}`).textContent =
+    document.getElementById(`desc_${row}`).value || "";
 }
 
 function syncAllDescPrint() {
   for (let i = 0; i < ROW_COUNT; i++) syncDescPrint(i);
 }
 
-/* พิมพ์หลายหน้า */
+/* ======================================================
+   Prepare input value attributes for print
+====================================================== */
 function syncInputAttributes() {
   document.querySelectorAll("#editPage input")
-    .forEach(inp => inp.setAttribute("value", inp.value));
+    .forEach(i => i.setAttribute("value", i.value));
 }
 
+/* ======================================================
+   ⭐⭐⭐  Multi-page print (10 แถว/หน้า) – เวอร์ชันที่ถูกต้องที่สุด
+====================================================== */
 function buildPrintPages() {
+
   recalcTotals();
   syncAllDescPrint();
   syncInputAttributes();
@@ -531,269 +542,47 @@ function buildPrintPages() {
 
   const editPage = document.getElementById("editPage");
 
-  // หาแถวสุดท้ายที่มีข้อมูลจริง
-  let lastRow = -1;
-  for (let i = 0; i < ROW_COUNT; i++) {
-    const d = document.getElementById(`desc_${i}`).value.trim();
-    const a = document.getElementById(`amount_${i}`).value.trim();
-    if (d || a) lastRow = i;
-  }
-  if (lastRow < 0) lastRow = 0;
-
-  const totalItems = lastRow + 1;
-  const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
-
-  for (let p = 0; p < totalPages; p++) {
-    const clone = editPage.cloneNode(true);
-    clone.id = "";
-    clone.classList.add("print-page");
-
-    const tbody = clone.querySelector("#itemBody");
-    const rows = tbody.querySelectorAll("tr");
-
-    const start = p * PAGE_SIZE;
-    const end = start + PAGE_SIZE;
-
-    rows.forEach((tr, idx) => {
-      if (idx < start || idx >= end) tr.style.display = "none";
-    });
-
-    clone.querySelector(".page-number").textContent = `หน้า ${p+1}/${totalPages}`;
-    printContainer.appendChild(clone);
-  }
-}
-
-function cleanupPrintPages() {
-  document.getElementById("printContainer").innerHTML = "";
-}
-
-/* ==========================================
-   Google Sheet Loader (Column G = price)
-   ========================================== */
-
-const SHEET_ID = "1U4d5PqBMQ1GfTahwvbvzDFQrEikT5sYCOwZIx8FabMI";
-const SHEET_NAME = "export-products";
-const SHEET_URL =
-  `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${SHEET_NAME}`;
-
-async function loadProducts() {
-  const res = await fetch(SHEET_URL);
-  const text = await res.text();
-  const json = JSON.parse(text.substring(47, text.length - 2));
-
-  return json.table.rows.map(r => ({
-    code: r.c[0]?.v || "",   // ITEMCODE
-    desc: r.c[1]?.v || "",   // product_name
-    unit: r.c[3]?.v || "",   // unit_desc
-    price: r.c[6]?.v || 0    // ⭐ Column G = ราคาขาย
-  }));
-}
-
-/* เติม datalist */
-async function renderProductList() {
-  const list = document.getElementById("productList");
-  const products = await loadProducts();
-
-  list.innerHTML = products
-    .map(p => `<option value="${p.desc}">(${p.code}) ราคา ${p.price}</option>`)
-    .join("");
-
-  attachAutoFill(products);
-}
-
-/* autofill เมื่อเลือกสินค้า */
-function attachAutoFill(products) {
-  for (let i = 0; i < ROW_COUNT; i++) {
-    const d = document.getElementById(`desc_${i}`);
-
-    d.addEventListener("change", () => {
-      const p = products.find(x => x.desc.trim() === d.value.trim());
-      if (!p) return;
-
-      document.getElementById(`code_${i}`).value = p.code;
-      document.getElementById(`unit_${i}`).value = p.unit;
-      document.getElementById(`price_${i}`).value = p.price;
-      document.getElementById(`amount_${i}`).value = p.price;
-
-      recalcTotals();
-    });
-  }
-}
-
-/* ==========================================
-   STARTUP
-   ========================================== */
-document.addEventListener("DOMContentLoaded", () => {
-  buildItemRows();
-
-  document.getElementById("sumDiscount").addEventListener("input", recalcTotals);
-  renderProductList();
-
-  window.addEventListener("beforeprint", buildPrintPages);
-  window.addEventListener("afterprint", cleanupPrintPages);
-
-  // auto-set date
-  const today = new Date();
-  const dd = String(today.getDate()).padStart(2,"0");
-  const mm = String(today.getMonth()+1).padStart(2,"0");
-  const yy = today.getFullYear() + 543;
-  document.getElementById("qtDate").value = `${dd}/${mm}/${yy}`;
-
-  // running number
-  let seq = parseInt(localStorage.getItem("QT_SEQ") || "0", 10);
-  seq++;
-  localStorage.setItem("QT_SEQ", seq);
-  document.getElementById("qtNo").value =
-    "QT-" + String(seq).padStart(4, "0");
-});
-function buildPrintPages() {
-  recalcTotals();
-  syncAllDescPrint();
-  syncInputAttributes();
-
-  const printContainer = document.getElementById("printContainer");
-  printContainer.innerHTML = "";
-
-  const editPage = document.getElementById("editPage");
-
-  // 1) หาแถวสินค้าที่มีข้อมูลจริง
-  let items = [];
-  for (let i = 0; i < ROW_COUNT; i++) {
-    const desc = document.getElementById(`desc_${i}`).value.trim();
-    const amt  = document.getElementById(`amount_${i}`).value.trim();
-    if (desc || amt) items.push(i);
-  }
-
-  if (items.length === 0) items = [0]; // ทำให้มีหน้าอย่างน้อย 1 หน้า
-
-  const totalPages = Math.ceil(items.length / PAGE_SIZE);
-
-  for (let p = 0; p < totalPages; p++) {
-    // Clone หน้าแม่
-    const page = editPage.cloneNode(true);
-    page.id = "";
-    page.classList.add("print-page");
-
-    const tbody = page.querySelector("#itemBody");
-
-    const start = p * PAGE_SIZE;
-    const end   = start + PAGE_SIZE;
-
-    // 2) ซ่อนทุกแถวก่อน
-    tbody.querySelectorAll("tr").forEach(tr => tr.style.display = "none");
-
-    // 3) แสดงเฉพาะรายการของหน้านี้
-    items.slice(start, end).forEach((rowIndex) => {
-      const tr = tbody.querySelectorAll("tr")[rowIndex];
-      if (tr) tr.style.display = "";
-    });
-
-    // 4) ใส่เลขหน้า
-    const pn = page.querySelector(".page-number");
-    if (pn) pn.textContent = `หน้า ${p + 1}/${totalPages}`;
-
-    printContainer.appendChild(page);
-  }
-}
-function buildPrintPages() {
-  recalcTotals();
-  syncAllDescPrint();
-  syncInputAttributes();
-
-  const printContainer = document.getElementById("printContainer");
-  printContainer.innerHTML = "";
-
-  const editPage = document.getElementById("editPage");
-
-  // 1) รวบรวมเฉพาะแถวที่มีข้อมูลจริง
+  // --------------------------
+  // รวบรวมเฉพาะรายการที่มีข้อมูลจริง
+  // --------------------------
   let filledRows = [];
   for (let i = 0; i < ROW_COUNT; i++) {
     const desc = document.getElementById(`desc_${i}`).value.trim();
-    const amt  = document.getElementById(`amount_${i}`).value.trim();
-    if (desc || amt) filledRows.push(i);
+    const amount = document.getElementById(`amount_${i}`).value.trim();
+    if (desc || amount) filledRows.push(i);
   }
 
-  if (filledRows.length === 0) filledRows = [0]; // ให้มี 1 หน้าเสมอ
+  if (filledRows.length === 0) filledRows = [0];
 
   const totalPages = Math.ceil(filledRows.length / PAGE_SIZE);
 
-  // 2) สร้างแต่ละหน้าแยกกัน
+  // --------------------------
+  // สร้างหน้าแยกตามจำนวนเพจ
+  // --------------------------
   for (let p = 0; p < totalPages; p++) {
     const page = editPage.cloneNode(true);
     page.classList.add("print-page");
     page.id = "";
-
-    const tbody = page.querySelector("#itemBody");
-    const trList = tbody.querySelectorAll("tr");
-
-    // ซ่อนทุกแถวก่อน
-    trList.forEach(tr => tr.style.display = "none");
-
-    // 3) แสดงเฉพาะรายการของหน้าที่ p
-    const start = p * PAGE_SIZE;
-    const end   = start + PAGE_SIZE;
-
-    filledRows.slice(start, end).forEach((rowIndex) => {
-      const tr = trList[rowIndex];
-      if (tr) tr.style.display = "";
-    });
-
-    // 4) อัปเดตเลขหน้า
-    let pn = page.querySelector(".page-number");
-    if (pn) pn.textContent = `หน้า ${p + 1}/${totalPages}`;
-
-    printContainer.appendChild(page);
-  }
-}
-function buildPrintPages() {
-  recalcTotals();
-  syncAllDescPrint();
-  syncInputAttributes();
-
-  const printContainer = document.getElementById("printContainer");
-  printContainer.innerHTML = "";
-
-  const editPage = document.getElementById("editPage");
-
-  // เก็บเฉพาะแถวที่มีข้อมูลจริง
-  let filledRows = [];
-  for (let i = 0; i < ROW_COUNT; i++) {
-    const desc = document.getElementById(`desc_${i}`).value.trim();
-    const price = document.getElementById(`price_${i}`).value.trim();
-    if (desc || price) {
-      filledRows.push(i);
-    }
-  }
-
-  if (filledRows.length === 0) filledRows = [0]; //อย่างน้อยหน้าเดียว
-
-  const totalPages = Math.ceil(filledRows.length / PAGE_SIZE);
-
-  for (let p = 0; p < totalPages; p++) {
-    const page = editPage.cloneNode(true);
-    page.id = "";
-    page.classList.add("print-page");
 
     const tbody = page.querySelector("#itemBody");
     const allRows = [...tbody.querySelectorAll("tr")];
 
-    // ล้างตารางก่อน (ลบ 30 แถวออก)
+    // เคลียร์แถวเดิมออก
     tbody.innerHTML = "";
 
-    // ดึงเฉพาะแถวที่ต้องใช้
+    // กำหนดช่วงรายการ
     const start = p * PAGE_SIZE;
     const end = start + PAGE_SIZE;
 
-    filledRows.slice(start, end).forEach((rowIndex) => {
-      const row = allRows[rowIndex].cloneNode(true);
-      tbody.appendChild(row);
+    // เพิ่มแถวที่ต้องแสดง
+    filledRows.slice(start, end).forEach(idx => {
+      tbody.appendChild(allRows[idx].cloneNode(true));
     });
 
-    // ถ้าแถวน้อยกว่า 10 → เติมแถวว่างให้นิ่ง 10 แถว
-    let existing = tbody.querySelectorAll("tr").length;
-    while (existing < PAGE_SIZE) {
-      const emptyRow = document.createElement("tr");
-      emptyRow.innerHTML = `
+    // เติมแถวว่างให้ครบ 10 แถว
+    while (tbody.querySelectorAll("tr").length < PAGE_SIZE) {
+      const empty = document.createElement("tr");
+      empty.innerHTML = `
         <td class="number-cell"></td>
         <td class="itemcode-cell"></td>
         <td class="desc-cell"></td>
@@ -802,11 +591,10 @@ function buildPrintPages() {
         <td class="price-cell"></td>
         <td class="amount-cell"></td>
       `;
-      tbody.appendChild(emptyRow);
-      existing++;
+      tbody.appendChild(empty);
     }
 
-    // ใส่เลขหน้า
+    // อัปเดตเลขหน้า
     const pn = page.querySelector(".page-number");
     if (pn) pn.textContent = `หน้า ${p + 1}/${totalPages}`;
 
@@ -814,10 +602,45 @@ function buildPrintPages() {
   }
 }
 
+/* ======================================================
+   เคลียร์หลังพิมพ์
+====================================================== */
+function cleanupPrintPages() {
+  document.getElementById("printContainer").innerHTML = "";
+}
+
+/* ======================================================
+   START
+====================================================== */
+document.addEventListener("DOMContentLoaded", () => {
+
+  buildItemRows();
+
+  // summary calc
+  document.getElementById("sumDiscount").addEventListener("input", recalcTotals);
+
+  // setup date
+  const t = new Date();
+  document.getElementById("qtDate").value =
+    `${String(t.getDate()).padStart(2,"0")}/${String(t.getMonth()+1).padStart(2,"0")}/${t.getFullYear() + 543}`;
+
+  // running QT number
+  let seq = parseInt(localStorage.getItem("QT_SEQ") || "0", 10);
+  seq++;
+  localStorage.setItem("QT_SEQ", seq);
+  document.getElementById("qtNo").value = "QT-" + String(seq).padStart(4, "0");
+
+  window.addEventListener("beforeprint", buildPrintPages);
+  window.addEventListener("afterprint", cleanupPrintPages);
+});
+
+</script>
+
 </script>
 
 </body>
 </html>
+
 
 
 
