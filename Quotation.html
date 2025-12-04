@@ -236,6 +236,14 @@
     page-break-after: auto;
   }
 }
+@media print {
+  .print-page {
+    page-break-after: always;
+  }
+  .print-page:last-child {
+    page-break-after: auto;
+  }
+}
 
   </style>
 </head>
@@ -687,9 +695,60 @@ function buildPrintPages() {
     printContainer.appendChild(page);
   }
 }
+function buildPrintPages() {
+  recalcTotals();
+  syncAllDescPrint();
+  syncInputAttributes();
+
+  const printContainer = document.getElementById("printContainer");
+  printContainer.innerHTML = "";
+
+  const editPage = document.getElementById("editPage");
+
+  // 1) รวบรวมเฉพาะแถวที่มีข้อมูลจริง
+  let filledRows = [];
+  for (let i = 0; i < ROW_COUNT; i++) {
+    const desc = document.getElementById(`desc_${i}`).value.trim();
+    const amt  = document.getElementById(`amount_${i}`).value.trim();
+    if (desc || amt) filledRows.push(i);
+  }
+
+  if (filledRows.length === 0) filledRows = [0]; // ให้มี 1 หน้าเสมอ
+
+  const totalPages = Math.ceil(filledRows.length / PAGE_SIZE);
+
+  // 2) สร้างแต่ละหน้าแยกกัน
+  for (let p = 0; p < totalPages; p++) {
+    const page = editPage.cloneNode(true);
+    page.classList.add("print-page");
+    page.id = "";
+
+    const tbody = page.querySelector("#itemBody");
+    const trList = tbody.querySelectorAll("tr");
+
+    // ซ่อนทุกแถวก่อน
+    trList.forEach(tr => tr.style.display = "none");
+
+    // 3) แสดงเฉพาะรายการของหน้าที่ p
+    const start = p * PAGE_SIZE;
+    const end   = start + PAGE_SIZE;
+
+    filledRows.slice(start, end).forEach((rowIndex) => {
+      const tr = trList[rowIndex];
+      if (tr) tr.style.display = "";
+    });
+
+    // 4) อัปเดตเลขหน้า
+    let pn = page.querySelector(".page-number");
+    if (pn) pn.textContent = `หน้า ${p + 1}/${totalPages}`;
+
+    printContainer.appendChild(page);
+  }
+}
 
 </script>
 
 </body>
 </html>
+
 
