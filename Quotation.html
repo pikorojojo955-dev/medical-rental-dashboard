@@ -440,4 +440,87 @@ document.addEventListener("DOMContentLoaded",()=>{
 </html>
 คุณพัฒน์นรี
 090-413-7894, 090-967-4207
+/* =============================
+   AUTO DATE + TIME + CONTACT
+   AUTO RUN QUOTATION NUMBER
+   AUTO ACCOUNT CODE
+   SAVE TO LOCAL STORAGE
+============================= */
+
+function autoInitAll() {
+
+  // === 1) วันที่อัตโนมัติ ===
+  const today = new Date();
+  const valid = new Date(today.getTime() + 30 * 86400000);
+
+  function fmt(d) {
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const yy = d.getFullYear() + 543;
+    return `${dd}/${mm}/${yy}`;
+  }
+
+  document.getElementById("quoteDate").value = fmt(today);
+  document.getElementById("validUntil").value = fmt(valid);
+
+  // === 2) เวลาอัตโนมัติ ===
+  const hh = String(today.getHours()).padStart(2, "0");
+  const mn = String(today.getMinutes()).padStart(2, "0");
+  document.getElementById("quoteTime")?.value = `${hh}:${mn}`;
+
+  // === 3) ชื่อผู้ติดต่ออัตโนมัติ ===
+  if (!localStorage.getItem("JP_CONTACT_NAME")) {
+    localStorage.setItem("JP_CONTACT_NAME", "คุณพัฒน์นรี");
+    localStorage.setItem("JP_CONTACT_TEL", "090-413-7894");
+  }
+  document.getElementById("contactName").value =
+    localStorage.getItem("JP_CONTACT_NAME");
+  document.getElementById("contactTel").value =
+    localStorage.getItem("JP_CONTACT_TEL");
+
+  // === 4) ระบบเลขที่ใบเสนอราคาอัตโนมัติ ===
+  let seq = parseInt(localStorage.getItem("JP_QUO_RUN") || "0", 10);
+  seq++;
+  localStorage.setItem("JP_QUO_RUN", seq);
+
+  const running = String(seq).padStart(4, "0");
+  document.getElementById("quoteNo").value = `QT-${running}`;
+
+  // === 5) ระบบบัญชี — ใส่รหัสอัตโนมัติในช่อง (ตัวอย่าง) ===
+  const accMap = {
+    sumSubTotal: "411101",   // รายได้จากการขาย
+    sumVat: "219201",        // เจ้าหนี้ภาษีซื้อ/ขาย
+    sumDiscount: "512001",   // ส่วนลดจ่าย
+    sumDeposit: "212001",    // เงินรับล่วงหน้า
+    sumGrand: "111201"       // เงินสด / เงินเช้า
+  };
+
+  Object.keys(accMap).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.setAttribute("data-account", accMap[id]);
+  });
+
+  // === 6) บันทึกหน้าใบเสนอราคาไว้ เพื่อไปใบเสร็จ ===
+  window.saveQuotationToStorage = function () {
+    const payload = {
+      quoteNo: document.getElementById("quoteNo").value,
+      date: document.getElementById("quoteDate").value,
+      time: document.getElementById("quoteTime")?.value || "",
+      validUntil: document.getElementById("validUntil").value,
+      customer: {
+        name: document.getElementById("custName").value,
+        org: document.getElementById("custOrg").value,
+        addr: document.getElementById("custAddr").value,
+        tel: document.getElementById("custTel").value
+      }
+    };
+    localStorage.setItem("JP_QUOTATION_DATA", JSON.stringify(payload));
+  };
+
+}
+
+// === เรียกทันทีเมื่อหน้าโหลด ===
+document.addEventListener("DOMContentLoaded", autoInitAll);
+
+
 
