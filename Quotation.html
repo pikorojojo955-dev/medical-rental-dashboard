@@ -1058,7 +1058,28 @@
     const pagePrefix = dict.page_prefix || "";
 
     for (let p = 0; p < totalPages; p++) {
-      const clone = editPage.cloneNode(true);
+      // --- FIX: Sync branch selection before printing ---
+const selectedBranch = document.getElementById("branchSelect").value;
+const cloneBranchSelect = clone.querySelector("#branchSelect");
+if (cloneBranchSelect) {
+    cloneBranchSelect.value = selectedBranch;
+}
+
+// อัปเดตข้อความที่อยู่สาขาใน clone ด้วย
+const cloneBranchInfo = clone.querySelector("#branchInfo");
+
+if (selectedBranch === "chon") {
+    cloneBranchInfo.textContent =
+        "ร้านอุปกรณ์การแพทย์ เจพี เมดิคอล โซ ซัพพลาย (สาขาชลบุรี)\n" +
+        "เลขที่ 51/49 ถนนสุขุมวิท หมู่ 4 ตำบลบ้านสวน อำเภอเมือง จังหวัดชลบุรี 20000\n" +
+        "โทร 090-413-7894, 090-967-4207";
+} else {
+    cloneBranchInfo.textContent =
+        "ร้านอุปกรณ์การแพทย์ เจพี เมดิคอล โซ ซัพพลาย (สำนักงานใหญ่)\n" +
+        "เลขที่ 871/1 ถนนอุบล ตำบลเมืองใต้ อำเภอเมือง จังหวัดศรีสะเกษ 33000\n" +
+        "โทร 090-413-7894, 090-967-4207";
+}
+
       clone.id = "";
       clone.classList.add("print-page");
 
@@ -1142,3 +1163,4 @@
 </script>
 </body>
 </html>
+
